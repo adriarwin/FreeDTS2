@@ -77,9 +77,8 @@ else { // run parallel tempering simulations
         std::cout<<"---> error: unknow type for "<<AbstractParallelReplicaRun::GetBaseDefaultReadName()<<"\n";
         exit(0);
     }
+}
 #endif
-
-
 }
 Job::~Job() {
     
