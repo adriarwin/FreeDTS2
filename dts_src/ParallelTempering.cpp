@@ -48,6 +48,7 @@ bool ParallelTempering::Initialize(ParallelReplicaData PRD){
 }
 bool ParallelTempering::Run() {
 
+    //Comparison of number of threads asked for (m_Bins) and number of threads available
 #ifdef _OPENMP
     omp_set_num_threads(m_Bins);
     
@@ -69,7 +70,7 @@ bool ParallelTempering::Run() {
    // T_state.GetVisualization() = new WritevtuFiles(&T_state, period, foldername);
    // 
     
-    T_state.GetSimulation()->do_Simulation();
+        T_state.GetSimulation()->do_Simulation();
 
 #endif
     

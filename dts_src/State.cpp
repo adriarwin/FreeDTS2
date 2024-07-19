@@ -789,7 +789,7 @@ while (input >> firstword) {
         }
         else if(firstword == "ParallelReplica")
         {
-            // ParallelReplica = Parallel_Tempering  rate  minbeta    maxbeta
+            // ParallelReplica = Parallel_Tempering  rate bins minbeta  maxbeta
             std::string type;
             input>>str>>type;
             getline(input,rest);

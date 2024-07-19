@@ -38,22 +38,29 @@ Job::Job(const std::vector<std::string> &argument) {
     }
 #ifndef _OPENMP
     // Perform a normal simulation on a single CPU if OpenMP is not enabled
+    std::cout<<"OpenMP has not been detected. Running simulation on single CPU"<<std::endl;
+
     State T_state(argument);
     T_state.Initialize();
     T_state.GetSimulation()->do_Simulation();
     
 #else
 //---> constract an State object
+    std::cout<<"OpenMP has been detected. Initializing parallel tempering routine"<<std::endl;
     State T_state(argument);
 //---> get parallel tempering data in the input.dts file
     ParallelReplicaData    PRD = T_state.GetParallelReplicaData();
+
+    
     
 //---> here is one openmp is on but still want to perform one single simulation
     if (!PRD.State) {
+        std::cout<<"OpenMP has been detected. We run on a single CPU."<<std::endl;
         T_state.Initialize();
         T_state.GetSimulation()->do_Simulation();
     }
 else { // run parallel tempering simulations
+    std::cout<<"OpenMP has been detected. Initializing parallel tempering routine."<<std::endl;
     AbstractParallelReplicaRun *pParallelReplicaRun;
         
     if (!PRD.Type == ParallelTempering::GetDefaultReadName()){
