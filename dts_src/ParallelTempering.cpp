@@ -53,6 +53,7 @@ bool ParallelTempering::Run() {
     omp_set_num_threads(m_Bins);
     
 #pragma omp parallel
+{
         int Thread_ID = omp_get_thread_num();
         State ReplicaState(m_Argument);
 
@@ -71,7 +72,7 @@ bool ParallelTempering::Run() {
    // 
     
         ReplicaState.GetSimulation()->do_Simulation();
-
+}
 #endif
     
     return true;
