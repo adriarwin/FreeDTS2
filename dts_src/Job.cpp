@@ -63,7 +63,7 @@ else { // run parallel tempering simulations
     std::cout<<"OpenMP has been detected. Initializing parallel tempering routine."<<std::endl;
     AbstractParallelReplicaRun *pParallelReplicaRun;
         
-    if (!PRD.Type == ParallelTempering::GetDefaultReadName()){
+    if (PRD.Type == ParallelTempering::GetDefaultReadName()){
             
         pParallelReplicaRun = new ParallelTempering(argument);
         if(pParallelReplicaRun->Initialize(PRD)){

@@ -54,7 +54,7 @@ bool ParallelTempering::Run() {
     
 #pragma omp parallel
         int Thread_ID = omp_get_thread_num();
-        State ReplicaState(m_Argument);
+        T_state ReplicaState(m_Argument);
 
         //--> set the temprature
         double beta = m_minBeta + double(Thread_ID) * (m_maxBeta - m_minBeta)/double(m_Bins-1)
