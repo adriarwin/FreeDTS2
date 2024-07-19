@@ -40,11 +40,18 @@ int main(int argc, char* argv[]) {
     std::cout << "------ Simulation of Biomembranes Using Dynamically Triangulated Surfaces ------------" << std::endl;
     std::cout << "--------------------------------------------------------------------------------------" << std::endl;
 
+    #ifdef _OPENMP
+    std::cout << "OpenMP is supported and detected." << std::endl;
+    #else
+    std::cout << "OpenMP is not supported." << std::endl;
+    #endif
     // Store command-line arguments in a vector
     std::vector<std::string> argument(argv, argv + argc);
 
     // Create a Job object and pass the arguments to it
     Job job(argument);
+
+    
 
     return 0;
 }
