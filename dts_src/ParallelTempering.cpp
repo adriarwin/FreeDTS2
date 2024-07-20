@@ -58,10 +58,10 @@ bool ParallelTempering::Run() {
         State ReplicaState(m_Argument);
 
         //--> set the temprature
-        double beta = m_minBeta + double(Thread_ID) * (m_maxBeta - m_minBeta)/double(m_Bins-1)
+        double beta = m_minBeta + double(Thread_ID) * (m_maxBeta - m_minBeta)/double(m_Bins-1);
         ReplicaState.GetSimulation()->SetBeta(beta, 0);
     //--> set the run tag id, we need to update this ID each time that the processor changes its temprature. The id should be temprature dependent
-        std::string gfile = T_state.GetRunTag() + Nfunction::Int_to_String(beta); // general output file name
+        std::string gfile = ReplicaState.GetRunTag() + Nfunction::Int_to_String(beta); // general output file name
         ReplicaState.UpdateRunTag(gfile);
         ReplicaState.Initialize();
    // T_state.GetVisualization()
