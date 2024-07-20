@@ -24,6 +24,7 @@ public:
     virtual inline std::string GetDerivedDefaultReadName() = 0;
     virtual std::string CurrentState() = 0;
     inline static std::string GetBaseDefaultReadName() {return "NonbinaryTrajectory";}
+    virtual void SetFolderName(const std::string& folder_name) = 0;
     
 private:
     

@@ -56,14 +56,23 @@ bool ParallelTempering::Run() {
 {
         int Thread_ID = omp_get_thread_num();
         State ReplicaState(m_Argument);
+        
 
         //--> set the temprature
         double beta = m_minBeta + double(Thread_ID) * (m_maxBeta - m_minBeta)/double(m_Bins-1);
         ReplicaState.GetSimulation()->SetBeta(beta, 0);
     //--> set the run tag id, we need to update this ID each time that the processor changes its temprature. The id should be temprature dependent
-        std::string gfile = ReplicaState.GetRunTag() + Nfunction::Int_to_String(beta); // general output file name
-        ReplicaState.UpdateRunTag(gfile);
+        //std::string gfile = ReplicaState.GetRunTag() + Nfunction::Int_to_String(beta); // general output file name
+        //ReplicaState.UpdateRunTag(gfile);
+        ReplicaState.GetNonbinaryTrajectory()->SetFolderName(Nfunction::Int_to_String(Thread_ID));
         ReplicaState.Initialize();
+        
+        //ReplicaState.GetNonbinaryTrajectory()->Traj_tsi(*ReplicaState)
+
+        //Learn how to access tsi folder name and VTU folder!
+
+
+
    // T_state.GetVisualization()
     // T_state.GetSimulation()->UpdateInitialStep(int ini_step)
    // T_state.GetSimulation()->UpdateFinalStep(int final_step)

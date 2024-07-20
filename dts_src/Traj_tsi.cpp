@@ -103,6 +103,10 @@ void Traj_tsi::WriteAFrame(std::string filename){
     fclose(output);
     
 }
+
+void Traj_tsi::SetFolderName(const std::string& folder_name) {
+    m_Folder_name = folder_name;
+}
 /*
 MeshBluePrint Traj_tsi::ReadAFrame(std::string filename, bool &isok)
 {

@@ -28,7 +28,7 @@ public:
     void WriteAFrame(std::string filename);
     void WriteAFrame(int step);
     bool OpenFolder();
-    
+    void SetFolderName(const std::string& folder_name);
     inline  std::string GetDerivedDefaultReadName()  {return "TSI";}
     static inline  std::string GetDefaultReadName()  {return "TSI";}
     std::string CurrentState();

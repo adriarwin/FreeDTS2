@@ -38,7 +38,7 @@ Job::Job(const std::vector<std::string> &argument) {
     }
 #ifndef _OPENMP
     // Perform a normal simulation on a single CPU if OpenMP is not enabled
-    std::cout<<"OpenMP has not been detected. Running simulation on single CPU"<<std::endl;
+    std::cout<<"Running simulation on single CPU"<<std::endl;
 
     State T_state(argument);
     T_state.Initialize();
