@@ -13,7 +13,7 @@ Description:
 #include <vector>
 #include <string>
 #include "SimDef.h"
-#include "ParallelTempering.h"
+#include "ParallelTemperingSharedMemory.h"
 #include "RNG.h"
 #include "State.h"
 
@@ -25,14 +25,14 @@ Parameters:
     argument (std::vector<std::string>&): Vector containing input arguments.
 
 */
-ParallelTempering::ParallelTempering(std::vector<std::string> Argument) : m_Argument(Argument) {
+ParallelTemperingSharedMemory::ParallelTemperingSharedMemory(std::vector<std::string> Argument) : m_Argument(Argument) {
 
 
 }
-ParallelTempering::~ParallelTempering() {
+ParallelTemperingSharedMemory::~ParallelTemperingSharedMemory() {
     
 }
-bool ParallelTempering::Initialize(ParallelReplicaData PRD){
+bool ParallelTemperingSharedMemory::Initialize(ParallelReplicaData PRD){
     
     std::vector<std::string> data = Nfunction::Split(PRD.Data);
     
@@ -46,7 +46,7 @@ bool ParallelTempering::Initialize(ParallelReplicaData PRD){
     
     return true;
 }
-bool ParallelTempering::Run() {
+bool ParallelTemperingSharedMemory::Run() {
 
     //Comparison of number of threads asked for (m_Bins) and number of threads available
 #ifdef _OPENMP
@@ -86,7 +86,7 @@ bool ParallelTempering::Run() {
     
     return true;
 }
-std::string ParallelTempering::CurrentState(){
+std::string ParallelTemperingSharedMemory::CurrentState(){
         std::string state = GetBaseDefaultReadName() +" = "+ this->GetDerivedDefaultReadName() + " "+ Nfunction::D2S(m_Rate)+" "+Nfunction::D2S(m_Bins);
         state = state +" "+Nfunction::D2S(m_minBeta) +" "+Nfunction::D2S(m_maxBeta);
         return state;

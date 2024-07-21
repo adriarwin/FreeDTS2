@@ -16,8 +16,8 @@ Description:
 #include "Job.h"
 #include "State.h"
 #include "RNG.h"
-#include "AbstractParallelReplicaRun.h"
-#include "ParallelTempering.h"
+#include "AbstractParallelTemperingSharedMemory.h"
+#include "ParallelTemperingSharedMemory.h"
 
 /*
 Description:
@@ -50,7 +50,10 @@ Job::Job(const std::vector<std::string> &argument) {
     State T_state(argument);
 //---> get parallel tempering data in the input.dts file
     ParallelReplicaData    PRD = T_state.GetParallelReplicaData();
-
+    //---> To be added. Depending on the type of PRD, we will run with either parallel_tempering with shared memory
+    // or parallel_tempering with distributed memory.
+    //Basically, take into account the type...
+    
     
     
 //---> here is one openmp is on but still want to perform one single simulation
@@ -61,11 +64,12 @@ Job::Job(const std::vector<std::string> &argument) {
     }
 else { // run parallel tempering simulations
     std::cout<<"OpenMP has been detected. Initializing parallel tempering routine."<<std::endl;
-    AbstractParallelReplicaRun *pParallelReplicaRun;
+    AbstractParallelTemperingSharedMemory *pParallelReplicaRun;
+    
         
-    if (PRD.Type == ParallelTempering::GetDefaultReadName()){
+    if (PRD.Type == ParallelTemperingSharedMemory::GetDefaultReadName()){
             
-        pParallelReplicaRun = new ParallelTempering(argument);
+        pParallelReplicaRun = new ParallelTemperingSharedMemory(argument);
         if(pParallelReplicaRun->Initialize(PRD)){
             pParallelReplicaRun->Run();
         }
@@ -74,7 +78,7 @@ else { // run parallel tempering simulations
         }
     }
     else{
-        std::cout<<"---> error: unknow type for "<<AbstractParallelReplicaRun::GetBaseDefaultReadName()<<"\n";
+        std::cout<<"---> error: unknow type for "<<AbstractParallelTemperingSharedMemory::GetBaseDefaultReadName()<<"\n";
         exit(0);
     }
 }

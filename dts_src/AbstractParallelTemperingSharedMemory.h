@@ -1,24 +1,24 @@
-#ifndef AbstractParallelReplicaRun_FREEDTS_H_INCLUDED
-#define AbstractParallelReplicaRun_FREEDTS_H_INCLUDED
+#ifndef AbstractParallelTemperingSharedMemory_FREEDTS_H_INCLUDED
+#define AbstractParallelTemperingSharedMemory_FREEDTS_H_INCLUDED
 
 #include "SimDef.h"
 #include <vector>
 #include <string>
 
 class ParallelReplicaData;
-class AbstractParallelReplicaRun {
+class AbstractParallelTemperingSharedMemory {
 public:
     // Constructor
-    AbstractParallelReplicaRun(){
+    AbstractParallelTemperingSharedMemory(){
         
     }
     // Destructor
-    virtual ~AbstractParallelReplicaRun(){
+    virtual ~AbstractParallelTemperingSharedMemory(){
         
     }
     virtual std::string CurrentState() = 0;
     virtual inline std::string GetDerivedDefaultReadName() {return "";}
-    inline static std::string GetBaseDefaultReadName() {return "ParallelReplicaRun";}
+    inline static std::string GetBaseDefaultReadName() {return "ParallelTemperingSharedMemory";}
     
     virtual bool Initialize(ParallelReplicaData PRD) = 0;
     virtual bool Run() = 0;

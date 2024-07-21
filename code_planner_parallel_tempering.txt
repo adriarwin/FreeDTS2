@@ -1,0 +1,11 @@
+Code planner for parallel tempering.
+
+1. Shared memory file. 
+
+From ParallelTempering --> ParallelTemperingSharedMemory
+From AbstractParallelReplicaRun --> AbstractParallelTemperingSharedMemory
+
+Create ParallelTemperingDistributedMemory .h and .cpp.
+Create AbstractParallelTemperingDistributedMemory .h 
+
+Change the logic of Job.cpp (to be done.)
