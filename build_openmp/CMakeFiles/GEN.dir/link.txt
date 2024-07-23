@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/GEN.dir/dts_generate/DMC.cpp.o CMakeFiles/GEN.dir/dts_generate/Generate.cpp.o CMakeFiles/GEN.dir/dts_generate/Nfunction.cpp.o CMakeFiles/GEN.dir/dts_generate/Vec3D.cpp.o -o GEN 
