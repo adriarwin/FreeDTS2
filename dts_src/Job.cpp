@@ -102,45 +102,55 @@ Job::Job(const std::vector<std::string> &argument) {
 
     }
 
-    #elif defined(MPI_VERSION)
+    #elif defined(MPI_DETECTED)
 
     int world_rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
 
     //Only run this with one CPU
-    if (world_rank == 0) {
+    
 
     State T_state(argument);
 //---> get parallel tempering data in the input.dts file
     ParallelReplicaData    PRD = T_state.GetParallelReplicaData();
+
+    MPI_Barrier(MPI_COMM_WORLD);
+    std::cout<<"Rank: "<<world_rank<<", PRD.Type: "<<PRD.Type<<std::endl;
 
     std::string ex_name = Nfunction::SubstringFromRight(argument[0], '/');
     if (ex_name != EXE_NAME) { // EXE_NAME is defined in the SimDef.h file
         std::cout << "--> unrecognized executable name ---> " << ex_name << " :( " << " it should be " << EXE_NAME << std::endl;
         exit(0);
     }
-    
-    std::cout<<"MPI has been detected in Job.cpp."<<std::endl;
+    //MPI_Barrier(MPI_COMM_WORLD);
+    if (world_rank == 0) {
+    std::cout<<"MPI has been detected in Job.cpp for all ranks"<<std::endl;}
 
     if (!PRD.State) {
 
+    if (world_rank == 0) {
     std::cout<<"MPI has been detected but we run on a single CPU as stated in input file"<<std::endl;
     T_state.Initialize();
-    T_state.GetSimulation()->do_Simulation();
+    T_state.GetSimulation()->do_Simulation();}
 
     }
     else{ // run parallel tempering simulations
-    std::cout<<"MPI has been detected and we initialize parallel tempering routine with distributed memory"<<std::endl;
+    std::cout<<"We got here all of us!"<<std::endl;
+    if (world_rank == 0) {
+    std::cout<<"MPI has been detected and we initialize parallel tempering routine with distributed memory"<<std::endl;}
     AbstractParallelTemperingDistributedMemory *pParallelReplicaRun;
     
-        
+    std::cout<<"ParallelTemperingDistributedMemory::GetDefaultReadName()"<<ParallelTemperingDistributedMemory::GetDefaultReadName()<<", Rank = "<<world_rank<<std::endl;
     if (PRD.Type == ParallelTemperingDistributedMemory::GetDefaultReadName()){
-        
-        std::cout<<"About to make the call for distributed Memory!"<<std::endl;
+        if (world_rank == 0) {
+        std::cout<<"About to make the call for distributed Memory!"<<std::endl;}
 
-        //pParallelReplicaRun = new ParallelTemperingDistributedMemory(argument);
-        //if(pParallelReplicaRun->Initialize(PRD)){
-        //    pParallelReplicaRun->Run();
+        pParallelReplicaRun = new ParallelTemperingDistributedMemory(argument);
+        if(pParallelReplicaRun->Initialize(PRD)){
+            if (world_rank == 0) {
+            std::cout<<"Parallel tempering routine initialized!"<<std::endl;
+            std::cout<<"Running parallel tempering routine with distributed memory"<<std::endl;}
+            pParallelReplicaRun->Run();
         //}
         //else{
         //    std::cout<<"---> error: faild .... "<<"\n";
@@ -153,6 +163,8 @@ Job::Job(const std::vector<std::string> &argument) {
 
     }
     }
+
+
 #endif
 }
 Job::~Job() {

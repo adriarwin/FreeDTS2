@@ -6,9 +6,9 @@ Description:
     This class checks the name of the executable, although it's not a critical task for the current version.
 */
 
-#ifdef _OPENMP
-    #include <omp.h>
-#endif
+#ifdef MPI_DETECTED
+#include <mpi.h>
+
 
 #include <vector>
 #include <string>
@@ -33,7 +33,8 @@ ParallelTemperingDistributedMemory::~ParallelTemperingDistributedMemory() {
     
 }
 bool ParallelTemperingDistributedMemory::Initialize(ParallelReplicaData PRD){
-    
+
+
     std::vector<std::string> data = Nfunction::Split(PRD.Data);
     
     if(data.size() < 4){
@@ -49,25 +50,27 @@ bool ParallelTemperingDistributedMemory::Initialize(ParallelReplicaData PRD){
 bool ParallelTemperingDistributedMemory::Run() {
 
     //Comparison of number of threads asked for (m_Bins) and number of threads available
-#ifdef _OPENMP
-    omp_set_num_threads(m_Bins);
     
-#pragma omp parallel
-{
-        int Thread_ID = omp_get_thread_num();
-        State ReplicaState(m_Argument);
-        
+    int rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    std::cout<<"Rank: "<<rank<<std::endl;
 
+    int size;
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    std::cout<<"Size: "<<size<<std::endl;
+
+    
+    
+    State ReplicaState(m_Argument);
         //--> set the temprature
-        double beta = m_minBeta + double(Thread_ID) * (m_maxBeta - m_minBeta)/double(m_Bins-1);
-        ReplicaState.GetSimulation()->SetBeta(beta, 0);
+    double beta = m_minBeta + double(rank) * (m_maxBeta - m_minBeta)/double(m_Bins-1);
+    ReplicaState.GetSimulation()->SetBeta(beta, 0);
     //--> set the run tag id, we need to update this ID each time that the processor changes its temprature. The id should be temprature dependent
         //std::string gfile = ReplicaState.GetRunTag() + Nfunction::Int_to_String(beta); // general output file name
         //ReplicaState.UpdateRunTag(gfile);
-        ReplicaState.GetNonbinaryTrajectory()->SetFolderName(Nfunction::Int_to_String(Thread_ID));
-        ReplicaState.Initialize();
+    //ReplicaState.GetNonbinaryTrajectory()->SetFolderName(Nfunction::Int_to_String(rank));
+    ReplicaState.Initialize();
         
-        //ReplicaState.GetNonbinaryTrajectory()->Traj_tsi(*ReplicaState)
 
         //Learn how to access tsi folder name and VTU folder!
 
@@ -80,12 +83,18 @@ bool ParallelTemperingDistributedMemory::Run() {
    // T_state.GetVisualization() = new WritevtuFiles(&T_state, period, foldername);
    // 
     
-        ReplicaState.GetSimulation()->do_Simulation();
-}
-#endif
-    
+    ReplicaState.GetSimulation()->do_Simulation();
+    //return true;}
+
+    //else{
+    //    std::cout<<"I am not doing anything for rank: "<<rank<<std::endl;
+    //    return true;
+    //}
+    std::cout<<"I am done for rank: "<<rank<<std::endl;
+    MPI_Barrier(MPI_COMM_WORLD);
     return true;
 }
+
 std::string ParallelTemperingDistributedMemory::CurrentState(){
         std::string state = GetBaseDefaultReadName() +" = "+ this->GetDerivedDefaultReadName() + " "+ Nfunction::D2S(m_Rate)+" "+Nfunction::D2S(m_Bins);
         state = state +" "+Nfunction::D2S(m_minBeta) +" "+Nfunction::D2S(m_maxBeta);
@@ -93,4 +102,5 @@ std::string ParallelTemperingDistributedMemory::CurrentState(){
 }
 
 
+#endif
 

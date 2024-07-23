@@ -3,6 +3,10 @@
 #ifdef _OPENMP
 # include <omp.h>
 #endif
+#ifdef MPI_DETECTED
+# include <mpi.h>
+#endif
+
 #include <thread>
 #include <ctime>
 #include <iostream>
@@ -119,24 +123,33 @@ for (int step = m_Initial_Step; step <= m_Final_Step; step++){
     std::cout<<"---- Simulation has ended ----\n";
     std::cout<<" The run took: "<<Nfunction::ConvertSecond2Time(elapsed_secs)<<"\n";
 
-
+    #ifndef MPI_DETECTED
     m_pState->GetCurvatureCalculator()->Initialize();
+    
     double Final_energy = m_pState->GetEnergyCalculator()->CalculateAllLocalEnergy();
     double energy_leak = Final_energy - m_pState->GetEnergyCalculator()->GetEnergy();
+    //#ifndef MPI_DETECTED
     std::cout << std::fixed << std::setprecision(4);
     if(fabs(energy_leak) > 0.0001){
         
         std::cout<<"---> possible source of code error: energy leak... "<<energy_leak<<" with real energy of "<<Final_energy<<"  and stored energy of "<<m_pState->GetEnergyCalculator()->GetEnergy()<<"\n";
     }
     // check for volume
+    
     double vol = 0;
     double g_c = 0;
     double t_a = 0;
-    m_pState->GetVAHGlobalMeshProperties()->CalculateGlobalVariables(vol,t_a,g_c);
+    //m_pState->GetVAHGlobalMeshProperties()->CalculateGlobalVariables(vol,t_a,g_c);
+
+    //#ifndef MPI_DETECTED
     vol -= m_pState->GetVAHGlobalMeshProperties()->GetTotalVolume();
     g_c -= m_pState->GetVAHGlobalMeshProperties()->GetTotalMeanCurvature();
     t_a -= m_pState->GetVAHGlobalMeshProperties()->GetTotalArea();
 
+    std::cout<<"total volume leak: "<<vol<<"\n";
+    std::cout<<"total mean curvature leak: "<<g_c<<"\n";
+    std::cout<<"total area leak: "<<t_a<<"\n";
+    
     if(fabs(vol) > 0.0001){
         std::cout<<fabs(vol)<<" volume leak\n";
     }
@@ -148,7 +161,7 @@ for (int step = m_Initial_Step; step <= m_Final_Step; step++){
     {
         std::cout<<fabs(t_a)<<" total area leak\n";
     }
-        
+    #endif
     return true;
 }
 void  MC_Simulation::PrintRate(int step, bool clean, bool clear){

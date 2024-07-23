@@ -57,6 +57,7 @@ int main(int argc, char* argv[]) {
     std::vector<std::string> argument(argv, argv + argc);
     // Create a Job object and pass the arguments to it
     Job job(argument);
+
     #elif defined(MPI_VERSION)
     //MPI detected
     //Macro to check if MPI is detected 
@@ -70,13 +71,14 @@ int main(int argc, char* argv[]) {
     std::cout << "████████████████████████████████    FreeDTS    ██████████████████████████████" << std::endl;
     std::cout << "------ Simulation of Biomembranes Using Dynamically Triangulated Surfaces ------------" << std::endl;
     std::cout << "--------------------------------------------------------------------------------------" << std::endl;
-    std::cout << "------ MPI is supported and detected ----------------------------------------------" << std::endl;
+    std::cout << "------ MPI is supported and detected ----------------------------------------------" << std::endl;}
     std::vector<std::string> argument(argv, argv + argc);
     // Create a Job object and pass the arguments to it
     Job job(argument);
-    }
 
+    MPI_Barrier(MPI_COMM_WORLD);
     MPI_Finalize();
+
     #else
     std::cout << "████████████████████████████████    FreeDTS    ██████████████████████████████" << std::endl;
     std::cout << "------ Simulation of Biomembranes Using Dynamically Triangulated Surfaces ------------" << std::endl;
