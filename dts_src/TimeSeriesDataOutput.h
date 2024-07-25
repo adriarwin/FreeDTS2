@@ -34,12 +34,14 @@ public:
     bool FlushFile(); // The energy file should be flushed first
     void UpdatePeriod(int period);
     std::string CurrentState();
+    void SetCustomFilename(const std::string &filename);
 
 private:
     State *m_pState;
     int m_Periodic;
     std::ofstream m_TimeSeriesFile;  // Member variable to hold the file stream
     bool CheckTimeSeriesFile(int endstep, const std::string &filename); // This checks if the energy file matches the restart end step
+    std::string m_customFilename;
 };
 
 #endif

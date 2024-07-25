@@ -68,7 +68,7 @@ bool ParallelTemperingDistributedMemory::Run() {
     //--> set the run tag id, we need to update this ID each time that the processor changes its temprature. The id should be temprature dependent
         //std::string gfile = ReplicaState.GetRunTag() + Nfunction::Int_to_String(beta); // general output file name
         //ReplicaState.UpdateRunTag(gfile);
-    //ReplicaState.GetNonbinaryTrajectory()->SetFolderName(Nfunction::Int_to_String(rank));
+    ReplicaState.GetNonbinaryTrajectory()->SetFolderName(Nfunction::Int_to_String(rank));
     ReplicaState.Initialize();
         
 
@@ -91,7 +91,7 @@ bool ParallelTemperingDistributedMemory::Run() {
     //    return true;
     //}
     std::cout<<"I am done for rank: "<<rank<<std::endl;
-    MPI_Barrier(MPI_COMM_WORLD);
+    //MPI_Barrier(MPI_COMM_WORLD);
     return true;
 }
 

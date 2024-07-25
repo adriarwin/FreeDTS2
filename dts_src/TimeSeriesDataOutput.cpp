@@ -87,7 +87,7 @@ bool TimeSeriesDataOutput::OpenFile(bool clearfile) {
       simulation. If the file cannot be opened or there is an error, appropriate error messages
       are printed to stderr.
      */
-    std::string filename = m_pState->GetRunTag() + TimeSeriDataExt;
+    std::string filename = m_customFilename.empty() ? (m_pState->GetRunTag() + TimeSeriDataExt) : m_customFilename;
 
     if (!clearfile) {
         // If it's a restart simulation, check if the energy file matches the restart
@@ -226,4 +226,8 @@ std::string TimeSeriesDataOutput::CurrentState(){
     
     std::string state = "TimeSeriesData_Period = "+ Nfunction::D2S(m_Periodic);
     return state;
+}
+
+void TimeSeriesDataOutput::SetCustomFilename(const std::string& filename) {
+    m_customFilename = filename;
 }

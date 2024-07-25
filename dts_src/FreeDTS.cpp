@@ -76,7 +76,7 @@ int main(int argc, char* argv[]) {
     // Create a Job object and pass the arguments to it
     Job job(argument);
 
-    MPI_Barrier(MPI_COMM_WORLD);
+    //MPI_Barrier(MPI_COMM_WORLD);
     MPI_Finalize();
 
     #else

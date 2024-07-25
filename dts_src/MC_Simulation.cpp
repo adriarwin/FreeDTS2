@@ -64,8 +64,11 @@ bool MC_Simulation::do_Simulation(){
 #if DEBUG_MODE == Enabled
     std::cout<<" We have reached simulation run loop!  \n";
 #endif
+
+//Only one rank prints this output
     std::clock_t start = std::clock();
     std::cout<<"------>   Simulation will be performed from "<<m_Initial_Step<<" to "<<m_Final_Step<<" steps\n";
+//Start of the simulation loop
 for (int step = m_Initial_Step; step <= m_Final_Step; step++){
         
 //----> write files
@@ -117,7 +120,9 @@ for (int step = m_Initial_Step; step <= m_Final_Step; step++){
         PrintRate(step, true, true);
     }
 
-} // for(int step=GetInitialStep(); step<GetFinalStep(); step++)
+} //End of simulation loop 
+
+// for(int step=GetInitialStep(); step<GetFinalStep(); step++)
     std::clock_t end = std::clock();
     double elapsed_secs = double(end - start) / CLOCKS_PER_SEC;
     std::cout<<"---- Simulation has ended ----\n";
