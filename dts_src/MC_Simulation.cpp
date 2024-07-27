@@ -46,6 +46,18 @@ bool MC_Simulation::do_Simulation(){
 #if DEBUG_MODE == Enabled
     std::cout<<" do_Simulation function is starting  \n";
 #endif
+
+#if MPI_DETECTED
+
+    int rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    std::cout<<"Rank: "<<rank<<std::endl;
+
+    int size;
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    std::cout<<"Size: "<<size<<std::endl;
+
+#endif
     
 //---> Voxelize the mesh for the first time; this should be done before any calculation
     m_pState->GetVoxelization()->Voxelize(m_pState->GetMesh()->GetActiveV());
@@ -58,7 +70,16 @@ bool MC_Simulation::do_Simulation(){
         //CheckMesh();
  
 //--- before simualtion lets have a frame of the initial system
+#ifndef MPI_DETECTED
         m_pState->GetVisualization()->WriteAFrame(0);
+#endif
+
+#ifdef MPI_DETECTED
+        if(rank == 0){ 
+            m_pState->GetVisualization()->WriteAFrame(0);
+        }
+#endif
+
    // time_t startTime;
    // time(&startTime);
 #if DEBUG_MODE == Enabled
@@ -73,7 +94,16 @@ for (int step = m_Initial_Step; step <= m_Final_Step; step++){
         
 //----> write files
         //--- write visulaization frame
+
+#ifndef MPI_DETECTED
         m_pState->GetVisualization()->WriteAFrame(step);
+#endif
+
+#ifdef MPI_DETECTED
+        if(rank == 0){ 
+            m_pState->GetVisualization()->WriteAFrame(step);
+        }
+#endif
         //--- write non-binary trejectory e.g., tsi, tsg
         m_pState->GetNonbinaryTrajectory()->WriteAFrame(step);
         //--- write binary trejectory e.g., bts
@@ -81,6 +111,7 @@ for (int step = m_Initial_Step; step <= m_Final_Step; step++){
         //--- write into time seri file, e.g., energy, volume ...
         m_pState->GetTimeSeriesDataOutput()->WriteTimeSeriesDataOutput(step);
         //--- write check point for the state
+        //--- Needs to be parallezied for MPI
         m_pState->GetRestart()->UpdateRestartState(step, m_pState->GetVertexPositionUpdate()->GetDR(), m_pState->GetDynamicBox()->GetDR());
     
 //---> centering the simulation box

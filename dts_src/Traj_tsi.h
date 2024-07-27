@@ -32,6 +32,7 @@ public:
     inline  std::string GetDerivedDefaultReadName()  {return "TSI";}
     static inline  std::string GetDefaultReadName()  {return "TSI";}
     std::string CurrentState();
+    std::string GetFolderName();
 
 private:
     // Private member variables

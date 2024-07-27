@@ -292,6 +292,8 @@ CMakeFiles/DTS.dir/dts_src/Job.cpp.o: \
  /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/AbstractBoundary.h \
  /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/RigidWallTypes.h \
  /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/MC_Simulation.h \
+ /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/AbstractParallelTemperingMove.h \
+ /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/ParallelTemperingMoveSimple.h \
  /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/AbstractParallelTemperingSharedMemory.h \
  /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/AbstractParallelTemperingDistributedMemory.h \
  /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/ParallelTemperingSharedMemory.h \

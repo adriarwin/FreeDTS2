@@ -125,6 +125,9 @@
 #include "RNG.h"
 #include "VAHGlobalMeshProperties.h"
 #include "InclusionType.h"
+//--- parallel tempering
+#include "AbstractParallelTemperingMove.h"
+#include "ParallelTemperingMoveSimple.h"
 
 
 struct ParallelReplicaData {  // data structure for turning on and off certain moves
@@ -182,6 +185,7 @@ inline AbstractDynamicBox               *GetDynamicBox()                        
 inline AbstractDynamicTopology          *GetDynamicTopology()                           {return m_pDynamicTopology;}
 inline AbstractOpenEdgeEvolution        *GetOpenEdgeEvolution()                         {return m_pOpenEdgeEvolution;}
 inline AbstractInclusionConversion      *GetInclusionConversion()                       {return m_pInclusionConversion;}
+inline AbstractParallelTemperingMove    *GetParallelTempering()                         {return m_pParallelTemperingMove;}
 
 
 inline AbstractBoundary                 *GetBoundary()                                  {return m_pBoundary;}
@@ -231,6 +235,7 @@ private:
     AbstractDynamicBox            *m_pDynamicBox;
     AbstractDynamicTopology       *m_pDynamicTopology;
     AbstractOpenEdgeEvolution     *m_pOpenEdgeEvolution;
+    AbstractParallelTemperingMove *m_pParallelTemperingMove;
     
     VAHGlobalMeshProperties       *m_pVAHCalculator;
     AbstractVolumeCoupling        *m_pVolumeCoupling;

@@ -256,4 +256,6 @@ CMakeFiles/DTS.dir/dts_src/Restart.cpp.o: \
  /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/ConstantExternalFieldOnVectorFields.h \
  /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/AbstractBoundary.h \
  /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/RigidWallTypes.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/MC_Simulation.h
+ /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/MC_Simulation.h \
+ /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/AbstractParallelTemperingMove.h \
+ /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/ParallelTemperingMoveSimple.h

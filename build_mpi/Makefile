@@ -1088,6 +1088,30 @@ dts_src/ParallelTemperingDistributedMemory.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/DTS.dir/build.make CMakeFiles/DTS.dir/dts_src/ParallelTemperingDistributedMemory.cpp.s
 .PHONY : dts_src/ParallelTemperingDistributedMemory.cpp.s
 
+dts_src/ParallelTemperingMoveSimple.o: dts_src/ParallelTemperingMoveSimple.cpp.o
+.PHONY : dts_src/ParallelTemperingMoveSimple.o
+
+# target to build an object file
+dts_src/ParallelTemperingMoveSimple.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/DTS.dir/build.make CMakeFiles/DTS.dir/dts_src/ParallelTemperingMoveSimple.cpp.o
+.PHONY : dts_src/ParallelTemperingMoveSimple.cpp.o
+
+dts_src/ParallelTemperingMoveSimple.i: dts_src/ParallelTemperingMoveSimple.cpp.i
+.PHONY : dts_src/ParallelTemperingMoveSimple.i
+
+# target to preprocess a source file
+dts_src/ParallelTemperingMoveSimple.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/DTS.dir/build.make CMakeFiles/DTS.dir/dts_src/ParallelTemperingMoveSimple.cpp.i
+.PHONY : dts_src/ParallelTemperingMoveSimple.cpp.i
+
+dts_src/ParallelTemperingMoveSimple.s: dts_src/ParallelTemperingMoveSimple.cpp.s
+.PHONY : dts_src/ParallelTemperingMoveSimple.s
+
+# target to generate assembly for a file
+dts_src/ParallelTemperingMoveSimple.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/DTS.dir/build.make CMakeFiles/DTS.dir/dts_src/ParallelTemperingMoveSimple.cpp.s
+.PHONY : dts_src/ParallelTemperingMoveSimple.cpp.s
+
 dts_src/ParallelTemperingSharedMemory.o: dts_src/ParallelTemperingSharedMemory.cpp.o
 .PHONY : dts_src/ParallelTemperingSharedMemory.o
 
@@ -1742,6 +1766,9 @@ help:
 	@echo "... dts_src/ParallelTemperingDistributedMemory.o"
 	@echo "... dts_src/ParallelTemperingDistributedMemory.i"
 	@echo "... dts_src/ParallelTemperingDistributedMemory.s"
+	@echo "... dts_src/ParallelTemperingMoveSimple.o"
+	@echo "... dts_src/ParallelTemperingMoveSimple.i"
+	@echo "... dts_src/ParallelTemperingMoveSimple.s"
 	@echo "... dts_src/ParallelTemperingSharedMemory.o"
 	@echo "... dts_src/ParallelTemperingSharedMemory.i"
 	@echo "... dts_src/ParallelTemperingSharedMemory.s"

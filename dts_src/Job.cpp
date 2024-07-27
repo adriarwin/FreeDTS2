@@ -103,7 +103,11 @@ Job::Job(const std::vector<std::string> &argument) {
     }
 
     #elif defined(MPI_DETECTED)
-
+    State T_state(argument);
+    T_state.Initialize();
+    T_state.GetSimulation()->do_Simulation();
+    
+/*
     int world_rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
 
@@ -164,7 +168,7 @@ Job::Job(const std::vector<std::string> &argument) {
     }
     }
 
-
+*/
 #endif
 }
 Job::~Job() {

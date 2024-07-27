@@ -4,6 +4,9 @@
 #include "MESH.h"
 #include "CreateMashBluePrint.h"
 #include "State.h"
+#ifdef MPI_DETECTED
+#include <mpi.h>
+#endif
 State::State(){
     
 }
@@ -39,6 +42,7 @@ State::State(std::vector<std::string> argument) :
       m_pDynamicTopology(new ConstantTopology),  // Initialize DynamicTopology
       m_pOpenEdgeEvolution(new NoEvolution),  // Initialize OpenEdgeEvolution
       m_pInclusionConversion(new NoInclusionConversion),  // Initialize InclusionConversion
+      m_pParallelTemperingMove(new NoParallelTemperingMove),  // Initialize ParallelTemperingMove
 
       //--- Initialize accessory objects
       m_pCurvatureCalculations(new CurvatureByShapeOperatorType1(this)),  // Initialize CurvatureCalculations
@@ -789,18 +793,27 @@ while (input >> firstword) {
         }
         else if(firstword == "ParallelReplica")
         {
-            // ParallelReplica = Parallel_Tempering  rate bins minbeta  maxbeta
-            std::string type;
-            input>>str>>type;
-            getline(input,rest);
+            // ParallelReplica = Parallel_Tempering Algorithm rate n_processors minbeta maxbeta
+            std::string algorithm,type;
+            int period, n_processors;
+            double minbeta, maxbeta;
+            input>>str>>type>>algorithm>>period>>n_processors>>minbeta>>maxbeta;
+            std::cout<<"Printing algorithm"<<algorithm<<std::endl;
+            if(algorithm == ParallelTemperingMoveSimple::GetBaseDefaultReadName()){
+                std::cout<<"Initializing this!"<<algorithm<<std::endl;
+                m_pParallelTemperingMove = new ParallelTemperingMoveSimple(this ,period, n_processors, minbeta, maxbeta);
+            }
+            
 
-            if(type == "No"|| type == "no"|| type == "NO")
-                m_Parallel_Replica.State = false;
-            else
-                m_Parallel_Replica.State = true;
+            //if(type == "No"|| type == "no"|| type == "NO")
+            //    m_Parallel_Replica.State = false;
+            //else
+            //    m_Parallel_Replica.State = true;
                         
-            m_Parallel_Replica.Type = type;
-            m_Parallel_Replica.Data = rest;
+            //m_Parallel_Replica.Type = type;
+            //m_Parallel_Replica.Data = rest;
+
+            getline(input,rest);
 
         }
         else if(firstword == BTSFile::GetDefaultReadName() ){ // "OutPutTRJ_BTS"
@@ -896,6 +909,9 @@ bool State::Initialize(){
         CreateMashBluePrint Create_BluePrint;
         MeshBluePrint mesh_blueprint;
 //---->  Check if the restart file name is provided
+
+        m_pParallelTemperingMove->Initialize();
+
         bool restartReadSuccess = false;
         if (!m_RestartFileName.empty()) {
             int step;
@@ -946,7 +962,7 @@ bool State::Initialize(){
             if(!m_pBinaryTrajectory->OpenFile(true, 'w')){
                 m_NumberOfErrors++;
             }
-            // Open folder for non-binary trajectory
+            // tolder for non-binary trajectory
             if(! m_pNonbinaryTrajectory->OpenFolder()){
                 m_NumberOfErrors++;
             }
@@ -997,8 +1013,18 @@ bool State::Initialize(){
 
 
 //--- now that the system is ready for simulation, we first write the State into the log file and make one vis 
+    #ifndef MPI_DETECTED
     m_pTimeSeriesLogInformation->WriteStartingState();
     m_pVisualizationFile->WriteAFrame(-m_pVisualizationFile->GetPeriod());
+    #endif
+    #if MPI_DETECTED
+    int rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    if (rank == 0) {
+        m_pTimeSeriesLogInformation->WriteStartingState();
+        m_pVisualizationFile->WriteAFrame(-m_pVisualizationFile->GetPeriod());
+    }
+    #endif
 //----> energy class
 //---> to get interaction energies
     m_pEnergyCalculator->Initialize(m_InputFileName);

@@ -68,28 +68,15 @@ bool ParallelTemperingDistributedMemory::Run() {
     //--> set the run tag id, we need to update this ID each time that the processor changes its temprature. The id should be temprature dependent
         //std::string gfile = ReplicaState.GetRunTag() + Nfunction::Int_to_String(beta); // general output file name
         //ReplicaState.UpdateRunTag(gfile);
-    ReplicaState.GetNonbinaryTrajectory()->SetFolderName(Nfunction::Int_to_String(rank));
+
+    //In here, I need to think how to implement the restart in the right way (will be hard but it is extremly important to do it right
+    ReplicaState.GetNonbinaryTrajectory()->SetFolderName(ReplicaState.GetNonbinaryTrajectory()->GetFolderName() +"_" + Nfunction::Int_to_String(rank));
+    ReplicaState.GetTimeSeriesDataOutput()->SetCustomFileName(ReplicaState.GetRunTag() + "_" +Nfunction::Int_to_String(rank)+TimeSeriDataExt);
     ReplicaState.Initialize();
         
-
-        //Learn how to access tsi folder name and VTU folder!
-
-
-
-   // T_state.GetVisualization()
-    // T_state.GetSimulation()->UpdateInitialStep(int ini_step)
-   // T_state.GetSimulation()->UpdateFinalStep(int final_step)
-    
-   // T_state.GetVisualization() = new WritevtuFiles(&T_state, period, foldername);
-   // 
     
     ReplicaState.GetSimulation()->do_Simulation();
-    //return true;}
 
-    //else{
-    //    std::cout<<"I am not doing anything for rank: "<<rank<<std::endl;
-    //    return true;
-    //}
     std::cout<<"I am done for rank: "<<rank<<std::endl;
     //MPI_Barrier(MPI_COMM_WORLD);
     return true;
