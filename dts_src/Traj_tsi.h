@@ -33,6 +33,7 @@ public:
     static inline  std::string GetDefaultReadName()  {return "TSI";}
     std::string CurrentState();
     std::string GetFolderName();
+    std::string GetOriginalFolderName();
 
 private:
     // Private member variables
@@ -40,6 +41,7 @@ private:
     std::string m_Precision;
     int m_Period;
     State* m_pState;
+    std::string m_Original_Folder_name;
 
 private:  // Consider removing this section if not needed
     // Private member functions

@@ -10,6 +10,10 @@
 #include "triangle.h"
 #include "MESH.h"
 #include "AbstractParallelTemperingMove.h"
+#ifdef MPI_DETECTED
+#include <mpi.h>
+#endif
+
 
 class State;
 class ParallelTemperingMoveSimple : public AbstractParallelTemperingMove {
@@ -26,6 +30,7 @@ public:
     std::string CurrentState();
 
 private:
+    bool ChangeToNewTemperatureID(int NewTempID);
 //Here I can insert things no one will ever know...
     
     
@@ -36,8 +41,17 @@ private:
     int m_Period;
     int m_Rank;
     int m_Size;
-    int m_tempID;
+    int m_TempID;
+    int m_Counter;
+    bool m_SizeIsEven;
+    std::vector<int>  m_RankAtTempID;   // a map for temp_id to thread_id, temp = temperatures.at(temp_id)
+    std::vector<double> m_BetaVec;        // the 1/temprature of each temp_id
     State *m_pState;
+    
+    std::vector<int> m_ReceiveBroadcast;
+    #ifdef MPI_DETECTED
+    std::vector<MPI_Request> m_RequestBroadcast;
+    #endif
     
 
 

@@ -139,6 +139,8 @@ for (int step = m_Initial_Step; step <= m_Final_Step; step++){
         m_pState->GetDynamicTopology()->MCMove(step);
         //---- convert inclusions
         m_pState->GetInclusionConversion()->Exchange(step);
+        //---- attempt parallel tempering move
+        m_pState->GetParallelTempering()->EvolveOneStep(step);
     
 
 //----> print info about the simulation, e.g., rate,

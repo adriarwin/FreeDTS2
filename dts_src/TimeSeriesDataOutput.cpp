@@ -23,6 +23,18 @@ TimeSeriesDataOutput::~TimeSeriesDataOutput(){
         m_TimeSeriesFile.close();
      }
 }
+
+void TimeSeriesDataOutput::CloseFile(){
+    if (m_TimeSeriesFile.is_open()) {
+        m_TimeSeriesFile.flush(); 
+        m_TimeSeriesFile.close();
+     }
+}
+
+void TimeSeriesDataOutput::OpenFileWithoutHeader(std::string filename)
+{
+    m_TimeSeriesFile.open(filename,std::ios_base::app);  
+}
 void TimeSeriesDataOutput::UpdatePeriod(int period){
     
     m_Periodic = period;
@@ -231,3 +243,10 @@ std::string TimeSeriesDataOutput::CurrentState(){
 void TimeSeriesDataOutput::SetCustomFileName(const std::string& filename) {
     m_customFileName = filename;
 }
+
+
+//Do I need one function that closes the file, and then opens it again?
+//IDEA (to be consulted with ChatGPT) --> A function that closes the file, give the file a new name
+//and closes the file again... Because, do I have to close it before opening it?
+//In that case, I will need to, first of all, make sure that both ranks are closing the file.
+//Then, we can open it. Maybe I should set that somehow?

@@ -35,6 +35,8 @@ public:
     void UpdatePeriod(int period);
     std::string CurrentState();
     void SetCustomFileName(const std::string &filename);
+    void CloseFile();
+    void OpenFileWithoutHeader(std::string filename);
 
 private:
     State *m_pState;
