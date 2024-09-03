@@ -186,7 +186,7 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
         }
         
     }
-
+    //Just something
     std::fill(m_ReceiveBroadcast.begin(), m_ReceiveBroadcast.end(), 0);
 
     std::fill(m_RequestBroadcast.begin(), m_RequestBroadcast.end(), MPI_REQUEST_NULL);
