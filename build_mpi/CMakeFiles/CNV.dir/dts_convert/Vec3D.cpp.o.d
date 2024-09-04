@@ -1,5 +1,5 @@
 CMakeFiles/CNV.dir/dts_convert/Vec3D.cpp.o: \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_convert/Vec3D.cpp \
+ /home/adriarwin/FreeDTS2/dts_convert/Vec3D.cpp \
  /usr/include/stdc-predef.h /usr/include/c++/11/iostream \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/os_defines.h \
@@ -144,8 +144,8 @@ CMakeFiles/CNV.dir/dts_convert/Vec3D.cpp.o: \
  /usr/include/c++/11/bits/basic_ios.tcc \
  /usr/include/c++/11/bits/ostream.tcc /usr/include/c++/11/istream \
  /usr/include/c++/11/bits/istream.tcc \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_convert/Vec3D.h \
- /usr/include/c++/11/vector /usr/include/c++/11/bits/stl_uninitialized.h \
+ /home/adriarwin/FreeDTS2/dts_convert/Vec3D.h /usr/include/c++/11/vector \
+ /usr/include/c++/11/bits/stl_uninitialized.h \
  /usr/include/c++/11/bits/stl_vector.h \
  /usr/include/c++/11/bits/stl_bvector.h \
  /usr/include/c++/11/bits/vector.tcc /usr/include/c++/11/math.h \

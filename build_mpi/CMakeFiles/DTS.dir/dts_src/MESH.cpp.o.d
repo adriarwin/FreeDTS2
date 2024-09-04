@@ -1,8 +1,7 @@
 CMakeFiles/DTS.dir/dts_src/MESH.cpp.o: \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/MESH.cpp \
- /usr/include/stdc-predef.h /usr/include/c++/11/fstream \
- /usr/include/c++/11/istream /usr/include/c++/11/ios \
- /usr/include/c++/11/iosfwd \
+ /home/adriarwin/FreeDTS2/dts_src/MESH.cpp /usr/include/stdc-predef.h \
+ /usr/include/c++/11/fstream /usr/include/c++/11/istream \
+ /usr/include/c++/11/ios /usr/include/c++/11/iosfwd \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/os_defines.h \
  /usr/include/features.h /usr/include/features-time64.h \
@@ -148,7 +147,7 @@ CMakeFiles/DTS.dir/dts_src/MESH.cpp.o: \
  /usr/include/x86_64-linux-gnu/c++/11/bits/basic_file.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++io.h \
  /usr/include/c++/11/bits/fstream.tcc \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/MESH.h /usr/include/c++/11/map \
+ /home/adriarwin/FreeDTS2/dts_src/MESH.h /usr/include/c++/11/map \
  /usr/include/c++/11/bits/stl_tree.h \
  /usr/include/c++/11/ext/aligned_buffer.h \
  /usr/include/c++/11/bits/stl_map.h /usr/include/c++/11/tuple \
@@ -157,9 +156,8 @@ CMakeFiles/DTS.dir/dts_src/MESH.cpp.o: \
  /usr/include/c++/11/bits/invoke.h \
  /usr/include/c++/11/bits/stl_multimap.h \
  /usr/include/c++/11/bits/erase_if.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/SimDef.h \
- /usr/include/c++/11/iostream /usr/include/c++/11/algorithm \
- /usr/include/c++/11/bits/stl_algo.h \
+ /home/adriarwin/FreeDTS2/dts_src/SimDef.h /usr/include/c++/11/iostream \
+ /usr/include/c++/11/algorithm /usr/include/c++/11/bits/stl_algo.h \
  /usr/include/c++/11/bits/algorithmfwd.h \
  /usr/include/c++/11/bits/stl_heap.h \
  /usr/include/c++/11/bits/stl_tempbuf.h \
@@ -171,15 +169,14 @@ CMakeFiles/DTS.dir/dts_src/MESH.cpp.o: \
  /usr/include/libintl.h /usr/include/c++/11/bits/locale_facets_nonio.tcc \
  /usr/include/c++/11/bits/locale_conv.h \
  /usr/include/c++/11/bits/unique_ptr.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/Nfunction.h \
- /usr/include/c++/11/vector /usr/include/c++/11/bits/stl_uninitialized.h \
+ /home/adriarwin/FreeDTS2/dts_src/Nfunction.h /usr/include/c++/11/vector \
+ /usr/include/c++/11/bits/stl_uninitialized.h \
  /usr/include/c++/11/bits/stl_vector.h \
  /usr/include/c++/11/bits/stl_bvector.h \
  /usr/include/c++/11/bits/vector.tcc \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/inclusion.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/Vec3D.h \
- /usr/include/c++/11/cmath /usr/include/math.h \
- /usr/include/x86_64-linux-gnu/bits/math-vector.h \
+ /home/adriarwin/FreeDTS2/dts_src/inclusion.h \
+ /home/adriarwin/FreeDTS2/dts_src/Vec3D.h /usr/include/c++/11/cmath \
+ /usr/include/math.h /usr/include/x86_64-linux-gnu/bits/math-vector.h \
  /usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h \
  /usr/include/x86_64-linux-gnu/bits/flt-eval-method.h \
  /usr/include/x86_64-linux-gnu/bits/fp-logb.h \
@@ -188,13 +185,13 @@ CMakeFiles/DTS.dir/dts_src/MESH.cpp.o: \
  /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
  /usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h \
  /usr/include/x86_64-linux-gnu/bits/iscanonical.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/InclusionType.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/triangle.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/vertex.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/Voxel.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/Voxelization.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/Tensor2.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/VertexVectorFields.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/VectorField.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/links.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/CreateMashBluePrint.h
+ /home/adriarwin/FreeDTS2/dts_src/InclusionType.h \
+ /home/adriarwin/FreeDTS2/dts_src/triangle.h \
+ /home/adriarwin/FreeDTS2/dts_src/vertex.h \
+ /home/adriarwin/FreeDTS2/dts_src/Voxel.h \
+ /home/adriarwin/FreeDTS2/dts_src/Voxelization.h \
+ /home/adriarwin/FreeDTS2/dts_src/Tensor2.h \
+ /home/adriarwin/FreeDTS2/dts_src/VertexVectorFields.h \
+ /home/adriarwin/FreeDTS2/dts_src/VectorField.h \
+ /home/adriarwin/FreeDTS2/dts_src/links.h \
+ /home/adriarwin/FreeDTS2/dts_src/CreateMashBluePrint.h

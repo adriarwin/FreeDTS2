@@ -1,6 +1,6 @@
 CMakeFiles/DTS.dir/dts_src/FreeDTS.cpp.o: \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/FreeDTS.cpp \
- /usr/include/stdc-predef.h /usr/include/c++/11/iostream \
+ /home/adriarwin/FreeDTS2/dts_src/FreeDTS.cpp /usr/include/stdc-predef.h \
+ /usr/include/c++/11/iostream \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/os_defines.h \
  /usr/include/features.h /usr/include/features-time64.h \
@@ -144,9 +144,8 @@ CMakeFiles/DTS.dir/dts_src/FreeDTS.cpp.o: \
  /usr/include/c++/11/bits/basic_ios.tcc \
  /usr/include/c++/11/bits/ostream.tcc /usr/include/c++/11/istream \
  /usr/include/c++/11/bits/istream.tcc \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/SimDef.h \
- /usr/include/c++/11/algorithm /usr/include/c++/11/utility \
- /usr/include/c++/11/bits/stl_relops.h \
+ /home/adriarwin/FreeDTS2/dts_src/SimDef.h /usr/include/c++/11/algorithm \
+ /usr/include/c++/11/utility /usr/include/c++/11/bits/stl_relops.h \
  /usr/include/c++/11/bits/stl_algo.h \
  /usr/include/c++/11/bits/algorithmfwd.h \
  /usr/include/c++/11/bits/stl_heap.h \
@@ -162,12 +161,12 @@ CMakeFiles/DTS.dir/dts_src/FreeDTS.cpp.o: \
  /usr/include/c++/11/bits/unique_ptr.h /usr/include/c++/11/tuple \
  /usr/include/c++/11/array /usr/include/c++/11/bits/uses_allocator.h \
  /usr/include/c++/11/bits/invoke.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/Nfunction.h \
- /usr/include/c++/11/vector /usr/include/c++/11/bits/stl_uninitialized.h \
+ /home/adriarwin/FreeDTS2/dts_src/Nfunction.h /usr/include/c++/11/vector \
+ /usr/include/c++/11/bits/stl_uninitialized.h \
  /usr/include/c++/11/bits/stl_vector.h \
  /usr/include/c++/11/bits/stl_bvector.h \
  /usr/include/c++/11/bits/vector.tcc \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/Job.h \
+ /home/adriarwin/FreeDTS2/dts_src/Job.h \
  /usr/lib/x86_64-linux-gnu/openmpi/include/mpi.h \
  /usr/lib/x86_64-linux-gnu/openmpi/include/mpi_portable_platform.h \
  /usr/lib/x86_64-linux-gnu/openmpi/include/openmpi/ompi/mpi/cxx/mpicxx.h \

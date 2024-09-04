@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/mnt/c/Users/Usuario/phd/FreeDTS2/dts_src -I/mnt/c/Users/Usuario/phd/FreeDTS2/dts_convert -I/mnt/c/Users/Usuario/phd/FreeDTS2/dts_generate
+CXX_INCLUDES = -I/home/adriarwin/FreeDTS2/dts_src -I/home/adriarwin/FreeDTS2/dts_convert -I/home/adriarwin/FreeDTS2/dts_generate
 
 CXX_FLAGS = -std=gnu++11
 

@@ -8,6 +8,7 @@
 #include "Voxelization.h"
 #ifdef MPI_DETECTED
 #include <mpi.h>
+#include <sstream>
 
 
 
@@ -53,23 +54,52 @@ void ParallelTemperingMoveSimple::Initialize() {
     m_RequestBroadcast.resize(m_Size);
     //m_RankWithUpTempID=rank;
     //m_RankWithDownTempID=rank;
-    double beta;
     for (int i=0;i<m_Size;i++)
         {
-            beta = m_MinBeta + double(i) * (m_MaxBeta - m_MinBeta)/double(m_Nprocessors-1);
-            m_BetaVec.push_back(beta);
             m_RankAtTempID.push_back(i);
         }
+    
+    std::vector<double> localBetaVec;
+    if (rank == 0) {
+        localBetaVec = ReadTemperatures();
+    }
+
+    // Broadcast the size of the vector to all ranks
+    int vecSize = (rank == 0) ? localBetaVec.size() : 0;
+    MPI_Bcast(&vecSize, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+    // Resize the local vector based on the size received
+    std::vector<double> globalBetaVec(vecSize);
+    if (rank == 0) {
+        // Ensure localBetaVec.data() is the correct pointer for broadcasting
+        MPI_Bcast(localBetaVec.data(), vecSize, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    } else {
+        MPI_Bcast(globalBetaVec.data(), vecSize, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    }
+
+    // Now each rank has a copy of the vector
+    m_BetaVec = globalBetaVec;
+    if (rank==0){m_BetaVec=localBetaVec;}
+
+    if (m_Size !=m_BetaVec.size()){
+        std::cout<<"The selected temperatures do not match the number of processors."<<std::endl;
+        exit(0);
+    }
+
 
     m_pState->GetSimulation()->SetBeta(m_BetaVec[m_TempID], 0);
     //--> set the run tag id, we need to update this ID each time that the processor changes its temprature. The id should be temprature dependent
         //std::string gfile = ReplicaState.GetRunTag() + Nfunction::Int_to_String(beta); // general output file name
         //ReplicaState.UpdateRunTag(gfile);
 
-    //In here, I need to think how to implement the restart in the right way (will be hard but it is extremly important to do it right
+    //In here, I need to think how to implement the restart in the right way (will be hard but it is extremly important to do it right)
     m_pState->GetNonbinaryTrajectory()->SetFolderName(m_pState->GetNonbinaryTrajectory()->GetOriginalFolderName() +"_" + Nfunction::Int_to_String(m_TempID));
     m_pState->GetTimeSeriesDataOutput()->SetCustomFileName(m_pState ->GetRunTag() + "_" +Nfunction::Int_to_String(m_TempID)+TimeSeriDataExt);
     
+    
+    if (m_Rank==0){
+        m_TimeSeriesFile.open(GetOutputFileName(),std::ios_base::app);
+    }
     #endif
 
 }
@@ -118,6 +148,7 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
             for(int i=0; i<m_Size; i++){
                 if(m_RankAtTempID[i]==m_Rank){
                     m_TempID=i;
+                    if (m_TempID==0){m_TargetState=true;}
                     break;
                 }
             }
@@ -173,6 +204,7 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
             for(int i=0; i<m_Size; i++){
                 if(m_RankAtTempID[i]==m_Rank){
                     m_TempID=i;
+                    if (m_TempID==0){m_TargetState=true;}
                     break;
                 }
             }
@@ -466,6 +498,82 @@ bool ParallelTemperingMoveSimple::ChangeToNewTemperatureID(int NewTempID){
 
 
     return true;
+}
+
+std::vector<double> ParallelTemperingMoveSimple::ReadTemperatures(){
+
+    Nfunction f;
+    std::string filename=ParallelTemperingMoveSimple::GetInitialTemperaturesFileName();
+
+    if(f.FileExist(filename)==false)
+    {
+        std::cout<<"-----> Error: the temperature file name with the name "<<filename<<" does not exist"<<std::endl;
+        exit(0);
+    }
+
+    std::ifstream TemperatureFile(filename);
+    
+    // Check if the file was opened successfully
+    if (!TemperatureFile.is_open()) {
+        std::cerr << "Error: Could not open file " << filename << std::endl;
+        exit(0);
+    }
+
+    std::vector<double> betavec;
+
+    // File processing code goes here
+
+    std::string line;
+    while (std::getline(TemperatureFile, line)) {
+        // Skip empty or whitespace-only lines
+        if (is_line_empty(line)) {
+            continue;
+        }
+
+        std::stringstream ss(line);  // Use a stringstream to parse the line
+        double value;
+        // Read the double value from the line
+        if (ss >> value) {
+            // Ensure there is no extra data in the line
+            if (ss >> std::ws && !ss.eof()) {
+                std::cerr << "Error: More than one value or extra data in line: \"" << line << "\"" << std::endl;
+                exit(0);  // Exit with error code
+            }
+
+            
+            betavec.push_back(value);  // Add each double to the data vector
+        } else {
+            std::cerr << "Error: Could not read a double value from line: \"" << line << "\"" << std::endl;
+            exit(0);  // Exit with error code
+        }
+    }
+
+    // Close the file
+    TemperatureFile.close();
+
+    for (size_t i = 1; i < betavec.size(); ++i) {
+        if (betavec[i] < betavec[i - 1]) {
+            std::cerr << "Error: Vector is not sorted in ascending order." << std::endl;
+            exit(0);  // Exit with error code
+        }
+    }
+
+    for (size_t i = 0; i < betavec.size(); ++i) {
+        betavec[i]=1/betavec[i];
+        std::cout<<betavec[i]<<std::endl;
+    }
+
+    return betavec;
+
+}
+
+bool ParallelTemperingMoveSimple::is_line_empty(const std::string& line) {
+    // Check if the line is empty or contains only whitespace
+    return line.empty() || std::all_of(line.begin(), line.end(), [](unsigned char c) { return std::isspace(c); });
+}
+
+bool ParallelTemperingMoveSimple::GetTargetState(){
+    return m_TargetState;
 }
 
 std::string ParallelTemperingMoveSimple::CurrentState(){

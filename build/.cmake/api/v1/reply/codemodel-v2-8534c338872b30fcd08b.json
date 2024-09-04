@@ -1,0 +1,79 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-b49b27917a64f31c3eda.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.10"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "FreeDTS2",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "CNV::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-CNV-Debug-b1cdc0320635098d4bb0.json",
+					"name" : "CNV",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "DTS::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-DTS-Debug-1bcc3d497bbf5951ee42.json",
+					"name" : "DTS",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "GEN::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-GEN-Debug-4cc3de2a735fca0ccabe.json",
+					"name" : "GEN",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/adriarwin/FreeDTS2/build",
+		"source" : "/home/adriarwin/FreeDTS2"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 3
+	}
+}

@@ -12,6 +12,7 @@
 #include "AbstractParallelTemperingMove.h"
 #ifdef MPI_DETECTED
 #include <mpi.h>
+#include <fstream>
 #endif
 
 
@@ -27,7 +28,9 @@ public:
 
     inline  std::string GetDerivedDefaultReadName()  {return "ParallelTemperingMoveSimple";}
     inline  static std::string GetBaseDefaultReadName()  {return "ParallelTemperingMoveSimple";}
+    
     std::string CurrentState();
+    bool GetTargetState();
 
 private:
     bool ChangeToNewTemperatureID(int NewTempID);
@@ -44,6 +47,7 @@ private:
     int m_TempID;
     int m_Counter;
     bool m_SizeIsEven;
+    bool m_TargetState;
     std::vector<int>  m_RankAtTempID;   // a map for temp_id to thread_id, temp = temperatures.at(temp_id)
     std::vector<double> m_BetaVec;        // the 1/temprature of each temp_id
     State *m_pState;
@@ -52,7 +56,13 @@ private:
     #ifdef MPI_DETECTED
     std::vector<MPI_Request> m_RequestBroadcast;
     #endif
-    
+
+    inline  std::string GetInitialTemperaturesFileName() {return "initial_temperatures.txt";}
+    inline  std::string GetOutputFileName() {return "output_trajectories.txt";}
+    std::vector<double> ReadTemperatures();
+    bool is_line_empty(const std::string& line);
+
+    std::ofstream m_TimeSeriesFile;
 
 
 };

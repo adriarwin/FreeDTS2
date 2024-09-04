@@ -1,5 +1,5 @@
 CMakeFiles/CNV.dir/dts_convert/Convert.cpp.o: \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_convert/Convert.cpp \
+ /home/adriarwin/FreeDTS2/dts_convert/Convert.cpp \
  /usr/include/stdc-predef.h /usr/include/c++/11/fstream \
  /usr/include/c++/11/istream /usr/include/c++/11/ios \
  /usr/include/c++/11/iosfwd \
@@ -148,11 +148,10 @@ CMakeFiles/CNV.dir/dts_convert/Convert.cpp.o: \
  /usr/include/x86_64-linux-gnu/c++/11/bits/basic_file.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++io.h \
  /usr/include/c++/11/bits/fstream.tcc \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_convert/Convert.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_convert/Def.h \
- /usr/include/c++/11/iostream /usr/include/c++/11/sstream \
- /usr/include/c++/11/bits/sstream.tcc /usr/include/c++/11/vector \
- /usr/include/c++/11/bits/stl_uninitialized.h \
+ /home/adriarwin/FreeDTS2/dts_convert/Convert.h \
+ /home/adriarwin/FreeDTS2/dts_convert/Def.h /usr/include/c++/11/iostream \
+ /usr/include/c++/11/sstream /usr/include/c++/11/bits/sstream.tcc \
+ /usr/include/c++/11/vector /usr/include/c++/11/bits/stl_uninitialized.h \
  /usr/include/c++/11/bits/stl_vector.h \
  /usr/include/c++/11/bits/stl_bvector.h \
  /usr/include/c++/11/bits/vector.tcc /usr/include/c++/11/stdlib.h \
@@ -199,10 +198,10 @@ CMakeFiles/CNV.dir/dts_convert/Convert.cpp.o: \
  /usr/include/c++/11/bits/gslice_array.h \
  /usr/include/c++/11/bits/mask_array.h \
  /usr/include/c++/11/bits/indirect_array.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_convert/Nfunction.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_convert/Vec3D.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_convert/MeshBluePrint.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_convert/TSIFile.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_convert/QFile.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_convert/WritevtuFiles.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_convert/VMDOutput.h
+ /home/adriarwin/FreeDTS2/dts_convert/Nfunction.h \
+ /home/adriarwin/FreeDTS2/dts_convert/Vec3D.h \
+ /home/adriarwin/FreeDTS2/dts_convert/MeshBluePrint.h \
+ /home/adriarwin/FreeDTS2/dts_convert/TSIFile.h \
+ /home/adriarwin/FreeDTS2/dts_convert/QFile.h \
+ /home/adriarwin/FreeDTS2/dts_convert/WritevtuFiles.h \
+ /home/adriarwin/FreeDTS2/dts_convert/VMDOutput.h

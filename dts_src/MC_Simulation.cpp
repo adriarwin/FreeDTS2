@@ -75,7 +75,7 @@ bool MC_Simulation::do_Simulation(){
 #endif
 
 #ifdef MPI_DETECTED
-        if(rank == 0){ 
+        if(m_pState->GetParallelTempering()->GetTargetState() == true){ 
             m_pState->GetVisualization()->WriteAFrame(0);
         }
 #endif
@@ -100,7 +100,7 @@ for (int step = m_Initial_Step; step <= m_Final_Step; step++){
 #endif
 
 #ifdef MPI_DETECTED
-        if(rank == 0){ 
+        if(m_pState->GetParallelTempering()->GetTargetState() == true){ 
             m_pState->GetVisualization()->WriteAFrame(step);
         }
 #endif

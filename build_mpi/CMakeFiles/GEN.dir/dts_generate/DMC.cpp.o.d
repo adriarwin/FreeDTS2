@@ -1,8 +1,6 @@
 CMakeFiles/GEN.dir/dts_generate/DMC.cpp.o: \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_generate/DMC.cpp \
- /usr/include/stdc-predef.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_generate/Def.h \
- /usr/include/c++/11/iostream \
+ /home/adriarwin/FreeDTS2/dts_generate/DMC.cpp /usr/include/stdc-predef.h \
+ /home/adriarwin/FreeDTS2/dts_generate/Def.h /usr/include/c++/11/iostream \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/os_defines.h \
  /usr/include/features.h /usr/include/features-time64.h \
@@ -198,6 +196,6 @@ CMakeFiles/GEN.dir/dts_generate/DMC.cpp.o: \
  /usr/include/c++/11/bits/gslice_array.h \
  /usr/include/c++/11/bits/mask_array.h \
  /usr/include/c++/11/bits/indirect_array.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_generate/Generate.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_generate/Nfunction.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_generate/Vec3D.h
+ /home/adriarwin/FreeDTS2/dts_generate/Generate.h \
+ /home/adriarwin/FreeDTS2/dts_generate/Nfunction.h \
+ /home/adriarwin/FreeDTS2/dts_generate/Vec3D.h

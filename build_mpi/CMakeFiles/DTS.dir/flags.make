@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = -DMPI_DETECTED
 
-CXX_INCLUDES = -I/mnt/c/Users/Usuario/phd/FreeDTS2/dts_src -I/mnt/c/Users/Usuario/phd/FreeDTS2/dts_convert -I/mnt/c/Users/Usuario/phd/FreeDTS2/dts_generate -isystem /usr/lib/x86_64-linux-gnu/openmpi/include -isystem /usr/lib/x86_64-linux-gnu/openmpi/include/openmpi
+CXX_INCLUDES = -I/home/adriarwin/FreeDTS2/dts_src -I/home/adriarwin/FreeDTS2/dts_convert -I/home/adriarwin/FreeDTS2/dts_generate -isystem /usr/lib/x86_64-linux-gnu/openmpi/include -isystem /usr/lib/x86_64-linux-gnu/openmpi/include/openmpi
 
 CXX_FLAGS = -std=gnu++11
 

@@ -1,7 +1,6 @@
 CMakeFiles/DTS.dir/dts_src/triangle.cpp.o: \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/triangle.cpp \
- /usr/include/stdc-predef.h /usr/include/c++/11/math.h \
- /usr/include/c++/11/cmath \
+ /home/adriarwin/FreeDTS2/dts_src/triangle.cpp /usr/include/stdc-predef.h \
+ /usr/include/c++/11/math.h /usr/include/c++/11/cmath \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/os_defines.h \
  /usr/include/features.h /usr/include/features-time64.h \
@@ -58,10 +57,9 @@ CMakeFiles/DTS.dir/dts_src/triangle.cpp.o: \
  /usr/include/x86_64-linux-gnu/bits/struct_mutex.h \
  /usr/include/x86_64-linux-gnu/bits/struct_rwlock.h /usr/include/alloca.h \
  /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/Vec3D.h \
- /usr/include/c++/11/iostream /usr/include/c++/11/ostream \
- /usr/include/c++/11/ios /usr/include/c++/11/iosfwd \
- /usr/include/c++/11/bits/stringfwd.h \
+ /home/adriarwin/FreeDTS2/dts_src/Vec3D.h /usr/include/c++/11/iostream \
+ /usr/include/c++/11/ostream /usr/include/c++/11/ios \
+ /usr/include/c++/11/iosfwd /usr/include/c++/11/bits/stringfwd.h \
  /usr/include/c++/11/bits/memoryfwd.h /usr/include/c++/11/bits/postypes.h \
  /usr/include/c++/11/cwchar /usr/include/wchar.h \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/stdarg.h \
@@ -158,11 +156,10 @@ CMakeFiles/DTS.dir/dts_src/triangle.cpp.o: \
  /usr/include/c++/11/bits/basic_ios.tcc \
  /usr/include/c++/11/bits/ostream.tcc /usr/include/c++/11/istream \
  /usr/include/c++/11/bits/istream.tcc \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/vertex.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/Voxel.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/SimDef.h \
- /usr/include/c++/11/algorithm /usr/include/c++/11/utility \
- /usr/include/c++/11/bits/stl_relops.h \
+ /home/adriarwin/FreeDTS2/dts_src/vertex.h \
+ /home/adriarwin/FreeDTS2/dts_src/Voxel.h \
+ /home/adriarwin/FreeDTS2/dts_src/SimDef.h /usr/include/c++/11/algorithm \
+ /usr/include/c++/11/utility /usr/include/c++/11/bits/stl_relops.h \
  /usr/include/c++/11/bits/stl_algo.h \
  /usr/include/c++/11/bits/algorithmfwd.h \
  /usr/include/c++/11/bits/stl_heap.h \
@@ -178,15 +175,15 @@ CMakeFiles/DTS.dir/dts_src/triangle.cpp.o: \
  /usr/include/c++/11/bits/unique_ptr.h /usr/include/c++/11/tuple \
  /usr/include/c++/11/array /usr/include/c++/11/bits/uses_allocator.h \
  /usr/include/c++/11/bits/invoke.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/Nfunction.h \
- /usr/include/c++/11/vector /usr/include/c++/11/bits/stl_uninitialized.h \
+ /home/adriarwin/FreeDTS2/dts_src/Nfunction.h /usr/include/c++/11/vector \
+ /usr/include/c++/11/bits/stl_uninitialized.h \
  /usr/include/c++/11/bits/stl_vector.h \
  /usr/include/c++/11/bits/stl_bvector.h \
  /usr/include/c++/11/bits/vector.tcc \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/Voxelization.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/Tensor2.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/inclusion.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/InclusionType.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/VertexVectorFields.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/VectorField.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/triangle.h
+ /home/adriarwin/FreeDTS2/dts_src/Voxelization.h \
+ /home/adriarwin/FreeDTS2/dts_src/Tensor2.h \
+ /home/adriarwin/FreeDTS2/dts_src/inclusion.h \
+ /home/adriarwin/FreeDTS2/dts_src/InclusionType.h \
+ /home/adriarwin/FreeDTS2/dts_src/VertexVectorFields.h \
+ /home/adriarwin/FreeDTS2/dts_src/VectorField.h \
+ /home/adriarwin/FreeDTS2/dts_src/triangle.h

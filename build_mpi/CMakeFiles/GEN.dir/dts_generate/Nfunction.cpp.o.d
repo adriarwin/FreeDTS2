@@ -1,5 +1,5 @@
 CMakeFiles/GEN.dir/dts_generate/Nfunction.cpp.o: \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_generate/Nfunction.cpp \
+ /home/adriarwin/FreeDTS2/dts_generate/Nfunction.cpp \
  /usr/include/stdc-predef.h /usr/include/c++/11/iostream \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/os_defines.h \
@@ -154,4 +154,4 @@ CMakeFiles/GEN.dir/dts_generate/Nfunction.cpp.o: \
  /usr/include/c++/11/bits/stl_vector.h \
  /usr/include/c++/11/bits/stl_bvector.h \
  /usr/include/c++/11/bits/vector.tcc \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_generate/Nfunction.h
+ /home/adriarwin/FreeDTS2/dts_generate/Nfunction.h

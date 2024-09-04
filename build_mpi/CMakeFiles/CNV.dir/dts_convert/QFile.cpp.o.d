@@ -1,5 +1,5 @@
 CMakeFiles/CNV.dir/dts_convert/QFile.cpp.o: \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_convert/QFile.cpp \
+ /home/adriarwin/FreeDTS2/dts_convert/QFile.cpp \
  /usr/include/stdc-predef.h /usr/include/time.h /usr/include/features.h \
  /usr/include/features-time64.h \
  /usr/include/x86_64-linux-gnu/bits/wordsize.h \
@@ -150,10 +150,10 @@ CMakeFiles/CNV.dir/dts_convert/QFile.cpp.o: \
  /usr/include/c++/11/bits/stl_relops.h /usr/include/c++/11/tuple \
  /usr/include/c++/11/array /usr/include/c++/11/bits/uses_allocator.h \
  /usr/include/c++/11/bits/invoke.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_convert/QFile.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_convert/Def.h \
- /usr/include/c++/11/iostream /usr/include/c++/11/ostream \
- /usr/include/c++/11/ios /usr/include/c++/11/bits/basic_ios.h \
+ /home/adriarwin/FreeDTS2/dts_convert/QFile.h \
+ /home/adriarwin/FreeDTS2/dts_convert/Def.h /usr/include/c++/11/iostream \
+ /usr/include/c++/11/ostream /usr/include/c++/11/ios \
+ /usr/include/c++/11/bits/basic_ios.h \
  /usr/include/c++/11/bits/basic_ios.tcc \
  /usr/include/c++/11/bits/ostream.tcc /usr/include/c++/11/istream \
  /usr/include/c++/11/bits/istream.tcc /usr/include/c++/11/fstream \
@@ -197,6 +197,6 @@ CMakeFiles/CNV.dir/dts_convert/QFile.cpp.o: \
  /usr/include/c++/11/bits/gslice_array.h \
  /usr/include/c++/11/bits/mask_array.h \
  /usr/include/c++/11/bits/indirect_array.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_convert/Vec3D.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_convert/Nfunction.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_convert/MeshBluePrint.h
+ /home/adriarwin/FreeDTS2/dts_convert/Vec3D.h \
+ /home/adriarwin/FreeDTS2/dts_convert/Nfunction.h \
+ /home/adriarwin/FreeDTS2/dts_convert/MeshBluePrint.h

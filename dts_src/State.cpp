@@ -799,6 +799,7 @@ while (input >> firstword) {
             double minbeta, maxbeta;
             input>>str>>type>>algorithm>>period>>n_processors>>minbeta>>maxbeta;
             std::cout<<"Printing algorithm"<<algorithm<<std::endl;
+            std::cout<<"Printing type"<<type<<std::endl;
             if(algorithm == ParallelTemperingMoveSimple::GetBaseDefaultReadName()){
                 std::cout<<"Initializing this!"<<algorithm<<std::endl;
                 m_pParallelTemperingMove = new ParallelTemperingMoveSimple(this ,period, n_processors, minbeta, maxbeta);

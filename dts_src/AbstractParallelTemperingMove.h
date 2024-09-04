@@ -56,6 +56,8 @@ public:
      */
     virtual bool EvolveOneStep(int step) = 0;
 
+    virtual bool GetTargetState() = 0;
+
     /*
      * @brief Pure virtual function to initialize the box parameters.
      */
@@ -109,6 +111,9 @@ public:
         return;
     }
     bool EvolveOneStep(int step){
+        return false;
+    }
+    bool GetTargetState(){
         return false;
     }
     std::string CurrentState(){

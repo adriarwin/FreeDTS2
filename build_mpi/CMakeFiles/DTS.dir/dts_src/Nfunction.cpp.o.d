@@ -1,5 +1,5 @@
 CMakeFiles/DTS.dir/dts_src/Nfunction.cpp.o: \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/Nfunction.cpp \
+ /home/adriarwin/FreeDTS2/dts_src/Nfunction.cpp \
  /usr/include/stdc-predef.h /usr/include/c++/11/iostream \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/os_defines.h \
@@ -164,10 +164,10 @@ CMakeFiles/DTS.dir/dts_src/Nfunction.cpp.o: \
  /usr/include/c++/11/bits/stl_relops.h /usr/include/c++/11/tuple \
  /usr/include/c++/11/array /usr/include/c++/11/bits/uses_allocator.h \
  /usr/include/c++/11/bits/invoke.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/SimDef.h \
- /usr/include/c++/11/algorithm /usr/include/c++/11/bits/stl_algo.h \
+ /home/adriarwin/FreeDTS2/dts_src/SimDef.h /usr/include/c++/11/algorithm \
+ /usr/include/c++/11/bits/stl_algo.h \
  /usr/include/c++/11/bits/algorithmfwd.h \
  /usr/include/c++/11/bits/stl_heap.h \
  /usr/include/c++/11/bits/stl_tempbuf.h \
  /usr/include/c++/11/bits/uniform_int_dist.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/Nfunction.h
+ /home/adriarwin/FreeDTS2/dts_src/Nfunction.h

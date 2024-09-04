@@ -1,6 +1,6 @@
 CMakeFiles/DTS.dir/dts_src/Vec3D.cpp.o: \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/Vec3D.cpp \
- /usr/include/stdc-predef.h /usr/include/c++/11/iostream \
+ /home/adriarwin/FreeDTS2/dts_src/Vec3D.cpp /usr/include/stdc-predef.h \
+ /usr/include/c++/11/iostream \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/os_defines.h \
  /usr/include/features.h /usr/include/features-time64.h \
@@ -162,4 +162,4 @@ CMakeFiles/DTS.dir/dts_src/Vec3D.cpp.o: \
  /usr/include/x86_64-linux-gnu/bits/posix2_lim.h \
  /usr/include/x86_64-linux-gnu/bits/xopen_lim.h \
  /usr/include/x86_64-linux-gnu/bits/uio_lim.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/Vec3D.h
+ /home/adriarwin/FreeDTS2/dts_src/Vec3D.h

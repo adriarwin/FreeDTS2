@@ -1,9 +1,7 @@
 CMakeFiles/DTS.dir/dts_src/RigidWallTypes.cpp.o: \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/RigidWallTypes.cpp \
- /usr/include/stdc-predef.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/State.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/SimDef.h \
- /usr/include/c++/11/iostream \
+ /home/adriarwin/FreeDTS2/dts_src/RigidWallTypes.cpp \
+ /usr/include/stdc-predef.h /home/adriarwin/FreeDTS2/dts_src/State.h \
+ /home/adriarwin/FreeDTS2/dts_src/SimDef.h /usr/include/c++/11/iostream \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/os_defines.h \
  /usr/include/features.h /usr/include/features-time64.h \
@@ -163,21 +161,20 @@ CMakeFiles/DTS.dir/dts_src/RigidWallTypes.cpp.o: \
  /usr/include/c++/11/bits/unique_ptr.h /usr/include/c++/11/tuple \
  /usr/include/c++/11/array /usr/include/c++/11/bits/uses_allocator.h \
  /usr/include/c++/11/bits/invoke.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/Nfunction.h \
- /usr/include/c++/11/vector /usr/include/c++/11/bits/stl_uninitialized.h \
+ /home/adriarwin/FreeDTS2/dts_src/Nfunction.h /usr/include/c++/11/vector \
+ /usr/include/c++/11/bits/stl_uninitialized.h \
  /usr/include/c++/11/bits/stl_vector.h \
  /usr/include/c++/11/bits/stl_bvector.h \
  /usr/include/c++/11/bits/vector.tcc \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/MESH.h /usr/include/c++/11/map \
+ /home/adriarwin/FreeDTS2/dts_src/MESH.h /usr/include/c++/11/map \
  /usr/include/c++/11/bits/stl_tree.h \
  /usr/include/c++/11/ext/aligned_buffer.h \
  /usr/include/c++/11/bits/stl_map.h \
  /usr/include/c++/11/bits/stl_multimap.h \
  /usr/include/c++/11/bits/erase_if.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/inclusion.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/Vec3D.h \
- /usr/include/c++/11/cmath /usr/include/math.h \
- /usr/include/x86_64-linux-gnu/bits/math-vector.h \
+ /home/adriarwin/FreeDTS2/dts_src/inclusion.h \
+ /home/adriarwin/FreeDTS2/dts_src/Vec3D.h /usr/include/c++/11/cmath \
+ /usr/include/math.h /usr/include/x86_64-linux-gnu/bits/math-vector.h \
  /usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h \
  /usr/include/x86_64-linux-gnu/bits/flt-eval-method.h \
  /usr/include/x86_64-linux-gnu/bits/fp-logb.h \
@@ -186,80 +183,79 @@ CMakeFiles/DTS.dir/dts_src/RigidWallTypes.cpp.o: \
  /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
  /usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h \
  /usr/include/x86_64-linux-gnu/bits/iscanonical.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/InclusionType.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/triangle.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/vertex.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/Voxel.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/Voxelization.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/Tensor2.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/VertexVectorFields.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/VectorField.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/links.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/CreateMashBluePrint.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/AbstractVertexPositionIntegrator.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/AbstractAlexanderMove.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/AbstractInclusionPoseIntegrator.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/AbstractVectorFieldsRotationMove.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/EvolveVerticesByMetropolisAlgorithm.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/AbstractSimulation.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/AlexanderMoveByMetropolisAlgorithm.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/InclusionPoseUpdateByMetropolisAlgorithm.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/VectorFieldsRotationByMetropolisAlgorithm.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/AbstractNonbinaryTrajectory.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/AbstractVisualizationFile.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/AbstractBinaryTrajectory.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/TimeSeriesDataOutput.h \
+ /home/adriarwin/FreeDTS2/dts_src/InclusionType.h \
+ /home/adriarwin/FreeDTS2/dts_src/triangle.h \
+ /home/adriarwin/FreeDTS2/dts_src/vertex.h \
+ /home/adriarwin/FreeDTS2/dts_src/Voxel.h \
+ /home/adriarwin/FreeDTS2/dts_src/Voxelization.h \
+ /home/adriarwin/FreeDTS2/dts_src/Tensor2.h \
+ /home/adriarwin/FreeDTS2/dts_src/VertexVectorFields.h \
+ /home/adriarwin/FreeDTS2/dts_src/VectorField.h \
+ /home/adriarwin/FreeDTS2/dts_src/links.h \
+ /home/adriarwin/FreeDTS2/dts_src/CreateMashBluePrint.h \
+ /home/adriarwin/FreeDTS2/dts_src/AbstractVertexPositionIntegrator.h \
+ /home/adriarwin/FreeDTS2/dts_src/AbstractAlexanderMove.h \
+ /home/adriarwin/FreeDTS2/dts_src/AbstractInclusionPoseIntegrator.h \
+ /home/adriarwin/FreeDTS2/dts_src/AbstractVectorFieldsRotationMove.h \
+ /home/adriarwin/FreeDTS2/dts_src/EvolveVerticesByMetropolisAlgorithm.h \
+ /home/adriarwin/FreeDTS2/dts_src/AbstractSimulation.h \
+ /home/adriarwin/FreeDTS2/dts_src/AlexanderMoveByMetropolisAlgorithm.h \
+ /home/adriarwin/FreeDTS2/dts_src/InclusionPoseUpdateByMetropolisAlgorithm.h \
+ /home/adriarwin/FreeDTS2/dts_src/VectorFieldsRotationByMetropolisAlgorithm.h \
+ /home/adriarwin/FreeDTS2/dts_src/AbstractNonbinaryTrajectory.h \
+ /home/adriarwin/FreeDTS2/dts_src/AbstractVisualizationFile.h \
+ /home/adriarwin/FreeDTS2/dts_src/AbstractBinaryTrajectory.h \
+ /home/adriarwin/FreeDTS2/dts_src/TimeSeriesDataOutput.h \
  /usr/include/c++/11/fstream \
  /usr/include/x86_64-linux-gnu/c++/11/bits/basic_file.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++io.h \
  /usr/include/c++/11/bits/fstream.tcc \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/TimeSeriesLogInformation.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/Traj_tsi.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/Restart.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/WritevtuFiles.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/BTSFile.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/AbstractEnergy.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/Inclusion_Interaction_Map.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/Energy.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/AbstractCurvature.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/CurvatureByShapeOperatorType1.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/AbstractDynamicBox.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/PositionRescaleFrameTensionCoupling.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/HarmonicPotentialBetweenTwoGroups.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/AbstractApplyConstraintBetweenGroups.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/AbstractDynamicTopology.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/Three_Edge_Scission.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/AbstractOpenEdgeEvolution.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/RNG.h \
- /usr/include/c++/11/random /usr/include/c++/11/limits \
- /usr/include/c++/11/bits/random.h \
+ /home/adriarwin/FreeDTS2/dts_src/TimeSeriesLogInformation.h \
+ /home/adriarwin/FreeDTS2/dts_src/Traj_tsi.h \
+ /home/adriarwin/FreeDTS2/dts_src/Restart.h \
+ /home/adriarwin/FreeDTS2/dts_src/WritevtuFiles.h \
+ /home/adriarwin/FreeDTS2/dts_src/BTSFile.h \
+ /home/adriarwin/FreeDTS2/dts_src/AbstractEnergy.h \
+ /home/adriarwin/FreeDTS2/dts_src/Inclusion_Interaction_Map.h \
+ /home/adriarwin/FreeDTS2/dts_src/Energy.h \
+ /home/adriarwin/FreeDTS2/dts_src/AbstractCurvature.h \
+ /home/adriarwin/FreeDTS2/dts_src/CurvatureByShapeOperatorType1.h \
+ /home/adriarwin/FreeDTS2/dts_src/AbstractDynamicBox.h \
+ /home/adriarwin/FreeDTS2/dts_src/PositionRescaleFrameTensionCoupling.h \
+ /home/adriarwin/FreeDTS2/dts_src/HarmonicPotentialBetweenTwoGroups.h \
+ /home/adriarwin/FreeDTS2/dts_src/AbstractApplyConstraintBetweenGroups.h \
+ /home/adriarwin/FreeDTS2/dts_src/AbstractDynamicTopology.h \
+ /home/adriarwin/FreeDTS2/dts_src/Three_Edge_Scission.h \
+ /home/adriarwin/FreeDTS2/dts_src/AbstractOpenEdgeEvolution.h \
+ /home/adriarwin/FreeDTS2/dts_src/RNG.h /usr/include/c++/11/random \
+ /usr/include/c++/11/limits /usr/include/c++/11/bits/random.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/opt_random.h \
  /usr/include/c++/11/bits/random.tcc /usr/include/c++/11/numeric \
  /usr/include/c++/11/bits/stl_numeric.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/OpenEdgeEvolutionWithConstantVertex.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/AbstractVolumeCoupling.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/VAHGlobalMeshProperties.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/Apply_Osmotic_Pressure.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/VolumeCouplingSecondOrder.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/AbstractGlobalCurvature.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/CouplingGlobalCurvatureToHarmonicPotential.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/AbstractTotalAreaCoupling.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/CouplingTotalAreaToHarmonicPotential.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/AbstractInclusionConversion.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/ActiveTwoStateInclusion.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/AbstractForceonVerticesfromInclusions.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/AbstractForceonVerticesfromVectorFields.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/Constant_NematicForce.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/Constant_NematicForceByVectorFields.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/AbstractExternalFieldOnVectorFields.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/AbstractExternalFieldOnInclusions.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/ConstantExternalField.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/ConstantExternalFieldOnVectorFields.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/AbstractBoundary.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/RigidWallTypes.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/MC_Simulation.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/AbstractParallelTemperingMove.h \
- /mnt/c/Users/Usuario/phd/FreeDTS2/dts_src/ParallelTemperingMoveSimple.h \
+ /home/adriarwin/FreeDTS2/dts_src/OpenEdgeEvolutionWithConstantVertex.h \
+ /home/adriarwin/FreeDTS2/dts_src/AbstractVolumeCoupling.h \
+ /home/adriarwin/FreeDTS2/dts_src/VAHGlobalMeshProperties.h \
+ /home/adriarwin/FreeDTS2/dts_src/Apply_Osmotic_Pressure.h \
+ /home/adriarwin/FreeDTS2/dts_src/VolumeCouplingSecondOrder.h \
+ /home/adriarwin/FreeDTS2/dts_src/AbstractGlobalCurvature.h \
+ /home/adriarwin/FreeDTS2/dts_src/CouplingGlobalCurvatureToHarmonicPotential.h \
+ /home/adriarwin/FreeDTS2/dts_src/AbstractTotalAreaCoupling.h \
+ /home/adriarwin/FreeDTS2/dts_src/CouplingTotalAreaToHarmonicPotential.h \
+ /home/adriarwin/FreeDTS2/dts_src/AbstractInclusionConversion.h \
+ /home/adriarwin/FreeDTS2/dts_src/ActiveTwoStateInclusion.h \
+ /home/adriarwin/FreeDTS2/dts_src/AbstractForceonVerticesfromInclusions.h \
+ /home/adriarwin/FreeDTS2/dts_src/AbstractForceonVerticesfromVectorFields.h \
+ /home/adriarwin/FreeDTS2/dts_src/Constant_NematicForce.h \
+ /home/adriarwin/FreeDTS2/dts_src/Constant_NematicForceByVectorFields.h \
+ /home/adriarwin/FreeDTS2/dts_src/AbstractExternalFieldOnVectorFields.h \
+ /home/adriarwin/FreeDTS2/dts_src/AbstractExternalFieldOnInclusions.h \
+ /home/adriarwin/FreeDTS2/dts_src/ConstantExternalField.h \
+ /home/adriarwin/FreeDTS2/dts_src/ConstantExternalFieldOnVectorFields.h \
+ /home/adriarwin/FreeDTS2/dts_src/AbstractBoundary.h \
+ /home/adriarwin/FreeDTS2/dts_src/RigidWallTypes.h \
+ /home/adriarwin/FreeDTS2/dts_src/MC_Simulation.h \
+ /home/adriarwin/FreeDTS2/dts_src/AbstractParallelTemperingMove.h \
+ /home/adriarwin/FreeDTS2/dts_src/ParallelTemperingMoveSimple.h \
  /usr/lib/x86_64-linux-gnu/openmpi/include/mpi.h \
  /usr/lib/x86_64-linux-gnu/openmpi/include/mpi_portable_platform.h \
  /usr/lib/x86_64-linux-gnu/openmpi/include/openmpi/ompi/mpi/cxx/mpicxx.h \
