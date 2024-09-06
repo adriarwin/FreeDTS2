@@ -31,6 +31,7 @@ public:
     
     std::string CurrentState();
     bool GetTargetState();
+    void SetRestart();
 
 private:
     bool ChangeToNewTemperatureID(int NewTempID);
@@ -65,6 +66,8 @@ private:
     
     std::ofstream m_TimeSeriesFile;
 
+    bool m_Restart=false;
+    
 
 };
 

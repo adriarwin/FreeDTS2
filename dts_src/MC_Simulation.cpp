@@ -111,7 +111,7 @@ for (int step = m_Initial_Step; step <= m_Final_Step; step++){
         //--- write into time seri file, e.g., energy, volume ...
         m_pState->GetTimeSeriesDataOutput()->WriteTimeSeriesDataOutput(step);
         //--- write check point for the state
-        //--- Needs to be parallezied for MPI
+        //This is already parallelized. I just need to change the name of the steps
         m_pState->GetRestart()->UpdateRestartState(step, m_pState->GetVertexPositionUpdate()->GetDR(), m_pState->GetDynamicBox()->GetDR());
     
 //---> centering the simulation box

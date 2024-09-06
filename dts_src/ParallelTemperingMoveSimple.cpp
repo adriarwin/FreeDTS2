@@ -95,13 +95,23 @@ void ParallelTemperingMoveSimple::Initialize() {
     //In here, I need to think how to implement the restart in the right way (will be hard but it is extremly important to do it right)
     m_pState->GetNonbinaryTrajectory()->SetFolderName(m_pState->GetNonbinaryTrajectory()->GetOriginalFolderName() +"_" + Nfunction::Int_to_String(m_TempID));
     m_pState->GetTimeSeriesDataOutput()->SetCustomFileName(m_pState ->GetRunTag() + "_" +Nfunction::Int_to_String(m_TempID)+TimeSeriDataExt);
+    m_pState->GetRestart()->SetUniqueRestartFileName("_" + Nfunction::Int_to_String(m_TempID));
     
-    
-    if (m_Rank == 0) {
-        m_TimeSeriesFile.open(GetOutputFileName(), std::ios_base::out);
-        m_TimeSeriesFile << "Rank-Temperature ID Mapping: "<<std::endl;
-        // Call the new function to write m_RankAtTempID to m_TimeSeriesFile
+    if (m_Restart==false){
+        if (m_Rank == 0) {
+            m_TimeSeriesFile.open(GetOutputFileName(), std::ios_base::out);
+            m_TimeSeriesFile << "Rank-Temperature ID Mapping: "<<std::endl;
+            // Call the new function to write m_RankAtTempID to m_TimeSeriesFile
+        }
     }
+    else{
+        if (m_Rank == 0) {
+            m_TimeSeriesFile.open(GetOutputFileName(), std::ios_base::app);
+            // Call the new function to write m_RankAtTempID to m_TimeSeriesFile
+        }
+
+    }
+
     #endif
 }
 
@@ -271,6 +281,7 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
             int EmptyBlockingInt=0;
             MPI_Send(&EmptyBlockingInt, 1, MPI_INT, DestRank, 3, MPI_COMM_WORLD);
             m_pState->GetTimeSeriesDataOutput()->OpenFileWithoutHeader(m_pState ->GetRunTag() + "_" +Nfunction::Int_to_String(NewTempID)+TimeSeriDataExt);
+            m_pState->GetRestart()->SetUniqueRestartFileName("_" + Nfunction::Int_to_String(NewTempID));
             }
             
         //BROADCAST TO UPDATE ALL TEMPERATURES ABOUT RESULT OF THE EXCHANGE ATTEMPT
@@ -329,6 +340,7 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
             int EmptyBlockingInt;
             MPI_Recv(&EmptyBlockingInt, 1, MPI_INT, SourceRank, 3, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             m_pState->GetTimeSeriesDataOutput()->OpenFileWithoutHeader(m_pState ->GetRunTag() + "_" +Nfunction::Int_to_String(NewTempID)+TimeSeriDataExt);
+            m_pState->GetRestart()->SetUniqueRestartFileName("_" + Nfunction::Int_to_String(NewTempID));
         }
         
 
@@ -394,6 +406,7 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
             int EmptyBlockingInt;
             MPI_Recv(&EmptyBlockingInt, 1, MPI_INT, SourceRank, 3, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             m_pState->GetTimeSeriesDataOutput()->OpenFileWithoutHeader(m_pState ->GetRunTag() + "_" +Nfunction::Int_to_String(NewTempID)+TimeSeriDataExt);
+            m_pState->GetRestart()->SetUniqueRestartFileName("_" + Nfunction::Int_to_String(NewTempID));
         }
         
 
@@ -464,6 +477,7 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
             int EmptyBlockingInt=0;
             MPI_Send(&EmptyBlockingInt, 1, MPI_INT, DestRank, 3, MPI_COMM_WORLD);
             m_pState->GetTimeSeriesDataOutput()->OpenFileWithoutHeader(m_pState ->GetRunTag() + "_" +Nfunction::Int_to_String(NewTempID)+TimeSeriDataExt);
+            m_pState->GetRestart()->SetUniqueRestartFileName("_" + Nfunction::Int_to_String(NewTempID));
             }
             
         //BROADCAST TO UPDATE ALL TEMPERATURES ABOUT RESULT OF THE EXCHANGE ATTEMPT
@@ -593,6 +607,10 @@ bool ParallelTemperingMoveSimple::is_line_empty(const std::string& line) {
 
 bool ParallelTemperingMoveSimple::GetTargetState(){
     return m_TargetState;
+}
+
+void ParallelTemperingMoveSimple::SetRestart(){
+    m_Restart=true;
 }
 
 std::string ParallelTemperingMoveSimple::CurrentState(){

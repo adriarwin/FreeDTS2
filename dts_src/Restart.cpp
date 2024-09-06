@@ -35,6 +35,13 @@ void Restart::SetRestartFileName(){
     m_TEMFileName = m_pState->GetRunTag() +"-1."+ RestartExt;
     return;
 }
+
+void Restart::SetUniqueRestartFileName(std::string extra){
+    
+    m_RestartFileName = m_pState->GetRunTag()+extra+"."+ RestartExt;
+    m_TEMFileName = m_pState->GetRunTag()+extra +"-1."+ RestartExt;
+    return;
+}
 bool Restart::UpdateRestartState(int step,  double r_vertex, double r_box){
         
     if(m_Period!=0 && step%m_Period == 0 ){

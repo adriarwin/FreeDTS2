@@ -58,6 +58,8 @@ public:
 
     virtual bool GetTargetState() = 0;
 
+    virtual void SetRestart() = 0;
+
     /*
      * @brief Pure virtual function to initialize the box parameters.
      */
@@ -116,6 +118,12 @@ public:
     bool GetTargetState(){
         return false;
     }
+
+    void SetRestart(){
+        return;
+    }
+
+
     std::string CurrentState(){
         
         std::string state = GetBaseDefaultReadName() +" = "+ this->GetDerivedDefaultReadName();

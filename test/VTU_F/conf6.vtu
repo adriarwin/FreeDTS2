@@ -11637,9 +11637,3 @@
     </Piece>
   </UnstructuredGrid>
 </VTKFile> 
- 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 
-        </DataArray>
-      </Cells>
-    </Piece>
-  </UnstructuredGrid>
-</VTKFile> 

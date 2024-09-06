@@ -9,7 +9,9 @@
 #include "State.h"
 #include "Nfunction.h"
 #include "SimDef.h"
-
+#ifdef MPI_DETECTED
+#include <mpi.h>
+#endif
 TimeSeriesDataOutput::TimeSeriesDataOutput(){
     m_Periodic = 0;
 }
@@ -177,12 +179,24 @@ bool TimeSeriesDataOutput::CheckTimeSeriesFile(int ini_step, const std::string& 
 // Open the input file
     std::ifstream inputFile(filename);
     if (!inputFile.is_open()) {
-        std::cerr << "Error: Unable to open file " << filename << std::endl;
+        std::cerr << "Error: Unable to open file, is it here? Why? " << filename << std::endl;
         return false;
     }
 
     // Create a temporary file for writing
-    std::ofstream tempFile("temp.txt");
+    #ifndef MPI_DETECTED
+    std::string NameTemporaryFile="temp.txt";
+    #endif
+
+    #ifdef MPI_DETECTED
+    int rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+    std::string NameTemporaryFile=std::string("temp") + "_" + Nfunction::Int_to_String(rank)+".txt";
+    #endif
+
+
+    std::ofstream tempFile(NameTemporaryFile);
     if (!tempFile.is_open()) {
         std::cerr << "Error: Unable to create temporary file" << std::endl;
         inputFile.close();  // Close the input file before returning
@@ -220,7 +234,7 @@ bool TimeSeriesDataOutput::CheckTimeSeriesFile(int ini_step, const std::string& 
         return false;
     }
     // Rename the temporary file to the original filename
-    if (std::rename("temp.txt", filename.c_str()) != 0) {
+    if (std::rename(NameTemporaryFile.c_str(), filename.c_str()) != 0) {
         std::cerr << "Error: Unable to rename file" << std::endl;
         return false;
     }

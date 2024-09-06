@@ -54,6 +54,7 @@ public:
      */
     MeshBluePrint ReadFromRestart(const std::string& filename, int& step, bool& readok, double& r_vertex, double& r_box); // Reading a restart file
     void SetRestartFileName();
+    void SetUniqueRestartFileName(std::string extra);
     void UpdatePeriod(int period);
     std::string CurrentState();
 
