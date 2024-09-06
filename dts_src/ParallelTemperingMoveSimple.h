@@ -61,7 +61,8 @@ private:
     inline  std::string GetOutputFileName() {return "output_trajectories.txt";}
     std::vector<double> ReadTemperatures();
     bool is_line_empty(const std::string& line);
-
+    void WriteRankAtTempIDToFile();
+    
     std::ofstream m_TimeSeriesFile;
 
 

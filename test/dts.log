@@ -1,5 +1,5 @@
 ;--------- this state is initiated by this command ---------------------------------  
-../build_mpi/DTS   -in   input2.dts   -top   top.top   
+../build_mpi/DTS   -in   input.dts   -top   top.top   
 ;--------- this part can be used as an input.dts file ---------------------------------  
  Run_Tag = dts
 ;-- abstract classes
@@ -14,7 +14,7 @@ VertexPositionIntegrator = MetropolisAlgorithm 1 1 0.05
 AlexanderMove = MetropolisAlgorithm 1
 InclusionPoseIntegrator = MetropolisAlgorithm 1 1
 VectorFieldsRotation = MetropolisAlgorithm 1 0.1
-NonbinaryTrajectory = TSI TrajTSI 2
+NonbinaryTrajectory = TSI TrajTSI_0 2
 BinaryTrajectory = NoFile
 VisualizationFormat = VTUFileFormat VTU_F 10
 CurvatureMethod = ShapeOperator_1

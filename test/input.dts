@@ -15,4 +15,4 @@ Dynamic_Box = IsotropicFrameTension 5 0 XY
 VisualizationFormat = VTUFileFormat VTU_F 10
 NonbinaryTrajectory = TSI TrajTSI 2
 Restart_Period = 50000
-ParallelReplica = ParallelTempering ParallelTemperingMoveSimple 50 4 0.5 1
+ParallelReplica = ParallelTempering ParallelTemperingMoveSimple 10 4 0.5 1

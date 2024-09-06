@@ -185,8 +185,14 @@ bool State::ExploreArguments(std::vector<std::string> &argument){
             m_pSimulation->UpdateFinalStep(Nfunction::String_to_Int(argument[i+1]));
         }
         else if(flag == SEED_FLAG){
-            
+            #ifndef MPI_DETECTED
             m_RandomNumberGenerator = new RNG(Nfunction::String_to_Int(argument[i+1]));
+            #endif
+            #ifdef MPI_DETECTED
+            int rank;
+            MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+            m_RandomNumberGenerator = new RNG(Nfunction::String_to_Int(argument[i+1])+rank);
+            #endif
         }
         else if(flag == RESTART_FLAG){
             
@@ -743,9 +749,18 @@ while (input >> firstword) {
         }
         else if(firstword == "Seed")
         {
+
             int seed;
             input>>str>>seed;
+
+            #ifdef MPI_DETECTED
+            int rank;
+            MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+            m_RandomNumberGenerator = new RNG(seed + rank);
+            #endif
+            #ifndef MPI_DETECTED
             m_RandomNumberGenerator = new RNG(seed);
+            #endif
             getline(input,rest);
         }
         else if(firstword == "Kappa")

@@ -97,12 +97,27 @@ void ParallelTemperingMoveSimple::Initialize() {
     m_pState->GetTimeSeriesDataOutput()->SetCustomFileName(m_pState ->GetRunTag() + "_" +Nfunction::Int_to_String(m_TempID)+TimeSeriDataExt);
     
     
-    if (m_Rank==0){
-        m_TimeSeriesFile.open(GetOutputFileName(),std::ios_base::app);
+    if (m_Rank == 0) {
+        m_TimeSeriesFile.open(GetOutputFileName(), std::ios_base::out);
+        m_TimeSeriesFile << "Rank-Temperature ID Mapping: "<<std::endl;
+        // Call the new function to write m_RankAtTempID to m_TimeSeriesFile
     }
     #endif
-
 }
+
+void ParallelTemperingMoveSimple::WriteRankAtTempIDToFile() {
+    if (!m_TimeSeriesFile.is_open()) {
+        std::cerr << "Error: Time series file is not open!" << std::endl;
+        return;
+    }
+
+    for (const auto& rankID : m_RankAtTempID) {
+        m_TimeSeriesFile << rankID << " ";
+    }
+    m_TimeSeriesFile << std::endl;
+}
+
+
 bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
     /**
      * @brief a call function to exchange temperature between replicas.
@@ -153,11 +168,11 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
                 }
             }
 
-            std::cout<<"Counter: "<<m_Counter<<", Rank: "<<m_Rank<<", TempID: "<<m_TempID<<", RankAtTempID:";
-            for (const int& element : m_RankAtTempID) {
-                std::cout << element << ' ';
-            }
-            std::cout << std::endl; 
+            //std::cout<<"Counter: "<<m_Counter<<", Rank: "<<m_Rank<<", TempID: "<<m_TempID<<", RankAtTempID:";
+            //for (const int& element : m_RankAtTempID) {
+            //    std::cout << element << ' ';
+            //}
+            //std::cout << std::endl; 
 
         }
 
@@ -209,11 +224,11 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
                 }
             }
 
-            std::cout<<"Counter: "<<m_Counter<<", Rank: "<<m_Rank<<", TempID: "<<m_TempID<<", RankAtTempID:";
-            for (const int& element : m_RankAtTempID) {
-                std::cout << element << ' ';
-            }
-            std::cout << std::endl; 
+            //std::cout<<"Counter: "<<m_Counter<<", Rank: "<<m_Rank<<", TempID: "<<m_TempID<<", RankAtTempID:";
+            //for (const int& element : m_RankAtTempID) {
+            //    std::cout << element << ' ';
+            //}
+            //std::cout << std::endl; 
 
         }
         
@@ -224,6 +239,10 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
     std::fill(m_RequestBroadcast.begin(), m_RequestBroadcast.end(), MPI_REQUEST_NULL);
 
     bool TempIDIsEven=(m_TempID%2==0);
+
+    if (m_Rank==0){
+        WriteRankAtTempIDToFile();
+    }
 
     //ATTEMPT EXCHANGE
     //CountIsEven=true;
