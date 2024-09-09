@@ -1,0 +1,4 @@
+mkdir build_mpi
+cd build_mpi
+cmake -DUSE_OPENMP=OFF -DUSE_MPI=ON ..
+make
