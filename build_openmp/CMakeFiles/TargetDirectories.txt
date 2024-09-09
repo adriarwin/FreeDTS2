@@ -1,9 +1,0 @@
-/mnt/c/Users/Usuario/phd/FreeDTS2/build_openmp/CMakeFiles/DTS.dir
-/mnt/c/Users/Usuario/phd/FreeDTS2/build_openmp/CMakeFiles/CNV.dir
-/mnt/c/Users/Usuario/phd/FreeDTS2/build_openmp/CMakeFiles/GEN.dir
-/mnt/c/Users/Usuario/phd/FreeDTS2/build_openmp/CMakeFiles/edit_cache.dir
-/mnt/c/Users/Usuario/phd/FreeDTS2/build_openmp/CMakeFiles/rebuild_cache.dir
-/mnt/c/Users/Usuario/phd/FreeDTS2/build_openmp/CMakeFiles/list_install_components.dir
-/mnt/c/Users/Usuario/phd/FreeDTS2/build_openmp/CMakeFiles/install.dir
-/mnt/c/Users/Usuario/phd/FreeDTS2/build_openmp/CMakeFiles/install/local.dir
-/mnt/c/Users/Usuario/phd/FreeDTS2/build_openmp/CMakeFiles/install/strip.dir

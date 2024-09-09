@@ -1,9 +1,0 @@
-/home/adriarwin/FreeDTS2/build/CMakeFiles/DTS.dir
-/home/adriarwin/FreeDTS2/build/CMakeFiles/CNV.dir
-/home/adriarwin/FreeDTS2/build/CMakeFiles/GEN.dir
-/home/adriarwin/FreeDTS2/build/CMakeFiles/edit_cache.dir
-/home/adriarwin/FreeDTS2/build/CMakeFiles/rebuild_cache.dir
-/home/adriarwin/FreeDTS2/build/CMakeFiles/list_install_components.dir
-/home/adriarwin/FreeDTS2/build/CMakeFiles/install.dir
-/home/adriarwin/FreeDTS2/build/CMakeFiles/install/local.dir
-/home/adriarwin/FreeDTS2/build/CMakeFiles/install/strip.dir
