@@ -10,9 +10,9 @@
 #include "triangle.h"
 #include "MESH.h"
 #include "AbstractParallelTemperingMove.h"
+#include <fstream>
 #ifdef MPI_DETECTED
 #include <mpi.h>
-#include <fstream>
 #endif
 
 

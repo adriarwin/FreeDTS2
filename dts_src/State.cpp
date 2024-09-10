@@ -807,6 +807,7 @@ while (input >> firstword) {
             getline(input,rest);
 
         }
+        
         else if(firstword == "ParallelReplica")
         {
             // ParallelReplica = Parallel_Tempering Algorithm rate n_processors minbeta maxbeta
@@ -818,8 +819,15 @@ while (input >> firstword) {
             std::cout<<"Printing type"<<type<<std::endl;
             if(algorithm == ParallelTemperingMoveSimple::GetBaseDefaultReadName()){
                 std::cout<<"Initializing this!"<<algorithm<<std::endl;
+                #ifdef MPI_DETECTED
                 m_pParallelTemperingMove = new ParallelTemperingMoveSimple(this ,period, n_processors, minbeta, maxbeta);
+                #endif
+
+                #ifndef MPI_DETECTED
+                std::cout<<"MPI is not detected. Program will be run with a single CPU."<<std::endl;
+                #endif
             }
+        
             
 
             //if(type == "No"|| type == "no"|| type == "NO")

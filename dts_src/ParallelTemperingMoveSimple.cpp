@@ -8,6 +8,7 @@
 #include "Voxelization.h"
 #ifdef MPI_DETECTED
 #include <mpi.h>
+
 #include <sstream>
 
 
@@ -620,8 +621,6 @@ std::string ParallelTemperingMoveSimple::CurrentState(){
     //state = state +" "+ Nfunction::D2S(m_Period)+" "+Nfunction::D2S(m_SigmaP)+" "+  m_Type;
     return state;
 }
-
-
 
 
 #endif
