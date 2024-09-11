@@ -6,8 +6,8 @@
 # University of Copenhagen
 
 cd dts_src
-g++ -c -O3 -fopenmp *.cpp
-g++ -o DTS -fopenmp *.o
+g++ -c -O3 *.cpp
+g++ -o DTS *.o
 mv DTS ../
 cd ..
 cd dts_convert
