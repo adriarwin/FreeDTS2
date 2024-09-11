@@ -1,3 +1,0 @@
-Rank-Temperature ID Mapping: 
-0 1 
-1 0 
