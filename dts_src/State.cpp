@@ -36,6 +36,7 @@ State::State(std::vector<std::string> argument) :
       m_pExternalFieldOnInclusions(new NoExternalFieldOnInclusions),  // Initialize ExternalFieldOnVectorFields
       m_pApplyConstraintBetweenGroups(new NoConstraint),  // Initialize ApplyConstraintBetweenGroups
       m_pBoundary(new PBCBoundary),  // Initialize Boundary
+      m_pVertexAdhesionToSubstrate(new NoVertexAdhesionCoupling),
 
       //---- Initialize supplementary integrators
       m_pDynamicBox(new NoBoxChange),  // Initialize DynamicBox
@@ -113,6 +114,7 @@ State::~State()
     delete m_pEnergyCalculator;
     delete m_pSimulation;
     delete m_pVoxelization;
+    delete m_pVertexAdhesionToSubstrate;
 }
 bool State::ExploreArguments(std::vector<std::string> &argument){
     /*
@@ -421,6 +423,37 @@ while (input >> firstword) {
                         return false;
                     }
             }
+        else if(firstword == AbstractVertexAdhesionToSubstrate::GetBaseDefaultReadName() ) { // "ConstantField"
+            
+            input >> str >> type;
+            if(type == SphericalVertexSubstrate::GetDefaultReadName() ){
+
+                getline(input,rest);
+                m_pVertexAdhesionToSubstrate = new SphericalVertexSubstrate(rest);
+            }
+            else if(type == FlatVertexSubstrate::GetDefaultReadName() ){
+
+                getline(input,rest);
+                m_pVertexAdhesionToSubstrate = new FlatVertexSubstrate(rest);
+            }
+            else if(type == FlatInclusionSubstrate::GetDefaultReadName() ){
+
+                getline(input,rest);
+                m_pVertexAdhesionToSubstrate = new FlatInclusionSubstrate(rest);
+            }
+
+            else if(type == "No"){
+                getline(input,rest);
+            }
+            else{
+                std::cout<<" unknown AdhesionToSubstrate method "<<std::endl;
+                m_NumberOfErrors++;
+                getline(input,rest);
+                return false;
+            }
+
+
+        }
 //---- Volume_Constraint data
         else if(firstword == AbstractVolumeCoupling::GetBaseDefaultReadName())   { // Volume_Constraint
                         
@@ -694,8 +727,8 @@ while (input >> firstword) {
             input >> str >> type;
             if(type == Constant_NematicForce::GetDefaultReadName()){  // Constant_NematicForce
                 double f0; // force value
-                input>>f0;
-                m_pForceonVerticesfromInclusions = new Constant_NematicForce(f0);
+                input>>f0>>str;
+                m_pForceonVerticesfromInclusions = new Constant_NematicForce(f0,str);
             }
             else if(firstword == NoForce::GetDefaultReadName()){  // No
                 

@@ -22,7 +22,8 @@ double Energy::SingleVertexEnergy(vertex *p_vertex) {
     double Energy=0.0;
 //---> note, if the vertex has no inclusion, this will return zero by default
     Energy += m_pState->GetExternalFieldOnInclusions()->GetCouplingEnergy(p_vertex);
-    
+    Energy += m_pState->GetVertexAdhesionToSubstrate()->GetCouplingEnergy(p_vertex);
+
     if(p_vertex->m_VertexType == 0) {
     
         Energy += SurfVertexBendingAndStretchingEnergy(p_vertex);

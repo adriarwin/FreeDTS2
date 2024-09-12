@@ -1,18 +1,27 @@
 #include "Constant_NematicForce.h"
 
 
-Constant_NematicForce::Constant_NematicForce(double f0) {
+Constant_NematicForce::Constant_NematicForce(double f0,std::string IncType) {
     m_F0 = f0;
     m_ActiveEnergy = 0;
-
+    m_IncTypeSelected = IncType;
+    std::cout<<"Called. Inclusion type:"<<m_IncTypeSelected<<" F=" <<m_F0<<std::endl;
 }
 Constant_NematicForce::~Constant_NematicForce() {
     
 }
 double Constant_NematicForce::Energy_of_Force(vertex *pv, Vec3D dx) {
     
-    if(!pv->VertexOwnInclusion() ||  m_F0 != 0 )
+    //std::cout<<"Called"<<std::endl;
+    if(!pv->VertexOwnInclusion()==1 || m_F0 == 0 )
         return 0;
+
+    inclusion *p_inc=pv->GetInclusion();
+    std::string inctype=p_inc->m_IncType->ITName;
+    if(inctype!=m_IncTypeSelected){
+        return 0;
+    }
+
     
     double En = 0;
     
@@ -22,7 +31,11 @@ double Constant_NematicForce::Energy_of_Force(vertex *pv, Vec3D dx) {
         {
             vertex *pv2 = (*it)->GetV2();
             if(pv2->VertexOwnInclusion()){
-                Force = Force + ActiveNematicForce_1(pv2, pv);
+                inclusion *p_inc2=pv->GetInclusion();
+                std::string inctype2=p_inc2->m_IncType->ITName;
+                if (inctype2==m_IncTypeSelected){
+                    Force = Force + ActiveNematicForce_1(pv2, pv);
+                }
             }
         }
         Tensor2  G2L = pv->GetG2LTransferMatrix();

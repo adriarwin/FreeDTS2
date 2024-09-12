@@ -128,7 +128,11 @@
 //--- parallel tempering
 #include "AbstractParallelTemperingMove.h"
 #include "ParallelTemperingMoveSimple.h"
-
+//--- interaction with Substrate
+#include "AbstractVertexAdhesionToSubstrate.h"
+#include "SphericalVertexSubstrate.h"
+#include "FlatVertexSubstrate.h"
+#include "FlatInclusionSubstrate.h"
 
 struct ParallelReplicaData {  // data structure for turning on and off certain moves
     ParallelReplicaData(){State = false;}
@@ -179,6 +183,7 @@ inline AbstractForceonVerticesfromVectorFields *GetForceonVerticesfromVectorFiel
 inline AbstractExternalFieldOnVectorFields *GetExternalFieldOnVectorFields()        {return m_pExternalFieldOnVectorFields;}
 inline AbstractExternalFieldOnInclusions *GetExternalFieldOnInclusions()        {return m_pExternalFieldOnInclusions;}
 
+inline AbstractVertexAdhesionToSubstrate *GetVertexAdhesionToSubstrate()        {return m_pVertexAdhesionToSubstrate;}
 inline VAHGlobalMeshProperties              *GetVAHGlobalMeshProperties()        {return m_pVAHCalculator;}
 //---- supplementary integrators
 inline AbstractDynamicBox               *GetDynamicBox()                                {return m_pDynamicBox;}
@@ -217,6 +222,7 @@ private:
     Restart *m_pRestart;
     AbstractForceonVerticesfromInclusions *m_pForceonVerticesfromInclusions;
     AbstractForceonVerticesfromVectorFields *m_pForceonVerticesfromVectorFields;
+    AbstractVertexAdhesionToSubstrate *m_pVertexAdhesionToSubstrate;
 
     AbstractExternalFieldOnVectorFields *m_pExternalFieldOnVectorFields;
     AbstractExternalFieldOnInclusions *m_pExternalFieldOnInclusions;
