@@ -4,28 +4,32 @@
 #include "MESH.h"
 #include "CreateMashBluePrint.h"
 #include "State.h"
+#ifdef MPI_DETECTED
+#include <mpi.h>
+#endif
 State::State(){
     
 }
 State::State(std::vector<std::string> argument) :
 
-      //ANA - Needed!
+      //New
+
+      
+
       m_NumberOfErrors(0),
       m_NumberOfWarnings(0),
+      //============ Initialization of all files
+// make voxels
       m_pVoxelization(new Voxelization<vertex>()),
       m_pSimulation(new MC_Simulation(this)),
-
-      //ANA - To be modified to extract global properties of each trajectory
       m_pTimeSeriesDataOutput(new TimeSeriesDataOutput(this)),  // Initialize TimeSeriesDataOutput
-
-      //ANA - Not Needed!
       m_pTimeSeriesLogInformation(new TimeSeriesLogInformation(this)),  // Initialize TimeSeriesLogInformation
       m_pRestart(new Restart(this)),  // Initialize Restart
       m_pNonbinaryTrajectory(new Traj_tsi(this)),  // Initialize Traj_tsi
       m_pVisualizationFile(new WritevtuFiles(this)),  // Initialize WritevtuFiles
       m_pBinaryTrajectory(new NoFile),  // Initialize BinaryTrajectory
 
-      //ANA - I do not know if it is needed?
+      //---- Initialize constraint components
       m_pVAHCalculator(new VAHGlobalMeshProperties),
       m_pVolumeCoupling(new NoCoupling(m_pVAHCalculator)),
       m_pCoupleGlobalCurvature(new NoGlobalCurvature(m_pVAHCalculator)),
@@ -34,22 +38,21 @@ State::State(std::vector<std::string> argument) :
       m_pForceonVerticesfromVectorFields(new NoVFForce),  // Initialize ForceonVerticesfromvectorfields
       m_pExternalFieldOnVectorFields(new NoExternalFieldOnVectorFields),  // Initialize ExternalFieldOnVectorFields
       m_pExternalFieldOnInclusions(new NoExternalFieldOnInclusions),  // Initialize ExternalFieldOnVectorFields
-      m_pVertexAdhesionToSubstrate(new NoVertexAdhesionCoupling),  // Initialize ExternalFieldOnVectorFields
       m_pApplyConstraintBetweenGroups(new NoConstraint),  // Initialize ApplyConstraintBetweenGroups
       m_pBoundary(new PBCBoundary),  // Initialize Boundary
+      m_pVertexAdhesionToSubstrate(new NoVertexAdhesionCoupling),
 
-      //ANA - Not Needed!
+      //---- Initialize supplementary integrators
       m_pDynamicBox(new NoBoxChange),  // Initialize DynamicBox
       m_pDynamicTopology(new ConstantTopology),  // Initialize DynamicTopology
       m_pOpenEdgeEvolution(new NoEvolution),  // Initialize OpenEdgeEvolution
       m_pInclusionConversion(new NoInclusionConversion),  // Initialize InclusionConversion
+      m_pParallelTemperingMove(new NoParallelTemperingMove),  // Initialize ParallelTemperingMove
 
-      //ANA - Needed
+      //--- Initialize accessory objects
       m_pCurvatureCalculations(new CurvatureByShapeOperatorType1(this)),  // Initialize CurvatureCalculations
-      
-      m_pEnergyCalculator(new Energy(this)),  // Initialize EnergyCalculator
-      //ANA - Should not bee needed!
       m_RandomNumberGenerator(new RNG(1234)),  // Initialize RandomNumberGenerator
+      m_pEnergyCalculator(new Energy(this)),  // Initialize EnergyCalculator
 
         // Initialize Simulation
      //--- Local state member variables
@@ -64,10 +67,8 @@ State::State(std::vector<std::string> argument) :
 { // start of the "class State" constructor
     
     
-    
-    m_pMesh = &m_Mesh;
     //---- Initialize integrators
-    //Not NEEDED, in theory!
+    m_pMesh = &m_Mesh;
     m_pVertexPositionIntegrator = new EvolveVerticesByMetropolisAlgorithm(this);
     m_pAlexanderMove            = new AlexanderMoveByMetropolisAlgorithm(this);         // Initialize AlexanderMove
     m_pInclusionPoseIntegrator  = new InclusionPoseUpdateByMetropolisAlgorithm(this);  // Initialize InclusionPoseIntegrator
@@ -103,7 +104,6 @@ State::~State()
     delete m_pForceonVerticesfromVectorFields;
     delete m_pExternalFieldOnVectorFields;
     delete m_pExternalFieldOnInclusions;
-    delete m_pVertexAdhesionToSubstrate;
     delete m_pApplyConstraintBetweenGroups;
     delete m_pBoundary;
     delete m_pVertexPositionIntegrator;
@@ -118,6 +118,7 @@ State::~State()
     delete m_pEnergyCalculator;
     delete m_pSimulation;
     delete m_pVoxelization;
+    delete m_pVertexAdhesionToSubstrate;
 }
 bool State::ExploreArguments(std::vector<std::string> &argument){
     /*
@@ -190,8 +191,14 @@ bool State::ExploreArguments(std::vector<std::string> &argument){
             m_pSimulation->UpdateFinalStep(Nfunction::String_to_Int(argument[i+1]));
         }
         else if(flag == SEED_FLAG){
-            
+            #ifndef MPI_DETECTED
             m_RandomNumberGenerator = new RNG(Nfunction::String_to_Int(argument[i+1]));
+            #endif
+            #ifdef MPI_DETECTED
+            int rank;
+            MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+            m_RandomNumberGenerator = new RNG(Nfunction::String_to_Int(argument[i+1])+rank);
+            #endif
         }
         else if(flag == RESTART_FLAG){
             
@@ -299,7 +306,6 @@ while (input >> firstword) {
             }
             getline(input,rest);
         }
-        //Not needed!
         else if(firstword == "Box_Centering_F")
         {
             double rate;
@@ -315,7 +321,6 @@ while (input >> firstword) {
             m_pSimulation->UpdateFinalStep(fi);
             getline(input,rest);
         }
-        
         else if(firstword == "MinfaceAngle")
         {
             double min_angle;
@@ -422,13 +427,44 @@ while (input >> firstword) {
                         return false;
                     }
             }
+        else if(firstword == AbstractVertexAdhesionToSubstrate::GetBaseDefaultReadName() ) { // "ConstantField"
+            
+            input >> str >> type;
+            if(type == SphericalVertexSubstrate::GetDefaultReadName() ){
+
+                getline(input,rest);
+                m_pVertexAdhesionToSubstrate = new SphericalVertexSubstrate(rest);
+            }
+            else if(type == FlatVertexSubstrate::GetDefaultReadName() ){
+
+                getline(input,rest);
+                m_pVertexAdhesionToSubstrate = new FlatVertexSubstrate(rest);
+            }
+            else if(type == FlatInclusionSubstrate::GetDefaultReadName() ){
+
+                getline(input,rest);
+                m_pVertexAdhesionToSubstrate = new FlatInclusionSubstrate(rest);
+            }
+
+            else if(type == "No"){
+                getline(input,rest);
+            }
+            else{
+                std::cout<<" unknown AdhesionToSubstrate method "<<std::endl;
+                m_NumberOfErrors++;
+                getline(input,rest);
+                return false;
+            }
+
+
+        }
 //---- Volume_Constraint data
         else if(firstword == AbstractVolumeCoupling::GetBaseDefaultReadName())   { // Volume_Constraint
+                        
+            m_pVAHCalculator->MakeVolumeActive();
+            m_pVAHCalculator->MakeAreaActive();
+
             input >> str >> type;
-            if(type != "No"){
-                m_pVAHCalculator->MakeVolumeActive();
-                m_pVAHCalculator->MakeAreaActive();
-            }
             if(type == VolumeCouplingSecondOrder::GetDefaultReadName()) { // SecondOrderCoupling
                 
                 double dp,k,vt;
@@ -452,14 +488,9 @@ while (input >> firstword) {
 //---- end Volume_Constraint
 //---- global curvature
         else if(firstword == AbstractGlobalCurvature::GetBaseDefaultReadName()) {
-
+            m_pVAHCalculator->MakeGlobalCurvatureActive();
+            m_pVAHCalculator->MakeAreaActive();
             input>>str>>type;
-            
-            if(type != "No"){
-                m_pVAHCalculator->MakeGlobalCurvatureActive();
-                m_pVAHCalculator->MakeAreaActive();
-            }
-            
             if(type == CouplingGlobalCurvatureToHarmonicPotential::GetDefaultReadName()) {
                 double k,gc0;
                 input>>k>>gc0;
@@ -477,10 +508,9 @@ while (input >> firstword) {
         }
 // -- global area coupling
         else if(firstword == "TotalAreaCoupling"){
+            m_pVAHCalculator->MakeAreaActive();
             input>>str>>type;
-            if(type != "No"){
-                m_pVAHCalculator->MakeAreaActive();
-            }
+
             if(type ==  CouplingTotalAreaToHarmonicPotential::GetDefaultReadName()){
                 double gamma , k0;
                 input>>k0>>gamma;
@@ -674,31 +704,6 @@ while (input >> firstword) {
             getline(input,rest);
 
         }
-        else if(firstword == AbstractVertexAdhesionToSubstrate::GetBaseDefaultReadName() ) { // "ConstantField"
-            
-            input >> str >> type;
-            if(type == SphericalVertexSubstrate::GetDefaultReadName() ){
-
-                getline(input,rest);
-                m_pVertexAdhesionToSubstrate = new SphericalVertexSubstrate(rest);
-            }
-            else if(type == FlatVertexSubstrate::GetDefaultReadName() ){
-
-                getline(input,rest);
-                m_pVertexAdhesionToSubstrate = new FlatVertexSubstrate(rest);
-            }
-            else if(type == "No"){
-                getline(input,rest);
-            }
-            else{
-                std::cout<<" unknown AdhesionToSubstrate method "<<std::endl;
-                m_NumberOfErrors++;
-                getline(input,rest);
-                return false;
-            }
-
-
-        }
 //-------
         else if( firstword == "MC_Moves" ) {
             
@@ -726,8 +731,8 @@ while (input >> firstword) {
             input >> str >> type;
             if(type == Constant_NematicForce::GetDefaultReadName()){  // Constant_NematicForce
                 double f0; // force value
-                input>>f0;
-                m_pForceonVerticesfromInclusions = new Constant_NematicForce(f0);
+                input>>f0>>str;
+                m_pForceonVerticesfromInclusions = new Constant_NematicForce(f0,str);
             }
             else if(firstword == NoForce::GetDefaultReadName()){  // No
                 
@@ -767,6 +772,7 @@ while (input >> firstword) {
                 input>>str>>m_GeneralOutputFilename;
                 getline(input,rest);
             }
+        //Here we state the restart period!
         else if(firstword == "Restart_Period")
         {
             int period;
@@ -781,9 +787,18 @@ while (input >> firstword) {
         }
         else if(firstword == "Seed")
         {
+
             int seed;
             input>>str>>seed;
+
+            #ifdef MPI_DETECTED
+            int rank;
+            MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+            m_RandomNumberGenerator = new RNG(seed + rank);
+            #endif
+            #ifndef MPI_DETECTED
             m_RandomNumberGenerator = new RNG(seed);
+            #endif
             getline(input,rest);
         }
         else if(firstword == "Kappa")
@@ -829,20 +844,38 @@ while (input >> firstword) {
             getline(input,rest);
 
         }
+        
         else if(firstword == "ParallelReplica")
         {
-            // ParallelReplica = Parallel_Tempering  rate  minbeta    maxbeta
-            std::string type;
-            input>>str>>type;
-            getline(input,rest);
+            // ParallelReplica = Parallel_Tempering Algorithm rate n_processors minbeta maxbeta
+            std::string algorithm,type;
+            int period, n_processors;
+            double minbeta, maxbeta;
+            input>>str>>type>>algorithm>>period>>n_processors>>minbeta>>maxbeta;
+            std::cout<<"Printing algorithm"<<algorithm<<std::endl;
+            std::cout<<"Printing type"<<type<<std::endl;
+            if(algorithm == ParallelTemperingMoveSimple::GetBaseDefaultReadName()){
+                std::cout<<"Initializing this!"<<algorithm<<std::endl;
+                #ifdef MPI_DETECTED
+                m_pParallelTemperingMove = new ParallelTemperingMoveSimple(this ,period, n_processors, minbeta, maxbeta);
+                #endif
 
-            if(type == "No"|| type == "no"|| type == "NO")
-                m_Parallel_Replica.State = false;
-            else
-                m_Parallel_Replica.State = true;
+                #ifndef MPI_DETECTED
+                std::cout<<"MPI is not detected. Program will be run with a single CPU."<<std::endl;
+                #endif
+            }
+        
+            
+
+            //if(type == "No"|| type == "no"|| type == "NO")
+            //    m_Parallel_Replica.State = false;
+            //else
+            //    m_Parallel_Replica.State = true;
                         
-            m_Parallel_Replica.Type = type;
-            m_Parallel_Replica.Data = rest;
+            //m_Parallel_Replica.Type = type;
+            //m_Parallel_Replica.Data = rest;
+
+            getline(input,rest);
 
         }
         else if(firstword == BTSFile::GetDefaultReadName() ){ // "OutPutTRJ_BTS"
@@ -938,7 +971,34 @@ bool State::Initialize(){
         CreateMashBluePrint Create_BluePrint;
         MeshBluePrint mesh_blueprint;
 //---->  Check if the restart file name is provided
+
+//----> ANA
+// We read the folder of TrajTSI files
+        m_pReadTrajTSI=new ReadTrajTSI(m_pNonbinaryTrajectory->GetFolderName(),m_GeneralOutputFilename);
+        m_pReadTrajTSI->ValidateFiles();
+//Update initial step and final step
+        //std::cout<<m_pReadTrajTSI->GetNumberOfFrames()<<std::endl;
+        m_pSimulation->UpdateInitialStep(0);
+        m_pSimulation->UpdateFinalStep(m_pReadTrajTSI->GetNumberOfFrames());
+
+        //std::vector<std::string> FilePaths=m_pReadTrajTSI->getFilePaths();
+        //std::vector<int> FrameList=m_pReadTrajTSI->getFrameList();
+
+        //for (const auto& elem : FrameList) {
+        //    std::cout << elem << std::endl;
+        //}
+        //std::cout << std::endl;
+
+        //for (const auto& elem : FilePaths) {
+        //    std::cout << elem << std::endl;
+        //}
+        //std::cout << std::endl;
+
+
         bool restartReadSuccess = false;
+
+        #ifndef MPI_DETECTED
+        m_pParallelTemperingMove->Initialize();
         if (!m_RestartFileName.empty()) {
             int step;
             double r_vertex;
@@ -974,7 +1034,72 @@ bool State::Initialize(){
                 m_NumberOfWarnings++;
             }
         }
+        #endif
+
+        #ifdef MPI_DETECTED
+        if (!m_RestartFileName.empty()) {
+            m_pParallelTemperingMove->SetRestart();
+            m_pParallelTemperingMove->Initialize();
+            int step;
+            double r_vertex;
+            double r_box;
+            int rank;
+            MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+            std::string extension = ".res";  // Define the extension part
+            std::string filename = m_RestartFileName;
+
+            // Find the position of ".res" in the filename
+            size_t pos = filename.rfind(extension);
+
+            if (pos != std::string::npos) {  // If ".res" is found in the string
+                // Extract the "something" part by removing ".res"
+                std::string baseName = filename.substr(0, pos);
+                
+                // Append "_<rank>" to the "something" part
+                baseName = baseName + "_" + Nfunction::Int_to_String(rank);
+                
+                // Reconstruct the filename with the modified "something" part and ".res"
+                m_RestartFileName = baseName + extension;
+            } else {
+                // Handle the case if ".res" is not found; use original filename as fallback
+                std::cerr << "Error: The file extension '.res' was not found in " << m_RestartFileName << std::endl;
+            }
+            // Attempt to open the restart file
+            std::cout << "---> Note: attempting to open the restart file: " << m_RestartFileName << std::endl;
+
+            // Read the restart file and update the State object to that state
+            mesh_blueprint = m_pRestart->ReadFromRestart(m_RestartFileName, step, restartReadSuccess, r_vertex, r_box);
+
+            // Check if the restart file was successfully read
+            if (restartReadSuccess) {
+                std::cout << "---> Note: Restart file was successfully read" << std::endl;
+                m_pVertexPositionIntegrator->UpdateDR(r_vertex);
+                m_pDynamicBox->UpdateDR(r_box);
+                m_pSimulation->UpdateInitialStep(step+1);
+                //----- open log file
+                if(!m_pTimeSeriesLogInformation->OpenFile(false)){
+                    m_NumberOfErrors++;
+                }
+                if(!m_pTimeSeriesDataOutput->OpenFile(false)){
+                    m_NumberOfErrors++;
+                }
+                //---- open the binary trajectory
+                if(!m_pBinaryTrajectory->OpenFile(false, 'w')){
+                    m_NumberOfErrors++;
+                }
+            }
+            else{
+                // If failed to read restart file, generate MeshBluePrint from input topology file
+                std::cout << "---> Warning: Failed to read restart file, will use topology file" << std::endl;
+                m_NumberOfWarnings++;
+            }
+        }
+        #endif
+
+
         if(!restartReadSuccess){ // this for also a situation where m_RestartFileName is empty
+            m_pParallelTemperingMove->Initialize();
             mesh_blueprint = Create_BluePrint.MashBluePrintFromInput_Top(m_InputFileName, m_TopologyFile);
             
             //----- open time series files
@@ -988,7 +1113,7 @@ bool State::Initialize(){
             if(!m_pBinaryTrajectory->OpenFile(true, 'w')){
                 m_NumberOfErrors++;
             }
-            // Open folder for non-binary trajectory
+            // tolder for non-binary trajectory
             if(! m_pNonbinaryTrajectory->OpenFolder()){
                 m_NumberOfErrors++;
             }
@@ -1000,7 +1125,6 @@ bool State::Initialize(){
             }
 
         }
-    
         m_RandomNumberGenerator->Initialize();
         // Generate mesh from the mesh blueprint
         m_Mesh.GenerateMesh(mesh_blueprint);
@@ -1008,8 +1132,13 @@ bool State::Initialize(){
 
         // Update group from index file
         m_pMesh->UpdateGroupFromIndexFile(m_IndexFileName);
+
+
 //============ activate of all inputs and data structures
+        //In here, this should depend on the used rank
+        #ifndef MPI_DETECTED
         m_pRestart->SetRestartFileName();
+        #endif
 //----> calaculate curvature for all vertices
         m_pCurvatureCalculations->Initialize();
 //----> set some easy access for integrators
@@ -1037,10 +1166,19 @@ bool State::Initialize(){
     m_pApplyConstraintBetweenGroups->Initialize();
     m_pSimulation->Initialize();
 
-
 //--- now that the system is ready for simulation, we first write the State into the log file and make one vis 
+    #ifndef MPI_DETECTED
     m_pTimeSeriesLogInformation->WriteStartingState();
     m_pVisualizationFile->WriteAFrame(-m_pVisualizationFile->GetPeriod());
+    #endif
+    #if MPI_DETECTED
+    int rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    if (rank == 0) {
+        m_pTimeSeriesLogInformation->WriteStartingState();
+        m_pVisualizationFile->WriteAFrame(-m_pVisualizationFile->GetPeriod());
+    }
+    #endif
 //----> energy class
 //---> to get interaction energies
     m_pEnergyCalculator->Initialize(m_InputFileName);
@@ -1057,6 +1195,9 @@ bool State::Initialize(){
     else{
         std::cout<<" All input files are valid, and the State has been successfully initialized! "<<std::endl;
     }
+
+
+
     return true;
 }
 bool State::ReadInclusionType(std::ifstream& input) {

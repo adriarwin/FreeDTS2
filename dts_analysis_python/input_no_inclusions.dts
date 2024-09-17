@@ -1,0 +1,14 @@
+Initial_Step                    = 1
+ Final_Step                      = 10000000
+ MinfaceAngle                   = -0.5
+ Display_periodic                = 1000
+ OutPutEnergy_periodic           = 100
+ Restart_periodic                = 50000
+ Kappa                           = 20 0
+ Seed                            = 50639
+ Spont_C                         = 0.6
+ OutPutTRJ_TSI                   = 2000  10  TrjTSI
+ Parallel_Tempering              = on 100000 0.25 1
+ GeneralOutputFilename           = output
+ Cell_Size                       = 2.5 2.6 2.5
+ Frame_Tension                   = on Position_Rescale 0 5

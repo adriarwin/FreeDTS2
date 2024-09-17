@@ -32,6 +32,21 @@ MeshBluePrint CreateMashBluePrint::MashBluePrintFromInput_Top(const std::string&
     m_MeshBluePrint.number_vector_field =  m_Number_of_VectorFields;
     return m_MeshBluePrint;
 }
+
+MeshBluePrint CreateMashBluePrint::MashBluePrintFromTop(const std::string& topfilename)
+{
+   
+    ReadTopology(topfilename);
+
+    m_MeshBluePrint.bvertex = m_VertexMap;
+    m_MeshBluePrint.btriangle = m_TriangleMap;
+    m_MeshBluePrint.binclusion = m_InclusionMap;
+    m_MeshBluePrint.simbox = m_Box;
+    m_MeshBluePrint.excluded_id = m_ExcludedID;
+    m_MeshBluePrint.bvectorfields = m_VectorFieldsMap;
+    m_MeshBluePrint.number_vector_field =  m_Number_of_VectorFields;
+    return m_MeshBluePrint;
+}
 CreateMashBluePrint::~CreateMashBluePrint()
 {
     
@@ -178,6 +193,7 @@ void CreateMashBluePrint::Read_TSIFile(const std::string &tsifile)
                     y=y/norm;
                     inc.x = x; inc.y = y;
                     m_InclusionMap.push_back(inc);
+                    
                 }
             }
         }
@@ -207,7 +223,7 @@ void CreateMashBluePrint::Read_TSIFile(const std::string &tsifile)
         }
         else
         {
-            std::cout<<"error ---> "<<str<<" is unidentified key word for tsi file \n";
+            std::cout<<"error ---> "<<str<<" entified key word for tsi file \n";
             exit(0);
         }
     }

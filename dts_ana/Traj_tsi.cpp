@@ -17,6 +17,7 @@ Traj_tsi::Traj_tsi(State *pstate, int period, std::string tsiFolder_name){
     m_pState = pstate;
     m_Period = period;
     m_Folder_name = tsiFolder_name;
+    m_Original_Folder_name = tsiFolder_name;
     m_Precision = TSI_Precisions;
     
 }
@@ -104,8 +105,17 @@ void Traj_tsi::WriteAFrame(std::string filename){
     
 }
 
-/*
+void Traj_tsi::SetFolderName(const std::string& folder_name) {
+    m_Folder_name = folder_name;
+}
 
+std::string Traj_tsi::GetFolderName() {
+    return m_Folder_name;
+}
+std::string Traj_tsi::GetOriginalFolderName() {
+    return m_Original_Folder_name;
+}
+/*
 MeshBluePrint Traj_tsi::ReadAFrame(std::string filename, bool &isok)
 {
     Nfunction f;
@@ -328,6 +338,7 @@ MeshBluePrint Traj_tsi::ReadTSI2(std::string filename, std::vector<InclusionType
     input.close();
     return blueprint;
 }
+
 */
 std::string Traj_tsi::CurrentState(){
     

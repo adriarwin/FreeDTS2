@@ -11,7 +11,7 @@
 #include "AbstractForceonVerticesfromInclusions.h"
 class Constant_NematicForce : public AbstractForceonVerticesfromInclusions{
 public:
-    Constant_NematicForce(double f0);
+    Constant_NematicForce(double f0,std::string IncType);
     ~Constant_NematicForce();
     double Energy_of_Force(vertex *p, Vec3D dx);
     std::string CurrentState();
@@ -22,6 +22,7 @@ private:
     Vec3D ActiveNematicForce_1(vertex *pv2, vertex *pv1);
     double m_F0;
     double m_ActiveEnergy;
+    std::string m_IncTypeSelected;
 
 };
 

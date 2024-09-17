@@ -28,10 +28,12 @@ public:
     void WriteAFrame(std::string filename);
     void WriteAFrame(int step);
     bool OpenFolder();
-    
+    void SetFolderName(const std::string& folder_name);
     inline  std::string GetDerivedDefaultReadName()  {return "TSI";}
     static inline  std::string GetDefaultReadName()  {return "TSI";}
     std::string CurrentState();
+    std::string GetFolderName();
+    std::string GetOriginalFolderName();
 
 private:
     // Private member variables
@@ -39,13 +41,12 @@ private:
     std::string m_Precision;
     int m_Period;
     State* m_pState;
+    std::string m_Original_Folder_name;
 
 private:  // Consider removing this section if not needed
     // Private member functions
-    /*
-    bool m_Condition=true;
-    MeshBluePrint ReadAFrame(std::string filename, bool& readok);
-    MeshBluePrint ReadTSI2(std::string filename, std::vector<InclusionType> bINCtype);*/
+   // MeshBluePrint ReadAFrame(std::string filename, bool& readok);
+   // MeshBluePrint ReadTSI2(std::string filename, std::vector<InclusionType> bINCtype);
 };
 
 #endif // TRAJ_TSI_H_INCLUDED

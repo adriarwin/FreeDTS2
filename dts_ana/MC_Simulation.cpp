@@ -3,6 +3,10 @@
 #ifdef _OPENMP
 # include <omp.h>
 #endif
+#ifdef MPI_DETECTED
+# include <mpi.h>
+#endif
+
 #include <thread>
 #include <ctime>
 #include <iostream>
@@ -42,9 +46,22 @@ bool MC_Simulation::do_Simulation(){
 #if DEBUG_MODE == Enabled
     std::cout<<" do_Simulation function is starting  \n";
 #endif
+
+#if MPI_DETECTED
+
+    int rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    std::cout<<"Rank: "<<rank<<std::endl;
+
+    int size;
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    std::cout<<"Size: "<<size<<std::endl;
+
+#endif
     
 //---> Voxelize the mesh for the first time; this should be done before any calculation
-    m_pState->GetVoxelization()->Voxelize(m_pState->GetMesh()->GetActiveV());
+
+    //m_pState->GetVoxelization()->Voxelize(m_pState->GetMesh()->GetActiveV());
     
 #if DEBUG_MODE == Enabled
     std::cout<<" system has been voxelaized  \n";
@@ -53,102 +70,54 @@ bool MC_Simulation::do_Simulation(){
 //----> checking if the mesh is good, within the bond of the simulation type. For here, it should be within
         //CheckMesh();
  
-//--- before simualtion lets have a frame of the initial system
-        m_pState->GetVisualization()->WriteAFrame(0);
+//--- ANA: No visualization!
+
    // time_t startTime;
    // time(&startTime);
 #if DEBUG_MODE == Enabled
     std::cout<<" We have reached simulation run loop!  \n";
 #endif
+
+
+    
+
+    std::vector<std::string> FramePath=m_pState->GetReadTrajTSI()->GetFilePaths();
+    std::vector<int> FrameList=m_pState->GetReadTrajTSI()->GetFrameList();
+
+//Only one rank prints this output
     std::clock_t start = std::clock();
-    std::cout<<"------>   Simulation will be performed from "<<m_Initial_Step<<" to "<<m_Final_Step<<" steps\n";
-for (int step = m_Initial_Step; step <= m_Final_Step; step++){
+    std::cout<<"------>   Analysis will be performed for frames "<<m_Initial_Step<<" to "<<m_Final_Step<<" steps\n";
+//Start of the analysis loop
+
+for (int step = m_Initial_Step; step <= 4; step++){
+
+        CreateMashBluePrint Create_BluePrint;
+        MeshBluePrint mesh_blueprint;
+
+        std::string filename=FramePath[step];
+        std::cout<<filename<<std::endl;
+
+        /*std::ifstream input(m_pState->GetInputFile());
+        ReadInclusionType(input,mesh);*/
         
-//----> write files
-        //--- write visulaization frame
-        m_pState->GetVisualization()->WriteAFrame(step);
-        //--- write non-binary trejectory e.g., tsi, tsg
-        m_pState->GetNonbinaryTrajectory()->WriteAFrame(step);
-        //--- write binary trejectory e.g., bts
-        m_pState->GetBinaryTrajectory()->WriteAFrame(step);
-        //--- write into time seri file, e.g., energy, volume ...
-        m_pState->GetTimeSeriesDataOutput()->WriteTimeSeriesDataOutput(step);
-        //--- write check point for the state
-        m_pState->GetRestart()->UpdateRestartState(step, m_pState->GetVertexPositionUpdate()->GetDR(), m_pState->GetDynamicBox()->GetDR());
-    
-//---> centering the simulation box
-    if(m_CenteringFrequently != 0 && step%m_CenteringFrequently == 0){
-        m_pState->GetMesh()->CenterMesh();
-        m_pState->GetVoxelization()->ReassignMembersToVoxels(m_pState->GetMesh()->GetActiveV());
-    } // [ if(GetBoxCentering()!=0 && step%GetBoxCentering()==0)]
+        mesh_blueprint = Create_BluePrint.MashBluePrintFromInput_Top(m_pState->GetInputFile(),filename);
+        m_pState->GetMesh()->GenerateMesh(mesh_blueprint);
 
-//---> Run standard Integrators
-        //--- run the vertex position update
-        m_pState->GetVertexPositionUpdate()->EvolveOneStep(step); // we may need the final step as well to check if the update of move size should be done
-        //--- run the link flip update
-        m_pState->GetAlexanderMove()->EvolveOneStep(step);
-        //--- run the inclusion update
-        m_pState->GetInclusionPoseUpdate()->EvolveOneStep(step);
-        //--- run vector fields
-        m_pState->GetVectorFieldsRotationUpdate()->EvolveOneStep(step);
+        m_pState->GetCurvatureCalculator()->Initialize();
+        double totalE = m_pState->GetEnergyCalculator()->CalculateAllLocalEnergy();
+        m_pState->GetEnergyCalculator()->UpdateTotalEnergy(totalE);
 
-//----> Run the supplementary integrators
-       //--- update the box side
-         m_pState->GetDynamicBox()->ChangeBoxSize(step); // we may need the final step as well to check if the update of move size should be done
-        //--- update edge of mesh open edge
-         m_pState->GetOpenEdgeEvolution()->Move(step);
-        //--- update the mesh topology
-        m_pState->GetDynamicTopology()->MCMove(step);
-        //---- convert inclusions
-        m_pState->GetInclusionConversion()->Exchange(step);
-    
+        
 
-//----> print info about the simulation, e.g., rate,
-   // time_t currentTime;
-   // time(&currentTime);
-    if(!CheckMesh(step)){
-        std::cout<<"---> error, the mesh does not meet the requirment for MC sim \n";
-    }
-    if (step%100 == 0) {
-        PrintRate(step, true, true);
-    }
+} //End of simulation loop 
 
-} // for(int step=GetInitialStep(); step<GetFinalStep(); step++)
+// for(int step=GetInitialStep(); step<GetFinalStep(); step++)
     std::clock_t end = std::clock();
     double elapsed_secs = double(end - start) / CLOCKS_PER_SEC;
-    std::cout<<"---- Simulation has ended ----\n";
-    std::cout<<" The run took: "<<Nfunction::ConvertSecond2Time(elapsed_secs)<<"\n";
+    std::cout<<"---- Analysis has ended ----\n";
+    std::cout<<" The analysis took: "<<Nfunction::ConvertSecond2Time(elapsed_secs)<<"\n";
 
-
-    m_pState->GetCurvatureCalculator()->Initialize();
-    double Final_energy = m_pState->GetEnergyCalculator()->CalculateAllLocalEnergy();
-    double energy_leak = Final_energy - m_pState->GetEnergyCalculator()->GetEnergy();
-    std::cout << std::fixed << std::setprecision(4);
-    if(fabs(energy_leak) > 0.0001){
-        
-        std::cout<<"---> possible source of code error: energy leak... "<<energy_leak<<" with real energy of "<<Final_energy<<"  and stored energy of "<<m_pState->GetEnergyCalculator()->GetEnergy()<<"\n";
-    }
-    // check for volume
-    double vol = 0;
-    double g_c = 0;
-    double t_a = 0;
-    m_pState->GetVAHGlobalMeshProperties()->CalculateGlobalVariables(vol,t_a,g_c);
-    vol -= m_pState->GetVAHGlobalMeshProperties()->GetTotalVolume();
-    g_c -= m_pState->GetVAHGlobalMeshProperties()->GetTotalMeanCurvature();
-    t_a -= m_pState->GetVAHGlobalMeshProperties()->GetTotalArea();
-
-    if(fabs(vol) > 0.0001){
-        std::cout<<fabs(vol)<<" volume leak\n";
-    }
-    if(fabs(g_c) > 0.0001)
-    {
-        std::cout<<fabs(g_c)<<" global curvature leak\n";
-    }
-    if(fabs(t_a) > 0.0001)
-    {
-        std::cout<<fabs(t_a)<<" total area leak\n";
-    }
-        
+    
     return true;
 }
 void  MC_Simulation::PrintRate(int step, bool clean, bool clear){
@@ -212,5 +181,76 @@ bool MC_Simulation::CheckMesh(int step){
 
 
     
+    return true;
+}
+
+bool MC_Simulation::ReadInclusionType(std::ifstream& input,MESH &mesh) {
+    /*
+     * @brief Reads and initializes inclusion types from an input file.
+     *
+     * This function reads the inclusion type definitions from an input file and initializes
+     * the necessary data structures in the State object. It reads various properties for
+     * each inclusion type and sets up the mesh to use these types.
+     *
+     * @param input Reference to the input file stream containing inclusion type definitions.
+     * @return true if the inclusion types were successfully read and initialized, false otherwise.
+     */
+    
+    std::string firstword, rest, str1, str2, TypeNames;
+    int N, TypeID, NoType;
+    double Kappa, KappaG, KappaP, KappaL, C0, C0P, C0N;
+
+    // Store inclusion types in a vector
+    std::vector<InclusionType> all_InclusionType;
+
+    // Add a default inclusion type
+    InclusionType emptyIncType;
+    all_InclusionType.push_back(emptyIncType);
+
+    // Read the header line
+    input >> str1 >> NoType >> str2;
+    getline(input, rest);
+    getline(input, rest); // Discard the header line
+
+    // Check if the header line indicates inclusion type definition
+    if (str1 == "Define" || str1 == "define" || str1 == "DEFINE") {
+        for (int i = 0; i < NoType; i++) {
+            std::string inc_data;
+            getline(input, inc_data);
+            std::vector<std::string> inclusion_str = Nfunction::split(inc_data);
+            N = Nfunction::String_to_Int(inclusion_str[0]);
+            TypeNames = inclusion_str[1];
+            Kappa = Nfunction::String_to_Double(inclusion_str[2]);
+            KappaG = Nfunction::String_to_Double(inclusion_str[3]);
+            KappaP = Nfunction::String_to_Double(inclusion_str[4]);
+            KappaL = Nfunction::String_to_Double(inclusion_str[5]);
+            C0 = Nfunction::String_to_Double(inclusion_str[6]);
+            C0P = Nfunction::String_to_Double(inclusion_str[7]);
+            C0N = Nfunction::String_to_Double(inclusion_str[8]);
+
+            // Parse edge data if available
+            double lam = 0, ekg = 0, ekn = 0, ecn = 0;
+            if (inclusion_str.size() >= 13) {
+                lam = Nfunction::String_to_Double(inclusion_str[9]);
+                ekg = Nfunction::String_to_Double(inclusion_str[10]);
+                ekn = Nfunction::String_to_Double(inclusion_str[11]);
+                ecn = Nfunction::String_to_Double(inclusion_str[12]);
+            }
+
+            // Create inclusion type and add to vector
+            InclusionType incType(TypeNames, i + 1, N, Kappa/2, KappaG, KappaP/2, KappaL/2, C0, C0P, C0N, lam, ekg, ekn, ecn);
+            all_InclusionType.push_back(incType);
+        }
+    }
+
+    // Set inclusion types in the mesh object
+    mesh.m_InclusionType = all_InclusionType;
+
+    // Set pointers to inclusion types
+    mesh.m_pInclusionType.clear();
+    for (size_t i = 0; i < mesh.m_InclusionType.size(); ++i) {
+        mesh.m_pInclusionType.push_back(&mesh.m_InclusionType[i]);
+    }
+
     return true;
 }

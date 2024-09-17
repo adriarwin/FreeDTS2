@@ -1,0 +1,13 @@
+directory_path=/home/adriarwin/parallel_tempering/test2/p0.0c00.0kkg1
+name_output_folder=analysis_output
+initial_step=1
+final_step=10
+area_calculation=off
+inclusion_average_neighbours_calculation=off
+inclusion_cluster_statistics_calculation=off
+fluctuation_spectrum_planar_calculation= off 5 5
+membrane_thickness_calculation=off
+energy_calculation=on
+projected_area=on
+parallel_tempering=off
+name_energy_filename=output-en.xvg

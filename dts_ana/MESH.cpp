@@ -69,8 +69,26 @@ void  MESH::CenterMesh(){
     
     return;
 }
+
+
 bool MESH::GenerateMesh(MeshBluePrint meshblueprint)
 {
+    m_Vertex.clear();
+    m_Triangle.clear();
+    m_Links.clear();
+    m_Inclusion.clear();
+    m_pActiveV.clear();
+    m_pSurfV.clear();
+    m_pEdgeV.clear();
+    m_pActiveL.clear();
+    m_pHL.clear();
+    m_pMHL.clear();
+    m_pEdgeL.clear();
+    m_pActiveT.clear();
+    m_pInclusion.clear();
+    m_pGhostT.clear();
+    m_pGhostL.clear();
+    m_pGhostV.clear();
     m_Box = meshblueprint.simbox;
     if(m_Box.isbad()){
         std::cout<<"---> box from blueprint is bad \n";

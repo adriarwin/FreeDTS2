@@ -47,7 +47,7 @@ public:
     ~CreateMashBluePrint();
     
     MeshBluePrint MashBluePrintFromInput_Top(const std::string& inputfilename, const std::string& topfilename); // Function to generate blueprint from provided topology file and input file
-    
+    MeshBluePrint MashBluePrintFromTop(const std::string& topfilename);
 private:
     std::string m_InputFileName;  // Class variable for the name of the input file (dts file)
     std::string m_TopologyFileName; // Class variable for the name of the topology file

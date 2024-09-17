@@ -114,10 +114,6 @@
 #include "AbstractExternalFieldOnInclusions.h"
 #include "ConstantExternalField.h"
 #include "ConstantExternalFieldOnVectorFields.h"
-//--- interaction with Substrate
-#include "AbstractVertexAdhesionToSubstrate.h"
-#include "SphericalVertexSubstrate.h"
-#include "FlatVertexSubstrate.h"
 //--- rigid boundries
 #include "AbstractBoundary.h"
 #include "RigidWallTypes.h"
@@ -129,6 +125,16 @@
 #include "RNG.h"
 #include "VAHGlobalMeshProperties.h"
 #include "InclusionType.h"
+//--- parallel tempering
+#include "AbstractParallelTemperingMove.h"
+#include "ParallelTemperingMoveSimple.h"
+//--- interaction with Substrate
+#include "AbstractVertexAdhesionToSubstrate.h"
+#include "SphericalVertexSubstrate.h"
+#include "FlatVertexSubstrate.h"
+#include "FlatInclusionSubstrate.h"
+//--- Reading
+#include "ReadTrajTSI.h"
 
 
 struct ParallelReplicaData {  // data structure for turning on and off certain moves
@@ -151,7 +157,8 @@ public:
     
   //  friend class Three_Edge_Scission;
 
-    
+//-- Analysis
+inline ReadTrajTSI                          *GetReadTrajTSI()                   {return m_pReadTrajTSI;}
 //-- standard Integrators
 inline AbstractAlexanderMove                *GetAlexanderMove()                 {return m_pAlexanderMove;}
 inline AbstractVertexPositionIntegrator     *GetVertexPositionUpdate()                  {return m_pVertexPositionIntegrator;}
@@ -179,7 +186,7 @@ inline AbstractForceonVerticesfromInclusions *GetForceonVerticesfromInclusions()
 inline AbstractForceonVerticesfromVectorFields *GetForceonVerticesfromVectorFields()    {return m_pForceonVerticesfromVectorFields;}
 inline AbstractExternalFieldOnVectorFields *GetExternalFieldOnVectorFields()        {return m_pExternalFieldOnVectorFields;}
 inline AbstractExternalFieldOnInclusions *GetExternalFieldOnInclusions()        {return m_pExternalFieldOnInclusions;}
-    
+
 inline AbstractVertexAdhesionToSubstrate *GetVertexAdhesionToSubstrate()        {return m_pVertexAdhesionToSubstrate;}
 inline VAHGlobalMeshProperties              *GetVAHGlobalMeshProperties()        {return m_pVAHCalculator;}
 //---- supplementary integrators
@@ -187,11 +194,13 @@ inline AbstractDynamicBox               *GetDynamicBox()                        
 inline AbstractDynamicTopology          *GetDynamicTopology()                           {return m_pDynamicTopology;}
 inline AbstractOpenEdgeEvolution        *GetOpenEdgeEvolution()                         {return m_pOpenEdgeEvolution;}
 inline AbstractInclusionConversion      *GetInclusionConversion()                       {return m_pInclusionConversion;}
+inline AbstractParallelTemperingMove    *GetParallelTempering()                         {return m_pParallelTemperingMove;}
 
 
 inline AbstractBoundary                 *GetBoundary()                                  {return m_pBoundary;}
 //---- System energy and voxels
 inline MESH                     *GetMesh()                                      {return m_pMesh;}  //
+inline void                     SetMesh(MESH newMesh)                          { (*m_pMesh) = (newMesh); }
 inline Voxelization<vertex>     *GetVoxelization()                              {return m_pVoxelization;}
 inline AbstractSimulation           *GetSimulation()                                {return m_pSimulation;};
 //--- accessory objects
@@ -201,7 +210,10 @@ inline std::vector <std::string> GetCommandLineArgument()                       
 inline std::string               GetRunTag()                                    {return m_GeneralOutputFilename;}
 inline int                       GetThreads_Number()                                {return m_Total_no_Threads;}
 inline ParallelReplicaData       GetParallelReplicaData()                           {return m_Parallel_Replica;}
+inline std::string               GetInputFile()                                     {return m_InputFileName;}
+//{return m_InputFileName;}
 std::string CurrentState();
+bool ReadInclusionType(std::ifstream& input);
 
 static void HelpMessage();              // writes a help message
 bool Initialize(); // makes all the objects ready for simulations, it will open the files ...
@@ -211,19 +223,21 @@ bool Initialize(); // makes all the objects ready for simulations, it will open 
 private:
     bool ReadInputFile(std::string inputfile);    // updates variables based on data in the inputfile
     bool ExploreArguments(std::vector<std::string> &argument);
-    bool ReadInclusionType(std::ifstream& input);
+    
 private:
+
+    //Analysis
+    ReadTrajTSI *m_pReadTrajTSI;
+
     AbstractApplyConstraintBetweenGroups *m_pApplyConstraintBetweenGroups;
     AbstractInclusionConversion* m_pInclusionConversion;
     Restart *m_pRestart;
     AbstractForceonVerticesfromInclusions *m_pForceonVerticesfromInclusions;
     AbstractForceonVerticesfromVectorFields *m_pForceonVerticesfromVectorFields;
+    AbstractVertexAdhesionToSubstrate *m_pVertexAdhesionToSubstrate;
 
     AbstractExternalFieldOnVectorFields *m_pExternalFieldOnVectorFields;
     AbstractExternalFieldOnInclusions *m_pExternalFieldOnInclusions;
-    
-    AbstractVertexAdhesionToSubstrate *m_pVertexAdhesionToSubstrate;
-
 //--- Integrators of different degree of freedom
     AbstractAlexanderMove               *m_pAlexanderMove;
     AbstractVertexPositionIntegrator    *m_pVertexPositionIntegrator;
@@ -239,6 +253,7 @@ private:
     AbstractDynamicBox            *m_pDynamicBox;
     AbstractDynamicTopology       *m_pDynamicTopology;
     AbstractOpenEdgeEvolution     *m_pOpenEdgeEvolution;
+    AbstractParallelTemperingMove *m_pParallelTemperingMove;
     
     VAHGlobalMeshProperties       *m_pVAHCalculator;
     AbstractVolumeCoupling        *m_pVolumeCoupling;
@@ -268,6 +283,7 @@ private:
 // --- pure members
 private:
     std::vector <std::string> m_Argument;
+    std::vector <std::string> m_TrajTSIfiles;
     std::string     m_GeneralOutputFilename; //  a general file flag for specific run
     std::string     m_InputFileName; // name of the topology file, *.top, *.dat *.tsi *.bts
     std::string     m_IndexFileName;            // Name of the index file for group specification

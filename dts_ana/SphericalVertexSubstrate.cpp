@@ -21,8 +21,9 @@ SphericalVertexSubstrate::~SphericalVertexSubstrate() {
 }
 double SphericalVertexSubstrate::GetCouplingEnergy(vertex *pvertex) {
 
-    Vec3D d_R = pvertex->GetPos() - m_Center;
-    double E = -m_AdhesionStrength * 1/(d_R.dot(d_R,d_R)+1);
+    Vec3D R = pvertex->GetPos() - m_Center;
+    double d_R = R.norm()-m_Radius;
+    double E = -m_AdhesionStrength * 1/(d_R*d_R+1);
     return E;
 }
 std::string SphericalVertexSubstrate::CurrentState(){

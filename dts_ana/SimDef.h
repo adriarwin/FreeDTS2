@@ -53,6 +53,7 @@
 #include <iomanip> // Include this header for std::setprecision
 #include "Nfunction.h"
 
+
 // Mathematical constants
 #define PI 3.14159265359  // Value of pi
 #define S60 0.8660254037844  // Square root of 3 divided by 2
@@ -85,8 +86,8 @@
 #define TimeSeriDataExt "-en.xvg"  // 
 
 // Names and identifiers
-#define S_Name "DTS"  // Software name
-#define EXE_NAME "DTS"  // Executable name
+#define S_Name "ANA"  // Software name
+#define EXE_NAME "ANA"  // Executable name
 
 // Library configurations
 #define Libarmadillo Disabled  // Armadillo library status

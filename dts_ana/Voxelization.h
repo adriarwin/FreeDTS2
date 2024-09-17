@@ -103,6 +103,26 @@ bool Voxelize(std::vector<Type *> all_pObjects) {
 #if DEBUG_MODE == Enabled
     std::cout<<" We are in the Voxelize function \n";
 #endif
+
+    m_Nx = int((*m_pBox)(0)/m_Lx);
+    m_Ny = int((*m_pBox)(1)/m_Ly);
+    m_Nz = int((*m_pBox)(2)/m_Lz);
+
+  // Allocate the main array
+    int voxel_id2=0;
+    m_AllVoxel = new Voxel<Type>***[m_Nx];
+    for (int i = 0; i < m_Nx; ++i) {
+            m_AllVoxel[i] = new Voxel<Type>**[m_Ny];
+            for (int j = 0; j < m_Ny; ++j) {
+                m_AllVoxel[i][j] = new Voxel<Type>*[m_Nz];
+                for (int k = 0; k < m_Nz; ++k) {
+                    m_AllVoxel[i][j][k] = new Voxel<Type>(voxel_id2,i,j,k, m_Nx, m_Ny, m_Nz);
+                    voxel_id2++;
+
+                }
+            }
+        }
+
     
     //---> make m_AllVoxel empty
             if (m_AllVoxel != nullptr) {

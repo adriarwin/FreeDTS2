@@ -1,0 +1,20 @@
+Initial_Step                    = 1
+Final_Step                      = 5000000
+Box_Centering_F                 = 1
+Display_periodic                = 2000
+OutPutEnergy_periodic           = 100
+Restart_periodic                = 10000
+Kappa                           = 20 0
+OutPutTRJ_TSI                   = 2000  10  TrjTSI
+GeneralOutputFilename           = output
+OpenEdgeEvolutionWithConstantVertex = off 5
+Volume_Constraint               = on 0 0 100000.0 0.975
+Constant_NematicForce           = 1.0 1 1 Pro1
+INCLUSION
+Define 2 Inclusions
+SRotation   Type   K   KG  KP  KL   C0     C0P   C0L  lambda   lkg   lkn    cn0
+1           Pro1   20  0  10.0 5.0   0.0    0.0    0   0.0        0     0      >
+2           Pro2   20  0   0   0   0.0   0   0    0   0  0  0.0
+Inclusion-Inclusion-Int
+1    1    1   2     0     -4
+2    2    1   0     4     0

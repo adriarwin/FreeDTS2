@@ -3,6 +3,7 @@
 
 #include "SimDef.h"
 #include "AbstractSimulation.h"
+#include "MESH.h"
 /*
  * MC_Simulation Class
  * Date 2024
@@ -54,6 +55,7 @@ private:
     State *m_pState;
     void PrintRate(int step, bool clean, bool clear);
     bool CheckMesh(int step);
+    bool ReadInclusionType(std::ifstream& input,MESH &mesh);
     // Private members
 };
 
