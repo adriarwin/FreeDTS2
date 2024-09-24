@@ -325,7 +325,7 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
         bool ExchangeAccepted=(RandomNumber<exp(dBeta*dE));
 
 
-        ExchangeAccepted=true;
+        //ExchangeAccepted=true;
         int ExchangeAcceptedInt = ExchangeAccepted ? 1 : 0;
 
         //SENDING RESULT OF ATTEMPT
@@ -391,7 +391,7 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
         bool ExchangeAccepted=(RandomNumber<exp(dBeta*dE));
 
 
-        ExchangeAccepted=true;
+        //ExchangeAccepted=true;
         int ExchangeAcceptedInt = ExchangeAccepted ? 1 : 0;
 
         //SENDING RESULT OF ATTEMPT
