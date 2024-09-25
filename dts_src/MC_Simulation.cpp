@@ -238,6 +238,11 @@ void  MC_Simulation::PrintRate(int step, bool clean, bool clear){
     double  bmove_rate =  100 * (m_pState->GetDynamicBox()->GetAcceptanceRate(clean));
     double  vfmove_rate = 100 * (m_pState->GetVectorFieldsRotationUpdate()->GetAcceptanceRate(clean));
 
+    if(clear){
+        std::cout << '\r';
+        std::cout << "\033[K";
+    }
+
     std::cout<<"Step = "<<step<<"/"<<m_Final_Step<<std::flush;
     std::cout << std::fixed << std::setprecision(1);
     std::cout<<" Rates: "<<std::flush;
@@ -252,10 +257,7 @@ void  MC_Simulation::PrintRate(int step, bool clean, bool clear){
     if(m_pState->GetDynamicBox()->GetDerivedDefaultReadName() != "No"){
         std::cout<<"; Box Move = "<<bmove_rate<<"%"<<std::flush;
     }
-    if(clear){
-        std::cout << '\r';
-        std::cout << "\033[K";
-    }
+    
 }
 std::string MC_Simulation::CurrentState(){
     
