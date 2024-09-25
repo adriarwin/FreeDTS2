@@ -6,6 +6,9 @@
 #include "vertex.h"
 #include "State.h"
 #include "Voxelization.h"
+#ifdef MPI_DETECTED
+#include <mpi.h>
+#endif
 
 
 /*
@@ -41,8 +44,15 @@ PositionRescaleFrameTensionCoupling::~PositionRescaleFrameTensionCoupling() {
     
 }
 void PositionRescaleFrameTensionCoupling::Initialize() {
-    
+    #ifdef MPI_DETECTED
+    int rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    if(rank==0){
+    std::cout<<"---> the algorithm for box change involves applying: "<< GetDefaultReadName()<<" \n";}
+    #endif
+    #ifndef MPI_DETECTED
     std::cout<<"---> the algorithm for box change involves applying: "<< GetDefaultReadName()<<" \n";
+    #endif
     m_pBox = (m_pState->GetMesh())->GetBox();
 }
 bool PositionRescaleFrameTensionCoupling::ChangeBoxSize(int step){

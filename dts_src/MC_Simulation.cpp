@@ -51,11 +51,11 @@ bool MC_Simulation::do_Simulation(){
 
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    std::cout<<"Rank: "<<rank<<std::endl;
+    //std::cout<<"Rank: "<<rank<<std::endl;
 
     int size;
     MPI_Comm_size(MPI_COMM_WORLD, &size);
-    std::cout<<"Size: "<<size<<std::endl;
+    //std::cout<<"Size: "<<size<<std::endl;
 
 #endif
     
@@ -87,8 +87,18 @@ bool MC_Simulation::do_Simulation(){
 #endif
 
 //Only one rank prints this output
+    
+    #ifdef MPI_DETECTED
+    std::clock_t start = std::clock();
+    if (rank==0){
+    
+    std::cout<<"------>   Simulation will be performed from "<<m_Initial_Step<<" to "<<m_Final_Step<<" steps\n";}
+    #endif
+
+    #ifndef MPI_DETECTED
     std::clock_t start = std::clock();
     std::cout<<"------>   Simulation will be performed from "<<m_Initial_Step<<" to "<<m_Final_Step<<" steps\n";
+    #endif
 //Start of the simulation loop
 for (int step = m_Initial_Step; step <= m_Final_Step; step++){
         
@@ -149,17 +159,35 @@ for (int step = m_Initial_Step; step <= m_Final_Step; step++){
     if(!CheckMesh(step)){
         std::cout<<"---> error, the mesh does not meet the requirment for MC sim \n";
     }
+    #ifdef MPI_DETECTED
+    if (rank==0){
+    if (step%100 == 0) {
+        PrintRate(step, true, true);
+    }}
+    #endif
+    #ifndef MPI_DETECTED
     if (step%100 == 0) {
         PrintRate(step, true, true);
     }
-
+    #endif
 } //End of simulation loop 
 
 // for(int step=GetInitialStep(); step<GetFinalStep(); step++)
+    #ifdef MPI_DETECTED
+    MPI_Barrier(MPI_COMM_WORLD);
+    if (rank==0){
+    std::clock_t end = std::clock();
+    double elapsed_secs = double(end - start) / CLOCKS_PER_SEC;
+    std::cout<<"---- Simulation has ended ----\n";
+    std::cout<<" The run took: "<<Nfunction::ConvertSecond2Time(elapsed_secs)<<"\n";}
+    #endif
+
+    #ifndef MPI_DETECTED
     std::clock_t end = std::clock();
     double elapsed_secs = double(end - start) / CLOCKS_PER_SEC;
     std::cout<<"---- Simulation has ended ----\n";
     std::cout<<" The run took: "<<Nfunction::ConvertSecond2Time(elapsed_secs)<<"\n";
+    #endif 
 
     #ifndef MPI_DETECTED
     m_pState->GetCurvatureCalculator()->Initialize();

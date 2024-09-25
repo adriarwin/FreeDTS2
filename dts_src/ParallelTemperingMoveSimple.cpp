@@ -38,21 +38,24 @@ ParallelTemperingMoveSimple::~ParallelTemperingMoveSimple() {
 }
 void ParallelTemperingMoveSimple::Initialize() {
     
-    std::cout<<"---> the algorithm for Parallel Tempering involves applying this: "<< GetBaseDefaultReadName()<<" \n";
+    
     #ifdef MPI_DETECTED
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    std::cout<<"Rank: "<<rank<<std::endl;
+    //std::cout<<"Rank: "<<rank<<std::endl;
     m_Rank=rank;
     int size;
     MPI_Comm_size(MPI_COMM_WORLD, &size);
-    std::cout<<"Size: "<<size<<std::endl;
+    //std::cout<<"Size: "<<size<<std::endl;
     m_Size=size;
     m_TempID=rank;
     m_Counter=0;
     m_SizeIsEven=(m_Size%2==0);
     m_ReceiveBroadcast.resize(m_Size);
     m_RequestBroadcast.resize(m_Size);
+
+    if(m_Rank==0){
+    std::cout<<"---> the algorithm for Parallel Tempering involves applying this: "<< GetBaseDefaultReadName()<<" \n";}
     //m_RankWithUpTempID=rank;
     //m_RankWithDownTempID=rank;
     for (int i=0;i<m_Size;i++)
@@ -592,10 +595,10 @@ std::vector<double> ParallelTemperingMoveSimple::ReadTemperatures(){
         }
     }
 
-    for (size_t i = 0; i < betavec.size(); ++i) {
-        betavec[i]=1/betavec[i];
-        std::cout<<betavec[i]<<std::endl;
-    }
+    //for (size_t i = 0; i < betavec.size(); ++i) {
+    //    betavec[i]=1/betavec[i];
+    //    std::cout<<betavec[i]<<std::endl;
+    //}
 
     return betavec;
 

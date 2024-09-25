@@ -4,6 +4,9 @@
 #include <fstream>
 #include "Inclusion_Interaction_Map.h"
 #include "Nfunction.h"
+#ifdef MPI_DETECTED
+#include <mpi.h>
+#endif
 /*
  Weria Pezeshkian (weria.pezeshkian@gmail.com)
  Copyright (c) Weria Pezeshkian
@@ -42,8 +45,17 @@ for (int i=0;i<Inclusion_Type_Number;i++)
         }
     }
     if (!hasInteraction) {
+        #ifdef MPI_DETECTED
+        int rank;
+        MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+        if (rank==0){
+        std::string warning = "Warning: No inclusion interaction energy is mentioned in the input file. They are all set to zero.";
+        std::cout << warning << std::endl;}
+        #endif
+        #ifndef MPI_DETECTED
         std::string warning = "Warning: No inclusion interaction energy is mentioned in the input file. They are all set to zero.";
         std::cout << warning << std::endl;
+        #endif
     }
 }
 

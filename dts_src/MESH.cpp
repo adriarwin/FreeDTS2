@@ -1,5 +1,8 @@
 #include <fstream>
 #include "MESH.h"
+#ifdef MPI_DETECTED
+#include <mpi.h>
+#endif
 /*
  Weria Pezeshkian (weria.pezeshkian@gmail.com)
  Copyright (c) Weria Pezeshkian
@@ -296,9 +299,16 @@ bool MESH::GenerateMesh(MeshBluePrint meshblueprint)
     }
     // =======
     // ==== info of the mesh
-    
+    #ifndef MPI_DETECTED
     std::cout<<"---> active vertex "<<m_pActiveV.size()<<" surf vertex "<<m_pSurfV.size()<<"  edge vertex "<<m_pEdgeV.size()<<" -- \n";
-
+    #endif
+    #ifdef MPI_DETECTED
+    int rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    if(rank==0){
+        std::cout<<"---> active vertex "<<m_pActiveV.size()<<" surf vertex "<<m_pSurfV.size()<<"  edge vertex "<<m_pEdgeV.size()<<" -- \n";
+    }
+    #endif
     //====== create ghost
     int lid = 2*(m_pMHL.size())+m_pEdgeL.size();
     int tid = m_pActiveT.size() ;
@@ -336,7 +346,13 @@ bool MESH::GenerateMesh(MeshBluePrint meshblueprint)
 
     if(m_No_VectorFields_Per_V != 0 ) {
         // Get an iterator to the beginning of meshblueprint.bvectorfields
+        #ifdef MPI_DETECTED
+        if(rank==0){
+        std::cout<<"---> Note, each vertex has "<< m_No_VectorFields_Per_V <<" vector fields \n";}
+        #endif
+        #ifndef MPI_DETECTED
         std::cout<<"---> Note, each vertex has "<< m_No_VectorFields_Per_V <<" vector fields \n";
+        #endif
         std::vector<VectorField_Map>::iterator data_it = meshblueprint.bvectorfields.begin();
         // Iterate over active vertices and initialize them with corresponding vector field data
         for (std::vector<vertex*>::iterator it = m_pActiveV.begin(); it != m_pActiveV.end(); ++it, ++data_it) {
@@ -345,7 +361,13 @@ bool MESH::GenerateMesh(MeshBluePrint meshblueprint)
         }
     }//     if(m_No_VectorFields_Per_V !=0) {
     else{
+        #ifdef MPI_DETECTED
+        if(rank==0){
+        std::cout<<"---> Note, the vertices do not have any vector fields. \n";}
+        #endif
+        #ifndef MPI_DETECTED
         std::cout<<"---> Note, the vertices do not have any vector fields. \n";
+        #endif
     }
     
     if(m_No_VectorFields_Per_V != 0 )
@@ -441,7 +463,15 @@ bool MESH::UpdateGroupFromIndexFile(std::string &filename){
     
     std::ifstream indexfile(filename);
     if (!indexfile) {
+        #ifdef MPI_DETECTED
+        int rank;
+        MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+        if(rank==0){
+        std::cerr << "---> note: no index file has been provided "  << std::endl;}
+        #endif
+        #ifndef MPI_DETECTED
         std::cerr << "---> note: no index file has been provided "  << std::endl;
+        #endif
         return false;
     }
 

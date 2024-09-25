@@ -848,10 +848,7 @@ while (input >> firstword) {
             int period, n_processors;
             double minbeta, maxbeta;
             input>>str>>type>>algorithm>>period>>n_processors>>minbeta>>maxbeta;
-            std::cout<<"Printing algorithm"<<algorithm<<std::endl;
-            std::cout<<"Printing type"<<type<<std::endl;
             if(algorithm == ParallelTemperingMoveSimple::GetBaseDefaultReadName()){
-                std::cout<<"Initializing this!"<<algorithm<<std::endl;
                 #ifdef MPI_DETECTED
                 m_pParallelTemperingMove = new ParallelTemperingMoveSimple(this ,period, n_processors, minbeta, maxbeta);
                 #endif
@@ -1168,7 +1165,13 @@ bool State::Initialize(){
         std::cout<<" There were "<<m_NumberOfWarnings<<" warning in the input files "<<std::endl;
     }
     else{
+    #ifdef MPI_DETECTED
+    if (rank==0){
+        std::cout<<" All input files are valid, and the State has been successfully initialized! "<<std::endl;}
+    #endif
+    #ifndef MPI_DETECTED
         std::cout<<" All input files are valid, and the State has been successfully initialized! "<<std::endl;
+    #endif
     }
     return true;
 }
