@@ -47,6 +47,7 @@ private:
     int m_Size;
     int m_TempID;
     int m_Counter;
+    int m_NumberOfPTSteps;
     bool m_SizeIsEven;
     bool m_TargetState;
     std::vector<int>  m_RankAtTempID;   // a map for temp_id to thread_id, temp = temperatures.at(temp_id)

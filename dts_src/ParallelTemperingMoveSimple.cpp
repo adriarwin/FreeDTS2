@@ -90,6 +90,17 @@ void ParallelTemperingMoveSimple::Initialize() {
         exit(0);
     }
 
+    //Getting the number of PT stepts that are going to be run
+    int t_ini=m_pState->GetSimulation()->GetInitialStep();
+    int t_fin=m_pState->GetSimulation()->GetFinalStep();
+    
+    m_NumberOfPTSteps= (t_fin - t_ini + 1)/m_Period;
+
+    if (m_Rank==0){
+        std::cout<<"Number of parallel tempering steps expected: "<< m_NumberOfPTSteps -1<< std::endl;
+    }
+    
+
 
     m_pState->GetSimulation()->SetBeta(m_BetaVec[m_TempID], 0);
     //--> set the run tag id, we need to update this ID each time that the processor changes its temprature. The id should be temprature dependent
@@ -149,7 +160,7 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
         return false;
 
     MPI_Barrier(MPI_COMM_WORLD);
-    
+
     bool CountIsEven=(m_Counter%2==0);
 
     //TEST::
@@ -261,6 +272,11 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
 
         }
         
+    }
+
+    //Breaking the last communication to do not let any pending comunication
+    if (step/m_Period==m_NumberOfPTSteps){
+        return true;
     }
     //Just something
     std::fill(m_ReceiveBroadcast.begin(), m_ReceiveBroadcast.end(), 0);
