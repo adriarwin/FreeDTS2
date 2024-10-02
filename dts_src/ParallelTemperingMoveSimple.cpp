@@ -148,6 +148,7 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
     if(step%m_Period != 0)
         return false;
 
+    MPI_Barrier(MPI_COMM_WORLD);
     
     bool CountIsEven=(m_Counter%2==0);
 
