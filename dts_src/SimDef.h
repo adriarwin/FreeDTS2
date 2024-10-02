@@ -98,7 +98,7 @@
 #define TEST_MODE Disabled  // Test mode status
 #define DEBUG_MODE Disabled  // Debug mode status
 #define DEVELOPMENT_MODE Disabled  // Test mode status
-#define DEBUG_MODE_PT Enabled //Test parallel tempering
+#define DEBUG_MODE_PT Disabled//Test parallel tempering
 
 // Random number generator configuration
 #define RNGTYPE UNIFROMTYPE0  // Random number generator type

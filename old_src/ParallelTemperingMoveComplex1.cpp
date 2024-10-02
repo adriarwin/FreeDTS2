@@ -1,7 +1,7 @@
 
 
 #include <stdio.h>
-#include "ParallelTemperingMoveSimple.h"
+#include "ParallelTemperingMoveComplex1.h"
 #include "Nfunction.h"
 #include "vertex.h"
 #include "State.h"
@@ -154,8 +154,6 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
     //TEST::
     //CountIsEven=true;
 
-
-    //RECEIVE BROADCAST FROM LAST EXCHANGE, SWAP RANKS, UPDATE RANKATTEMPID
     if (m_Counter>0){
 
         if (!CountIsEven){
@@ -261,12 +259,7 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
         }
         
     }
-    //Just something
-    std::fill(m_ReceiveBroadcast.begin(), m_ReceiveBroadcast.end(), 0);
 
-    std::fill(m_RequestBroadcast.begin(), m_RequestBroadcast.end(), MPI_REQUEST_NULL);
-
-    bool TempIDIsEven=(m_TempID%2==0);
 
     if (m_Rank==0){
         WriteRankAtTempIDToFile();
@@ -284,35 +277,24 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
         int DestTempID=m_TempID-1;
         int DestRank=m_RankAtTempID[DestTempID];
         int ReceiveExchangeAcceptedInt;
-
-        MPI_Request request_send;
-        MPI_Request request_receive;
-        MPI_Request request_send_1;
-        MPI_Request request_receive_1;
         
 #if DEBUG_MODE_PT==Enabled
         std::cout <<"step:"<< step <<" ,Rank: " << m_Rank << ", TempID: " << m_TempID 
         << ", Counter: " << m_Counter << " reached stage prior to send energy" << std::endl;
 #endif
-        MPI_Isend(&sending_energy, 1, MPI_DOUBLE, DestRank, 0, MPI_COMM_WORLD, &request_send);
+        MPI_Send(&sending_energy, 1, MPI_DOUBLE, DestTempID, 0, MPI_COMM_WORLD);
 #if DEBUG_MODE_PT==Enabled
         std::cout <<"step:"<< step <<" ,Rank: "<< m_Rank << ", TempID: " << m_TempID 
         << ", Counter: " << m_Counter << " sent energy to" <<DestTempID <<std::endl;
 #endif
-        //MPI_Wait(&request_send, MPI_STATUS_IGNORE);
+
 
         //RECEIVE RESULT OF EXCHANGE ATTEMPTS
-        MPI_Irecv(&ReceiveExchangeAcceptedInt, 1, MPI_INT, DestRank, 1, MPI_COMM_WORLD, &request_receive);
+        MPI_Recv(&ReceiveExchangeAcceptedInt, 1, MPI_INT, DestRank, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 #if DEBUG_MODE_PT==Enabled
         std::cout <<"step:"<< step << " ,Rank: " << m_Rank << ", TempID: " << m_TempID 
         << ", Counter: " << m_Counter << " received energy from" <<DestRank <<std::endl;
 #endif
-        MPI_Wait(&request_receive, MPI_STATUS_IGNORE);
-#if DEBUG_MODE_PT==Enabled
-        std::cout <<"step:"<< step << " ,Rank: " << m_Rank << ", TempID: " << m_TempID 
-        << ", Counter: " << m_Counter << " Completed wait after receive " <<DestRank <<std::endl;
-#endif
-
         bool ReceiveExchangeAccepted=(ReceiveExchangeAcceptedInt==1);
 
         //IF ACCEPTED, EFFECTIVELY SWAP RANKS
@@ -321,59 +303,25 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
             m_pState->GetSimulation()->SetBeta(m_BetaVec[NewTempID], 0);
             m_pState->GetNonbinaryTrajectory()->SetFolderName(m_pState->GetNonbinaryTrajectory()->GetOriginalFolderName() +"_" + Nfunction::Int_to_String(NewTempID)); 
             m_pState->GetTimeSeriesDataOutput()->CloseFile();
-            int EmptyBlockingInt_1=0;
-            int EmptyBlockingInt_2;
-            MPI_Isend(&EmptyBlockingInt_1, 1, MPI_INT, DestRank, 3, MPI_COMM_WORLD,&request_send_1);
+            int EmptyBlockingInt=0;
+            MPI_Send(&EmptyBlockingInt, 1, MPI_INT, DestRank, 3, MPI_COMM_WORLD);
 #if DEBUG_MODE_PT==Enabled
             std::cout << "step:"<< step <<" ,Rank: " << m_Rank << ", TempID: " << m_TempID 
         << ", Counter: " << m_Counter << " sent blocking INT to " <<DestTempID <<std::endl;
 #endif
-            //MPI_Wait(&request_send_1,MPI_STATUS_IGNORE);
-            MPI_Irecv(&EmptyBlockingInt_2, 1, MPI_INT, DestRank, 4, MPI_COMM_WORLD,&request_receive_1);
-#if DEBUG_MODE_PT==Enabled
-            std::cout << "step:"<< step <<" ,Rank: " << m_Rank << ", TempID: " << m_TempID 
-        << ", Counter: " << m_Counter << " Waiting " <<DestRank <<std::endl;
-#endif
-            MPI_Wait(&request_receive_1,MPI_STATUS_IGNORE);
-#if DEBUG_MODE_PT==Enabled
-            std::cout << "step:"<< step <<" ,Rank: " << m_Rank << ", TempID: " << m_TempID 
-        << ", Counter: " << m_Counter << " Waiting completed from " <<DestRank <<std::endl;
-#endif
             m_pState->GetTimeSeriesDataOutput()->OpenFileWithoutHeader(m_pState ->GetRunTag() + "_" +Nfunction::Int_to_String(NewTempID)+TimeSeriDataExt);
             m_pState->GetRestart()->SetUniqueRestartFileName("_" + Nfunction::Int_to_String(NewTempID));
             }
+
+        MPI_Request request;
+        MPI_Isend(&ReceiveExchangeAccepted, 0,MPI_INT, 0,4,MPI_COMM_WORLD, request )
             
-        //BROADCAST TO UPDATE ALL TEMPERATURES ABOUT RESULT OF THE EXCHANGE ATTEMPT
-        for(int i=0;i<m_Size;i++){
-            if(i%2==0){
-                MPI_Ibcast(&m_ReceiveBroadcast[i], 1, MPI_INT, m_RankAtTempID[i], MPI_COMM_WORLD, &m_RequestBroadcast[i]);
-            }
-        }
-
-        #if DEBUG_MODE_PT==Enabled
-        std::cout <<"step:"<< step <<" ,Rank: " << m_Rank << ", TempID: " << m_TempID 
-        << ", Counter: " << m_Counter << ". The received non-sync broadcast is set." <<std::endl;
-#endif
-
 
     }
     //IF COUNT IS EVEN, EVEN TEMPIDS RECEIVE ENERGY AND ATTEMPT EXCHANGE
     else if (TempIDIsEven){
         //DEALING WITH SPECIAL CASE. IF SIZE IS ODD, THE LAST TEMP ID IS OUT OF THE ATTEMPT.
         if (!m_SizeIsEven && m_TempID==m_Size-1){
-#if DEBUG_MODE_PT==Enabled
-        std::cout <<"step:"<< step <<" , Rank: " << m_Rank << ", TempID: " << m_TempID 
-        << ", Counter: " << m_Counter << ". Setting special case broadcast for last temp ID." <<std::endl;
-#endif
-            for(int i=0;i<m_Size;i++){
-                if(i%2==0){
-                    MPI_Ibcast(&m_ReceiveBroadcast[i], 1, MPI_INT, m_RankAtTempID[i], MPI_COMM_WORLD, &m_RequestBroadcast[i]);
-                }
-            }
-#if DEBUG_MODE_PT==Enabled
-        std::cout <<"step:"<< step <<" , Rank: "<< m_Rank << ", TempID: " << m_TempID 
-        << ", Counter: " << m_Counter << ". Set special case broadcast for last temp ID." <<std::endl;
-#endif
 
             m_Counter++;
 
@@ -386,23 +334,14 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
         double receive_energy;
         int SourceTempID=m_TempID+1;
         int SourceRank=m_RankAtTempID[SourceTempID];
-        MPI_Request request_receive;
-        MPI_Request request_send_exchange_result;
-        MPI_Request request_receive_last_1;
-        MPI_Request request_receive_last_2;
 #if DEBUG_MODE_PT==Enabled
         std::cout <<"step:"<< step <<" , Rank: "<< m_Rank << ", TempID: " << m_TempID 
         << ", Counter: " << m_Counter << ". 0 Receive from " <<SourceTempID<<std::endl;
 #endif
-        MPI_Irecv(&receive_energy, 1, MPI_DOUBLE, SourceRank, 0, MPI_COMM_WORLD, &request_receive);
+        MPI_Recv(&receive_energy, 1, MPI_DOUBLE, SourceRank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 #if DEBUG_MODE_PT==Enabled
         std::cout <<"step:"<< step <<" , Rank: "<< m_Rank << ", TempID: " << m_TempID 
         << ", Counter: " << m_Counter << ". 1 Receive from " <<SourceTempID<<std::endl;
-#endif 
-        MPI_Wait(&request_receive, MPI_STATUS_IGNORE);
-#if DEBUG_MODE_PT==Enabled
-        std::cout <<"step:"<< step <<" , Rank: "<< m_Rank << ", TempID: " << m_TempID 
-        << ", Counter: " << m_Counter << ". 1 Wait from this completed, Receive from " <<SourceTempID<<std::endl;
 #endif 
         //ATTEMPT EXCHANGE
         double dE=receive_energy-own_energy;
@@ -411,38 +350,25 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
         //std::cout<<RandomNumber<<std::endl;
         bool ExchangeAccepted=(RandomNumber<exp(dBeta*dE));
 
+
         //ExchangeAccepted=true;
         int ExchangeAcceptedInt = ExchangeAccepted ? 1 : 0;
+
         //SENDING RESULT OF ATTEMPT
-        MPI_Isend(&ExchangeAcceptedInt, 1, MPI_INT, SourceRank, 1, MPI_COMM_WORLD, &request_send_exchange_result);
+        MPI_Send(&ExchangeAcceptedInt, 1, MPI_INT, SourceRank, 1, MPI_COMM_WORLD);
 #if DEBUG_MODE_PT==Enabled
         std::cout <<"step:"<< step <<" , Rank: "<< m_Rank << ", TempID: " << m_TempID 
         << ", Counter: " << m_Counter << ". Send to " <<SourceTempID<<std::endl;
 #endif         
-        //MPI_Wait(&request_send_exchange_result, MPI_STATUS_IGNORE);
+        
         //EFFECTIVE SWAP OF TEMPERATURES
         if (ExchangeAccepted){
             int NewTempID=SourceTempID;
             m_pState->GetSimulation()->SetBeta(m_BetaVec[NewTempID], 0);
             m_pState->GetNonbinaryTrajectory()->SetFolderName(m_pState->GetNonbinaryTrajectory()->GetOriginalFolderName() +"_" + Nfunction::Int_to_String(NewTempID));
             m_pState->GetTimeSeriesDataOutput()->CloseFile();
-            int EmptyBlockingInt_1;
-            int EmptyBlockingInt_2=0;
-            #if DEBUG_MODE_PT==Enabled
-             std::cout <<"step:"<< step <<" , Rank: "<< m_Rank << ", TempID: " << m_TempID 
-        << ", Counter: " << m_Counter << " Receiving from "<<SourceRank<<std::endl;
-            #endif     
-            MPI_Irecv(&EmptyBlockingInt_1, 1, MPI_INT, SourceRank, 3, MPI_COMM_WORLD, &request_receive_last_1);
-            #if DEBUG_MODE_PT==Enabled
-            std::cout <<"step:"<< step <<" , Rank: "<< m_Rank << ", TempID: " << m_TempID 
-        << ", Counter: " << m_Counter << " Waiting from "<<SourceRank<<std::endl;
-            #endif 
-            MPI_Wait(&request_receive_last_1,MPI_STATUS_IGNORE);
-            #if DEBUG_MODE_PT==Enabled
-            std::cout <<"step:"<< step <<" , Rank: "<< m_Rank << ", TempID: " << m_TempID 
-        << ", Counter: " << m_Counter << " Waiting completed from "<<SourceRank<<std::endl;
-            #endif 
-            MPI_Isend(&EmptyBlockingInt_2, 1, MPI_INT, SourceRank, 4, MPI_COMM_WORLD, &request_receive_last_2);
+            int EmptyBlockingInt;
+            MPI_Recv(&EmptyBlockingInt, 1, MPI_INT, SourceRank, 3, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             #if DEBUG_MODE_PT==Enabled
         std::cout <<"step:"<< step <<" , Rank: "<< m_Rank << ", TempID: " << m_TempID 
         << ", Counter: " << m_Counter << "Blocking reception from "<<SourceTempID<<std::endl;
@@ -452,23 +378,7 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
         }
         
 
-        //BROADCAST TO UPDATE ALL TEMPERATURES ABOUT RESULT OF THE EXCHANGE ATTEMPT
-
         
-        for(int i=0;i<m_Size;i++){
-            if(i%2==0 && i!=m_TempID){
-                MPI_Ibcast(&m_ReceiveBroadcast[i], 1, MPI_INT, m_RankAtTempID[i], MPI_COMM_WORLD, &m_RequestBroadcast[i]);
-            }
-            else if(i==m_TempID){
-                MPI_Ibcast(&ExchangeAcceptedInt, 1, MPI_INT, m_RankAtTempID[i], MPI_COMM_WORLD, &m_RequestBroadcast[i]);
-            }
-        }
-        #if DEBUG_MODE_PT==Enabled
-        std::cout <<"step:"<< step <<" , Rank: "<< m_Rank << ", TempID: " << m_TempID 
-        << ", Counter: " << m_Counter << "Setting and receiving broadcast "<<std::endl;
-#endif       
-
-        m_ReceiveBroadcast[m_TempID]=ExchangeAcceptedInt;
 
     }
 
@@ -479,16 +389,6 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
     if (!TempIDIsEven){
         //SPECIAL CASE: IF SIZE IS EVEN AND COUNT IS ODD, THE LAST TEMP ID IS OUT OF THE ATTEMPT.
         if (m_SizeIsEven && m_TempID==m_Size-1){
-
-            #if DEBUG_MODE_PT==Enabled
-        std::cout <<"step:"<< step <<" , Rank: "<< m_Rank << ", TempID: " << m_TempID 
-        << ", Counter: " << m_Counter << "Setting and receiving broadcast special case "<<std::endl;
-#endif       
-            for(int i=0;i<m_Size;i++){
-                if(i%1==0 && i!=m_TempID){
-                    MPI_Ibcast(&m_ReceiveBroadcast[i], 1, MPI_INT, m_RankAtTempID[i], MPI_COMM_WORLD, &m_RequestBroadcast[i]);
-                }
-            }
             m_Counter++;
             //std::cout<<"Rank: "<<m_Rank<<", TempID: "<<m_TempID<<", Counter: "<<m_Counter<<". End Of Evolve One Step."<<std::endl;
             return false;
@@ -499,17 +399,15 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
         double receive_energy;
         int SourceTempID=m_TempID+1;
         int SourceRank=m_RankAtTempID[SourceTempID];
-        MPI_Request requestA,requestB,requestC,requestD;
         #if DEBUG_MODE_PT==Enabled
         std::cout <<"step:"<< step <<" , Rank: "<< m_Rank << ", TempID: " << m_TempID 
         << ", Counter: " << m_Counter << "Receiving from "<<SourceTempID<<std::endl;
 #endif      
-        MPI_Irecv(&receive_energy, 1, MPI_DOUBLE, SourceRank, 0, MPI_COMM_WORLD, &requestA);
+        MPI_Recv(&receive_energy, 1, MPI_DOUBLE, SourceRank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         #if DEBUG_MODE_PT==Enabled
         std::cout <<"step:"<< step <<" , Rank: "<< m_Rank << ", TempID: " << m_TempID 
         << ", Counter: " << m_Counter << "Received from  "<<SourceTempID<<std::endl;
 #endif   
-        MPI_Wait(&requestA,MPI_STATUS_IGNORE);
         //ATTEMPT EXCHANGE
         double dE=receive_energy-own_energy;
         double dBeta=m_BetaVec[SourceTempID] - m_BetaVec[m_TempID];
@@ -522,7 +420,7 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
         int ExchangeAcceptedInt = ExchangeAccepted ? 1 : 0;
 
         //SENDING RESULT OF ATTEMPT
-        MPI_Isend(&ExchangeAcceptedInt, 1, MPI_INT, SourceRank, 1, MPI_COMM_WORLD,&requestB);
+        MPI_Send(&ExchangeAcceptedInt, 1, MPI_INT, SourceRank, 1, MPI_COMM_WORLD);
         #if DEBUG_MODE_PT==Enabled
         std::cout <<"step:"<< step <<" , Rank: "<< m_Rank << ", TempID: " << m_TempID 
         << ", Counter: " << m_Counter << "Sent exchange attempt result to "<<SourceTempID<<std::endl;
@@ -534,12 +432,8 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
             m_pState->GetSimulation()->SetBeta(m_BetaVec[NewTempID], 0);
             m_pState->GetNonbinaryTrajectory()->SetFolderName(m_pState->GetNonbinaryTrajectory()->GetOriginalFolderName() +"_" + Nfunction::Int_to_String(NewTempID));
             m_pState->GetTimeSeriesDataOutput()->CloseFile();
-            int EmptyBlockingInt_1;
-            int EmptyBlockingInt_2=0;
-
-            MPI_Irecv(&EmptyBlockingInt_1, 1, MPI_INT, SourceRank, 3, MPI_COMM_WORLD, &requestC);
-            MPI_Wait(&requestC, MPI_STATUS_IGNORE);
-            MPI_Isend(&EmptyBlockingInt_2, 1, MPI_INT, SourceRank, 4, MPI_COMM_WORLD, &requestD);
+            int EmptyBlockingInt;
+            MPI_Recv(&EmptyBlockingInt, 1, MPI_INT, SourceRank, 3, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             #if DEBUG_MODE_PT==Enabled
         std::cout <<"step:"<< step <<" , Rank: "<< m_Rank << ", TempID: " << m_TempID 
         << ", Counter: " << m_Counter << "Received blocking from"<<SourceTempID<<std::endl;
@@ -550,55 +444,12 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
         
 
         //BROADCAST TO UPDATE ALL TEMPERATURES ABOUT RESULT OF THE EXCHANGE ATTEMPT
-        
-        for(int i=0;i<m_Size;i++){
-            if (!m_SizeIsEven){
-                if(i%1==0 && i!=m_TempID ){
-
-                    MPI_Ibcast(&m_ReceiveBroadcast[i], 1, MPI_INT, m_RankAtTempID[i], MPI_COMM_WORLD, &m_RequestBroadcast[i]);
-                }
-                else if(i==m_TempID){
-                    MPI_Ibcast(&ExchangeAcceptedInt, 1, MPI_INT, m_RankAtTempID[i], MPI_COMM_WORLD, &m_RequestBroadcast[i]);
-                }
-            }
-            else if(m_SizeIsEven){
-                if(i%1==0 && i!=m_TempID && i!=m_Size-1){
-                    MPI_Ibcast(&m_ReceiveBroadcast[i], 1, MPI_INT, m_RankAtTempID[i], MPI_COMM_WORLD, &m_RequestBroadcast[i]);
-                }
-                else if(i==m_TempID){
-                    MPI_Ibcast(&ExchangeAcceptedInt, 1, MPI_INT, m_RankAtTempID[i], MPI_COMM_WORLD, &m_RequestBroadcast[i]);
-                }
-            }
-        }
-
-        #if DEBUG_MODE_PT==Enabled
-        std::cout <<"step:"<< step <<" , Rank: "<< m_Rank << ", TempID: " << m_TempID 
-        << ", Counter: " << m_Counter << "Broadcast ready"<<SourceTempID<<std::endl;
-#endif   
-
-        m_ReceiveBroadcast[m_TempID]=ExchangeAcceptedInt;
 
         
     }
     //ODD COUNT, EVEN TEMPID SEND ENERGY TO TEMPID -1.
     else if (TempIDIsEven){
         if (m_TempID==0){
-            #if DEBUG_MODE_PT==Enabled
-        std::cout <<"step:"<< step <<" , Rank: "<< m_Rank << ", TempID: " << m_TempID 
-        << ", Counter: " << m_Counter << "Special case when size is even..."<<std::endl;
-#endif   
-            for(int i=0;i<m_Size;i++){
-                if (m_SizeIsEven){
-                    if(i%1==0 && i!=m_Size-1){
-                        MPI_Ibcast(&m_ReceiveBroadcast[i], 1, MPI_INT, m_RankAtTempID[i], MPI_COMM_WORLD, &m_RequestBroadcast[i]);
-                    }
-                }
-                else if (!m_SizeIsEven){
-                    if(i%1==0){
-                        MPI_Ibcast(&m_ReceiveBroadcast[i], 1, MPI_INT, m_RankAtTempID[i], MPI_COMM_WORLD, &m_RequestBroadcast[i]);
-                    }
-                }
-            }
             //std::cout<<"Rank: "<<m_Rank<<", TempID: "<<m_TempID<<", Counter: "<<m_Counter<<". End Of Evolve One Step"<<std::endl;
             m_Counter++;
             return false;
@@ -610,20 +461,17 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
         int DestTempID=m_TempID-1;
         int DestRank=m_RankAtTempID[DestTempID];
         int ReceiveExchangeAcceptedInt;
-        MPI_Request requestA,requestB,requestC,requestD;
         #if DEBUG_MODE_PT==Enabled
         std::cout <<"step:"<< step <<" , Rank: "<< m_Rank << ", TempID: " << m_TempID 
         << ", Counter: " << m_Counter << "Send to "<<DestTempID<<std::endl;
 #endif 
-        MPI_Isend(&sending_energy, 1, MPI_DOUBLE, DestRank, 0, MPI_COMM_WORLD,&requestA);
+        MPI_Send(&sending_energy, 1, MPI_DOUBLE, DestRank, 0, MPI_COMM_WORLD);
         #if DEBUG_MODE_PT==Enabled
         std::cout <<"step:"<< step <<" , Rank: "<< m_Rank << ", TempID: " << m_TempID 
         << ", Counter: " << m_Counter << "Sent to "<<DestTempID<<std::endl;
 #endif 
         //RECEIVE RESULT OF EXCHANGE ATTEMPTS
-        MPI_Irecv(&ReceiveExchangeAcceptedInt, 1, MPI_INT, DestRank, 1, MPI_COMM_WORLD, &requestB);
-
-        MPI_Wait(&requestB,MPI_STATUS_IGNORE);
+        MPI_Recv(&ReceiveExchangeAcceptedInt, 1, MPI_INT, DestRank, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         bool ReceiveExchangeAccepted=(ReceiveExchangeAcceptedInt==1);
 
         #if DEBUG_MODE_PT==Enabled
@@ -637,12 +485,10 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
             m_pState->GetSimulation()->SetBeta(m_BetaVec[NewTempID], 0);
             m_pState->GetNonbinaryTrajectory()->SetFolderName(m_pState->GetNonbinaryTrajectory()->GetOriginalFolderName() +"_" + Nfunction::Int_to_String(NewTempID)); 
             m_pState->GetTimeSeriesDataOutput()->CloseFile();
-            int EmptyBlockingInt_1=0;
-            int EmptyBlockingInt_2;
+            int EmptyBlockingInt=0;
+            
        
-            MPI_Isend(&EmptyBlockingInt_1, 1, MPI_INT, DestRank, 3, MPI_COMM_WORLD,&requestC);
-            MPI_Irecv(&EmptyBlockingInt_2, 1, MPI_INT, DestRank, 4, MPI_COMM_WORLD,&requestD);
-            MPI_Wait(&requestD,MPI_STATUS_IGNORE);
+            MPI_Send(&EmptyBlockingInt, 1, MPI_INT, DestRank, 3, MPI_COMM_WORLD);
             #if DEBUG_MODE_PT==Enabled
             std::cout <<"step:"<< step <<" , Rank: "<< m_Rank << ", TempID: " << m_TempID 
         << ", Counter: " << m_Counter << "Blocking sent to "<<DestTempID<<std::endl;
@@ -652,24 +498,6 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
             }
             
         //BROADCAST TO UPDATE ALL TEMPERATURES ABOUT RESULT OF THE EXCHANGE ATTEMPT
-
-
-        for(int i=0;i<m_Size;i++){
-            if (!m_SizeIsEven){
-                if(i%1==0){
-                    MPI_Ibcast(&m_ReceiveBroadcast[i], 1, MPI_INT, m_RankAtTempID[i], MPI_COMM_WORLD, &m_RequestBroadcast[i]);
-                }
-            }
-            else if(m_SizeIsEven){
-                if(i%1==0 && i!=m_Size-1){
-                    MPI_Ibcast(&m_ReceiveBroadcast[i], 1, MPI_INT, m_RankAtTempID[i], MPI_COMM_WORLD, &m_RequestBroadcast[i]);
-                }
-            }
-        }
-        #if DEBUG_MODE_PT==Enabled
-            std::cout <<"step:"<< step <<" , Rank: "<< m_Rank << ", TempID: " << m_TempID 
-        << ", Counter: " << m_Counter << "Broadcasting"<<std::endl;
-#endif 
         
     }
 
