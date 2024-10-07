@@ -785,10 +785,9 @@ std::vector<double> ParallelTemperingMoveSimple::ReadTemperatures(){
         }
     }
 
-    //for (size_t i = 0; i < betavec.size(); ++i) {
-    //    betavec[i]=1/betavec[i];
-    //    std::cout<<betavec[i]<<std::endl;
-    //}
+    for (size_t i = 0; i < betavec.size(); ++i) {
+        betavec[i]=1/betavec[i];
+    }
 
     return betavec;
 

@@ -10,6 +10,8 @@
 #include <thread>
 #include <ctime>
 #include <iostream>
+#include <complex>
+#include <cmath>
 #include <string.h>
 #include "MC_Simulation.h"
 #include "State.h"
@@ -24,7 +26,7 @@
 
 
 
-
+using Complex = std::complex<double>;
 
 
 /*
@@ -61,7 +63,7 @@ bool MC_Simulation::do_Simulation(){
     
 //---> Voxelize the mesh for the first time; this should be done before any calculation
 
-    //m_pState->GetVoxelization()->Voxelize(m_pState->GetMesh()->GetActiveV());
+    
     
 #if DEBUG_MODE == Enabled
     std::cout<<" system has been voxelaized  \n";
@@ -78,7 +80,7 @@ bool MC_Simulation::do_Simulation(){
     std::cout<<" We have reached simulation run loop!  \n";
 #endif
 
-
+    
     
 
     std::vector<std::string> FramePath=m_pState->GetReadTrajTSI()->GetFilePaths();
@@ -89,7 +91,7 @@ bool MC_Simulation::do_Simulation(){
     std::cout<<"------>   Analysis will be performed for frames "<<m_Initial_Step<<" to "<<m_Final_Step<<" steps\n";
 //Start of the analysis loop
 
-for (int step = m_Initial_Step; step <= 4; step++){
+for (int step = 1900; step <= 1999; step++){
 
         CreateMashBluePrint Create_BluePrint;
         MeshBluePrint mesh_blueprint;
@@ -103,10 +105,45 @@ for (int step = m_Initial_Step; step <= 4; step++){
         mesh_blueprint = Create_BluePrint.MashBluePrintFromInput_Top(m_pState->GetInputFile(),filename);
         m_pState->GetMesh()->GenerateMesh(mesh_blueprint);
 
+        //I need one specially thought for semi-flat membranees!!!
+        //m_pState->GetMesh()->CenterMesh();
+
         m_pState->GetCurvatureCalculator()->Initialize();
         double totalE = m_pState->GetEnergyCalculator()->CalculateAllLocalEnergy();
         m_pState->GetEnergyCalculator()->UpdateTotalEnergy(totalE);
+        m_pState->GetFluctationSpectrum()->CalculateSpectrum();
 
+        Complex sum_p(0,0);
+
+        double n=1;
+        double m=1;
+
+        double qx=n*2*PI/(*(m_pState->GetMesh()->GetBox()))(0);
+        double qy=m*2*PI/(*(m_pState->GetMesh()->GetBox()))(1);
+
+        std::cout<<(*(m_pState->GetMesh()->GetBox()))(0)<<" "<<(*(m_pState->GetMesh()->GetBox()))(1)<<std::endl;
+
+        const std::vector<vertex *>& pAllVertices = m_pState->GetMesh()->GetActiveV();
+        
+        for (std::vector<vertex *>::const_iterator it = pAllVertices.begin() ; it != pAllVertices.end(); ++it) {
+            sum_p=sum_p+Complex((*it)->GetVZPos(),0)*std::exp(Complex(0, qx*(*it)->GetVXPos()+qy*(*it)->GetVYPos()));
+        }
+
+        std::cout<<"Number one "<<(sum_p*std::conj(sum_p)).real()<<std::endl;
+
+        n=2;
+        m=2;
+
+        qx=n*2*PI/(*(m_pState->GetMesh()->GetBox()))(0);
+        qy=m*2*PI/(*(m_pState->GetMesh()->GetBox()))(1);
+
+        sum_p=Complex(0,0);
+        
+        for (std::vector<vertex *>::const_iterator it = pAllVertices.begin() ; it != pAllVertices.end(); ++it) {
+            sum_p=sum_p+Complex((*it)->GetVZPos(),0)*std::exp(Complex(0, qx*(*it)->GetVXPos()+qy*(*it)->GetVYPos()));
+        }
+
+        std::cout<<"Number two "<<(sum_p*std::conj(sum_p)).real()<<std::endl;
         
 
 } //End of simulation loop 

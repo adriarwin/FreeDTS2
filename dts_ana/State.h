@@ -135,6 +135,8 @@
 #include "FlatInclusionSubstrate.h"
 //--- Reading
 #include "ReadTrajTSI.h"
+//--- Fluctuation spectrum
+#include "FluctuationSpectrum.h"
 
 
 struct ParallelReplicaData {  // data structure for turning on and off certain moves
@@ -200,6 +202,7 @@ inline AbstractParallelTemperingMove    *GetParallelTempering()                 
 inline AbstractBoundary                 *GetBoundary()                                  {return m_pBoundary;}
 //---- System energy and voxels
 inline MESH                     *GetMesh()                                      {return m_pMesh;}  //
+inline FluctuationSpectrum      *GetFluctationSpectrum()                        {return m_pFluctuationSpectrum;}
 inline void                     SetMesh(MESH newMesh)                          { (*m_pMesh) = (newMesh); }
 inline Voxelization<vertex>     *GetVoxelization()                              {return m_pVoxelization;}
 inline AbstractSimulation           *GetSimulation()                                {return m_pSimulation;};
@@ -228,6 +231,7 @@ private:
 
     //Analysis
     ReadTrajTSI *m_pReadTrajTSI;
+    FluctuationSpectrum *m_pFluctuationSpectrum;
 
     AbstractApplyConstraintBetweenGroups *m_pApplyConstraintBetweenGroups;
     AbstractInclusionConversion* m_pInclusionConversion;

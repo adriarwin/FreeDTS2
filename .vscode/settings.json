@@ -58,7 +58,9 @@
         "cinttypes": "cpp",
         "typeinfo": "cpp",
         "valarray": "cpp",
-        "cstdarg": "cpp"
+        "cstdarg": "cpp",
+        "codecvt": "cpp",
+        "complex": "cpp"
     },
     "C_Cpp.errorSquiggles": "enabled"
 }

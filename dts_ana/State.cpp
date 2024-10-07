@@ -981,6 +981,11 @@ bool State::Initialize(){
         m_pSimulation->UpdateInitialStep(0);
         m_pSimulation->UpdateFinalStep(m_pReadTrajTSI->GetNumberOfFrames());
 
+        int nx=5;
+        int ny=5;
+        
+        m_pFluctuationSpectrum = new FluctuationSpectrum(this,nx,ny);
+
         //std::vector<std::string> FilePaths=m_pReadTrajTSI->getFilePaths();
         //std::vector<int> FrameList=m_pReadTrajTSI->getFrameList();
 
