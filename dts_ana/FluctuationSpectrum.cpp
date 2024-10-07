@@ -4,6 +4,7 @@
 #include <time.h>
 #include "FluctuationSpectrum.h"
 #include "State.h"
+#include <algorithm> // For std::sort
 
 using Complex = std::complex<double>;
 /*
@@ -47,6 +48,16 @@ void FluctuationSpectrum::GenerateVectorOrder(){
             m_VectorOrder.push_back(input);
         }
     }
+
+    auto distance = [](const std::vector<int>& v) {
+        return std::sqrt(v[0] * v[0] + v[1] * v[1]);
+    };
+
+    // Sort m_VectorOrder based on the calculated distance
+    std::sort(m_VectorOrder.begin(), m_VectorOrder.end(),
+              [&distance](const std::vector<int>& a, const std::vector<int>& b) {
+                  return distance(a) < distance(b);
+              });
 }
 
 void FluctuationSpectrum::GenerateZeroAndNonZeroVectorOrder(){
@@ -58,7 +69,7 @@ void FluctuationSpectrum::GenerateZeroAndNonZeroVectorOrder(){
                   << m_VectorOrder[i][0] << ", " << m_VectorOrder[i][1] << "]" << std::endl;
 
 
-        if(m_VectorOrder[i][0]==m_VectorOrder[i][1]){
+        /*if(m_VectorOrder[i][0]==m_VectorOrder[i][1]){
             MatrixOrder[0]=m_VectorOrder[i];
             MatrixOrder[1] = {m_VectorOrder[i][0], -m_VectorOrder[i][1]};
             m_MatrixOrder.push_back(MatrixOrder);}
@@ -68,14 +79,14 @@ void FluctuationSpectrum::GenerateZeroAndNonZeroVectorOrder(){
             m_MatrixOrder.push_back(MatrixOrder);
         }
         
-        else{
+        else{*/
             MatrixOrder[0]=m_VectorOrder[i];
             MatrixOrder[1] = {m_VectorOrder[i][1], m_VectorOrder[i][0]};
             MatrixOrder[2] = {m_VectorOrder[i][0], -m_VectorOrder[i][1]};
             MatrixOrder[3] = {m_VectorOrder[i][1], -m_VectorOrder[i][0]};
             m_MatrixOrder.push_back(MatrixOrder);
             //Do something
-        }
+        // }
 
         std::cout << "m_MatrixOrder[" << i << "]: " << std::endl;
         for (size_t j = 0; j < m_MatrixOrder[i].size(); ++j) {
@@ -110,6 +121,7 @@ double FluctuationSpectrum::FourierTransform(std::vector<std::vector<double>> qv
 
     for (size_t i = 0; i < qvector.size(); ++i) {
         result+=(sum_p[i]*std::conj(sum_p[i])).real();
+        //std::cout<<"Fourier result: "<<result<<std::endl;
     }
 
     result=result/static_cast<double>(qvector.size());
@@ -148,7 +160,7 @@ void FluctuationSpectrum::CalculateSpectrum(){
         std::vector<double> q={m_VectorOrder[i][0]*2*PI/Lx,m_VectorOrder[i][1]*2*PI/Ly};
         qvector[i]=std::sqrt(std::pow(q[0], 2) + std::pow(q[1], 2));
 
-        if((m_VectorOrder[i][0]==m_VectorOrder[i][1]) || (m_VectorOrder[i][0]==0 || m_VectorOrder[i][1]==0)){
+        /*if((m_VectorOrder[i][0]==m_VectorOrder[i][1]) || (m_VectorOrder[i][0]==0 || m_VectorOrder[i][1]==0)){
             std::vector<std::vector<double>> qmatrix(2,std::vector<double>(2,0));
             for (size_t j = 0; j < 2; ++j) {
                 std::cout<<m_MatrixOrder[i][j][0]<<m_MatrixOrder[i][j][1]<<std::endl;
@@ -158,25 +170,26 @@ void FluctuationSpectrum::CalculateSpectrum(){
 
             hqvector[i]=FourierTransform(qmatrix);
         }   
-        else{
+        else{*/
             std::vector<std::vector<double>> qmatrix(4,std::vector<double>(2,0));
             for (size_t j = 0; j < 4; ++j) {
-                std::cout<<m_MatrixOrder[i][j][0]<<m_MatrixOrder[i][j][1]<<std::endl;
+                //std::cout<<m_MatrixOrder[i][j][0]<<m_MatrixOrder[i][j][1]<<std::endl;
                 qmatrix[j][0]=static_cast<double>(m_MatrixOrder[i][j][0])*2*PI/Lx;
                 qmatrix[j][1]=static_cast<double>(m_MatrixOrder[i][j][1])*2*PI/Ly;
             }
 
             hqvector[i]=FourierTransform(qmatrix);  
-            }
+            //}
 
     }
 
-    std::cout << "Matrix order: ";
+    
+    /*std::cout << "Matrix order: ";
     for (size_t i = 0; i < qvector.size(); ++i) {
         std::cout << m_MatrixOrder[i][0][0] <<m_MatrixOrder[i][0][1] << " ";
-    }
-    std::cout << std::endl; // New line for better readability
-    std::cout << std::endl; // New line for better readability
+    }*/
+    //std::cout << std::endl; // New line for better readability
+    //std::cout << std::endl; // New line for better readability
     std::cout << "qvector: ";
     for (size_t i = 0; i < qvector.size(); ++i) {
         std::cout << qvector[i] << " ";
@@ -189,7 +202,7 @@ void FluctuationSpectrum::CalculateSpectrum(){
     }
     std::cout << std::endl; // New line for better readability
 
-
+    
 }
 
 

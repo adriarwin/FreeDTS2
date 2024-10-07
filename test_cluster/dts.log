@@ -1,5 +1,5 @@
 ;--------- this state is initiated by this command ---------------------------------  
-/home/adriarwin/FreeDTS2/ANA   -in   input.dts   -top   top.top   
+../ANA   -in   input.dts   -top   top.top   
 ;--------- this part can be used as an input.dts file ---------------------------------  
  Run_Tag = dts
 ;-- abstract classes

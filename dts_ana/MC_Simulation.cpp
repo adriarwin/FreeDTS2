@@ -90,7 +90,7 @@ bool MC_Simulation::do_Simulation(){
     std::cout<<"------>   Analysis will be performed for frames "<<m_Initial_Step<<" to "<<m_Final_Step<<" steps\n";
 //Start of the analysis loop
 
-for (int step = 0; step <= 4; step++){
+for (int step = m_Initial_Step; step < m_Final_Step; step++){
 
         CreateMashBluePrint Create_BluePrint;
         MeshBluePrint mesh_blueprint;
@@ -112,7 +112,7 @@ for (int step = 0; step <= 4; step++){
         m_pState->GetEnergyCalculator()->UpdateTotalEnergy(totalE);
         m_pState->GetFluctationSpectrum()->CalculateSpectrum();
 
-        Complex sum_p(0,0);
+        /*Complex sum_p(0,0);
 
         double n=1;
         double m=1;
@@ -143,6 +143,7 @@ for (int step = 0; step <= 4; step++){
         }
 
         std::cout<<"Number two "<<(sum_p*std::conj(sum_p)).real()<<std::endl;
+        */
         
 
 } //End of simulation loop 
