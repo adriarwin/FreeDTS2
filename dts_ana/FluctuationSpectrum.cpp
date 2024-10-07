@@ -104,7 +104,7 @@ double FluctuationSpectrum::FourierTransform(std::vector<std::vector<double>> qv
             y=(*it)->GetVYPos();
             z=(*it)->GetVZPos();
             for (size_t i = 0; i < qvector.size(); ++i) {
-            sum_p[i]=sum_p[i]+Complex(z,0)*std::exp(Complex(0, -qvector[i][0]*x-qvector[i][1]*y));
+            sum_p[i]=sum_p[i]+Complex(z-m_AverageHeight,0)*std::exp(Complex(0, -qvector[i][0]*x-qvector[i][1]*y));
             }
     }
 
@@ -117,6 +117,20 @@ double FluctuationSpectrum::FourierTransform(std::vector<std::vector<double>> qv
     return result;
 }
 
+void FluctuationSpectrum::AverageHeight(){
+    
+    double average_height=0;
+    const std::vector<vertex *>& pAllVertices = m_pState->GetMesh()->GetActiveV();
+    double number_vertex=0;
+
+    for (std::vector<vertex *>::const_iterator it = pAllVertices.begin() ; it != pAllVertices.end(); ++it) {
+            average_height+=(*it)->GetVZPos();
+            number_vertex+=1;
+    }
+
+    average_height/=number_vertex;
+    m_AverageHeight=average_height;
+}
 
 void FluctuationSpectrum::CalculateSpectrum(){
     //Generate two vectors, one that gives the modulus of q and another one that gives the value of hq
@@ -124,6 +138,7 @@ void FluctuationSpectrum::CalculateSpectrum(){
 
     double Lx=(*(m_pState->GetMesh()->GetBox()))(0);
     double Ly=(*(m_pState->GetMesh()->GetBox()))(1);
+    AverageHeight();
 
     std::vector<double> qvector(m_VectorOrder.size(),0);
     std::vector<double> hqvector(m_VectorOrder.size(),0);
@@ -156,9 +171,9 @@ void FluctuationSpectrum::CalculateSpectrum(){
 
     }
 
-    std::cout << "vector order: ";
+    std::cout << "Matrix order: ";
     for (size_t i = 0; i < qvector.size(); ++i) {
-        std::cout << m_VectorOrder[i][0] <<m_VectorOrder[i][1] << " ";
+        std::cout << m_MatrixOrder[i][0][0] <<m_MatrixOrder[i][0][1] << " ";
     }
     std::cout << std::endl; // New line for better readability
     std::cout << std::endl; // New line for better readability

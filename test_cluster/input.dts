@@ -1,0 +1,17 @@
+Integrator_Type = MC_Simulation 
+Min_Max_Lenghts = 1 3
+MinfaceAngle = -0.5
+Temperature = 1.0 0
+Set_Steps = 1 1000000
+EnergyMethod = FreeDTS1.0_FF
+Seed = 88091
+Kappa = 20 0 0.0
+VertexArea = 0 0.7 0 0
+TimeSeriesData_Period = 25
+VertexPositionIntegrator = MetropolisAlgorithm 1 1 0.05
+AlexanderMove = MetropolisAlgorithm 1
+InclusionPoseIntegrator = MetropolisAlgorithm  1 1
+Dynamic_Box = IsotropicFrameTension 5 0 XY
+VisualizationFormat = VTUFileFormat VTU_F 100000
+NonbinaryTrajectory = TSI TrajTSI 2000
+ Restart_Period = 50000

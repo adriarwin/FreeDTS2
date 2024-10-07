@@ -82,7 +82,6 @@ bool MC_Simulation::do_Simulation(){
 
     
     
-
     std::vector<std::string> FramePath=m_pState->GetReadTrajTSI()->GetFilePaths();
     std::vector<int> FrameList=m_pState->GetReadTrajTSI()->GetFrameList();
 
@@ -91,7 +90,7 @@ bool MC_Simulation::do_Simulation(){
     std::cout<<"------>   Analysis will be performed for frames "<<m_Initial_Step<<" to "<<m_Final_Step<<" steps\n";
 //Start of the analysis loop
 
-for (int step = 1900; step <= 1999; step++){
+for (int step = 0; step <= 4; step++){
 
         CreateMashBluePrint Create_BluePrint;
         MeshBluePrint mesh_blueprint;

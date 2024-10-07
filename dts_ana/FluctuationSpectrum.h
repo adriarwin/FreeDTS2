@@ -33,6 +33,7 @@ private:
     void GenerateVectorOrder();
     void GenerateZeroAndNonZeroVectorOrder();
     double FourierTransform(std::vector<std::vector<double>> qvector);
+    void AverageHeight();
     
 
 
@@ -42,6 +43,7 @@ private:
     std::vector<std::vector<int>> m_VectorOrder;
     int m_SpectrumSize;
     std::vector<std::vector<std::vector<int>>> m_MatrixOrder;
+    double m_AverageHeight;
 
 
 
