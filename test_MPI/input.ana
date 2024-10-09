@@ -1,0 +1,8 @@
+FluctuationSpectrum = on 5 5
+FolderName = Analysisx
+Energy = on
+Area = on
+ProjectedArea = on
+Thickness = on
+MeanCurvature = on
+GaussianCurvature = on

@@ -78,6 +78,7 @@
 
 // File extensions
 #define InExt "dts"  // Input file extension
+#define AnaExt "ana" // Analysis input file extension
 #define TSIExt "tsi"  // TSI file extension
 #define TopExt "top"  // Topology file extension
 #define TSExt "q"  // TS file extension

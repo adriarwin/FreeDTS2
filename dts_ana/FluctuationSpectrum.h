@@ -6,6 +6,7 @@
 #include "triangle.h"
 #include "links.h"
 #include "Inclusion_Interaction_Map.h"
+#include <fstream>
 
 /*
  * @brief Energy calculation based on FreeDTS1.1 force field.
@@ -29,11 +30,14 @@ public:
 
 public:
     void CalculateSpectrum();
+    void OpenOutputStreams();
+    void CloseOutputStreams();
 private:
     void GenerateVectorOrder();
     void GenerateZeroAndNonZeroVectorOrder();
     double FourierTransform(std::vector<std::vector<double>> qvector);
     void AverageHeight();
+
     
 
 
@@ -44,8 +48,8 @@ private:
     int m_SpectrumSize;
     std::vector<std::vector<std::vector<int>>> m_MatrixOrder;
     double m_AverageHeight;
-
-
+    std::ofstream m_QVector,m_HQVector;
+    
 
 
 };

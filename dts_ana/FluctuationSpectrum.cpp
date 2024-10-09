@@ -20,14 +20,7 @@ FluctuationSpectrum::FluctuationSpectrum(State* pState,int nx,int ny){
     m_Ny = ny;
     GenerateVectorOrder();
     m_SpectrumSize=m_VectorOrder.size();
-    std::cout<<"Spectrum size: "<<m_SpectrumSize<<std::endl;
 
-    for (size_t i = 0; i < m_VectorOrder.size(); ++i) {
-        for (size_t j = 0; j < m_VectorOrder[i].size(); ++j) {
-            std::cout << m_VectorOrder[i][j] << " ";
-        }
-        std::cout << std::endl;  // Newline after each inner vector
-    }
 
     GenerateZeroAndNonZeroVectorOrder();
 
@@ -37,6 +30,29 @@ FluctuationSpectrum::FluctuationSpectrum(State* pState,int nx,int ny){
 }
 FluctuationSpectrum::~FluctuationSpectrum() {
     
+}
+
+void FluctuationSpectrum::OpenOutputStreams() {
+
+    std::string hqfilename=m_pState->GetAnalysisVariables()->GetFolderName() + '/' + m_pState->GetAnalysisVariables()->GetNameHQVectorFile();
+    std::string qfilename=m_pState->GetAnalysisVariables()->GetFolderName() + '/' + m_pState->GetAnalysisVariables()->GetNameQVectorFile();
+    m_QVector.open(qfilename);
+    m_HQVector.open(hqfilename);
+}
+
+void FluctuationSpectrum::CloseOutputStreams() {
+
+
+    if (m_QVector.is_open()) {
+        m_QVector.flush(); 
+        m_QVector.close();
+     }
+
+    if (m_HQVector.is_open()) {
+        m_HQVector.flush(); 
+        m_HQVector.close();
+     }
+
 }
 
 void FluctuationSpectrum::GenerateVectorOrder(){
@@ -65,11 +81,8 @@ void FluctuationSpectrum::GenerateZeroAndNonZeroVectorOrder(){
     for (size_t i = 0; i < m_VectorOrder.size(); ++i) {
         std::vector<std::vector<int>> MatrixOrder(4, std::vector<int>(2, 0));
 
-        std::cout << "m_VectorOrder[" << i << "]: ["
-                  << m_VectorOrder[i][0] << ", " << m_VectorOrder[i][1] << "]" << std::endl;
 
-
-        /*if(m_VectorOrder[i][0]==m_VectorOrder[i][1]){
+        if(m_VectorOrder[i][0]==m_VectorOrder[i][1]){
             MatrixOrder[0]=m_VectorOrder[i];
             MatrixOrder[1] = {m_VectorOrder[i][0], -m_VectorOrder[i][1]};
             m_MatrixOrder.push_back(MatrixOrder);}
@@ -79,24 +92,14 @@ void FluctuationSpectrum::GenerateZeroAndNonZeroVectorOrder(){
             m_MatrixOrder.push_back(MatrixOrder);
         }
         
-        else{*/
+        else{
             MatrixOrder[0]=m_VectorOrder[i];
             MatrixOrder[1] = {m_VectorOrder[i][1], m_VectorOrder[i][0]};
             MatrixOrder[2] = {m_VectorOrder[i][0], -m_VectorOrder[i][1]};
             MatrixOrder[3] = {m_VectorOrder[i][1], -m_VectorOrder[i][0]};
             m_MatrixOrder.push_back(MatrixOrder);
-            //Do something
-        // }
-
-        std::cout << "m_MatrixOrder[" << i << "]: " << std::endl;
-        for (size_t j = 0; j < m_MatrixOrder[i].size(); ++j) {
-            std::cout << "[";
-            for (size_t k = 0; k < m_MatrixOrder[i][j].size(); ++k) {
-                std::cout << m_MatrixOrder[i][j][k];
-                if (k < m_MatrixOrder[i][j].size() - 1) std::cout << ", ";
-            }
-            std::cout << "]" << std::endl;
         }
+
     }
 }
 
@@ -160,47 +163,48 @@ void FluctuationSpectrum::CalculateSpectrum(){
         std::vector<double> q={m_VectorOrder[i][0]*2*PI/Lx,m_VectorOrder[i][1]*2*PI/Ly};
         qvector[i]=std::sqrt(std::pow(q[0], 2) + std::pow(q[1], 2));
 
-        /*if((m_VectorOrder[i][0]==m_VectorOrder[i][1]) || (m_VectorOrder[i][0]==0 || m_VectorOrder[i][1]==0)){
+        if((m_VectorOrder[i][0]==m_VectorOrder[i][1]) || (m_VectorOrder[i][0]==0 || m_VectorOrder[i][1]==0)){
             std::vector<std::vector<double>> qmatrix(2,std::vector<double>(2,0));
             for (size_t j = 0; j < 2; ++j) {
-                std::cout<<m_MatrixOrder[i][j][0]<<m_MatrixOrder[i][j][1]<<std::endl;
                 qmatrix[j][0]=static_cast<double>(m_MatrixOrder[i][j][0])*2*PI/Lx;
                 qmatrix[j][1]=static_cast<double>(m_MatrixOrder[i][j][1])*2*PI/Ly;
             }
 
             hqvector[i]=FourierTransform(qmatrix);
         }   
-        else{*/
+        else{
             std::vector<std::vector<double>> qmatrix(4,std::vector<double>(2,0));
             for (size_t j = 0; j < 4; ++j) {
-                //std::cout<<m_MatrixOrder[i][j][0]<<m_MatrixOrder[i][j][1]<<std::endl;
                 qmatrix[j][0]=static_cast<double>(m_MatrixOrder[i][j][0])*2*PI/Lx;
                 qmatrix[j][1]=static_cast<double>(m_MatrixOrder[i][j][1])*2*PI/Ly;
             }
 
             hqvector[i]=FourierTransform(qmatrix);  
-            //}
+            }
 
     }
 
     
-    /*std::cout << "Matrix order: ";
-    for (size_t i = 0; i < qvector.size(); ++i) {
-        std::cout << m_MatrixOrder[i][0][0] <<m_MatrixOrder[i][0][1] << " ";
-    }*/
-    //std::cout << std::endl; // New line for better readability
-    //std::cout << std::endl; // New line for better readability
-    std::cout << "qvector: ";
-    for (size_t i = 0; i < qvector.size(); ++i) {
-        std::cout << qvector[i] << " ";
-    }
-    std::cout << std::endl; // New line for better readability
+    // Write the qvector and hqvector to files
+    
 
-    std::cout << "hqvector: ";
-    for (size_t i = 0; i < hqvector.size(); ++i) {
-        std::cout << hqvector[i] << " ";
+    if (m_QVector.is_open()) {
+        for (size_t i = 0; i < qvector.size(); ++i) {
+            m_QVector << qvector[i] << " ";
+        }
+        m_QVector << "\n";
+    } else {
+        std::cerr << "Unable to open qvector.txt for writing." << std::endl;
     }
-    std::cout << std::endl; // New line for better readability
+
+    if (m_HQVector.is_open()) {
+        for (size_t i = 0; i < hqvector.size(); ++i) {
+            m_HQVector << hqvector[i] << " ";
+        }
+        m_HQVector << "\n";
+    } else {
+        std::cerr << "Unable to open hqvector.txt for writing." << std::endl;
+    }
 
     
 }

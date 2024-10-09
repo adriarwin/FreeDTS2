@@ -133,10 +133,13 @@
 #include "SphericalVertexSubstrate.h"
 #include "FlatVertexSubstrate.h"
 #include "FlatInclusionSubstrate.h"
-//--- Reading
+//--- Analysis
 #include "ReadTrajTSI.h"
 //--- Fluctuation spectrum
 #include "FluctuationSpectrum.h"
+#include "AnalysisVariables.h"
+#include "AnalysisCalculations.h"
+
 
 
 struct ParallelReplicaData {  // data structure for turning on and off certain moves
@@ -160,6 +163,8 @@ public:
   //  friend class Three_Edge_Scission;
 
 //-- Analysis
+inline AnalysisCalculations                    *GetAnalysisCalculations()             {return m_pAnalysisCalculations;}
+inline AnalysisVariables                    *GetAnalysisVariables()             {return m_pAnalysisVariables;}
 inline ReadTrajTSI                          *GetReadTrajTSI()                   {return m_pReadTrajTSI;}
 //-- standard Integrators
 inline AbstractAlexanderMove                *GetAlexanderMove()                 {return m_pAlexanderMove;}
@@ -224,14 +229,17 @@ bool Initialize(); // makes all the objects ready for simulations, it will open 
         m_GeneralOutputFilename = runtag;
     }
 private:
+    bool ReadAnalysisInputFile(std::string inputfile);
     bool ReadInputFile(std::string inputfile);    // updates variables based on data in the inputfile
     bool ExploreArguments(std::vector<std::string> &argument);
     
 private:
 
     //Analysis
+    AnalysisVariables *m_pAnalysisVariables;
     ReadTrajTSI *m_pReadTrajTSI;
     FluctuationSpectrum *m_pFluctuationSpectrum;
+    AnalysisCalculations *m_pAnalysisCalculations;
 
     AbstractApplyConstraintBetweenGroups *m_pApplyConstraintBetweenGroups;
     AbstractInclusionConversion* m_pInclusionConversion;
@@ -288,6 +296,7 @@ private:
 private:
     std::vector <std::string> m_Argument;
     std::vector <std::string> m_TrajTSIfiles;
+    std::string     m_InputAnalysisFileName;
     std::string     m_GeneralOutputFilename; //  a general file flag for specific run
     std::string     m_InputFileName; // name of the topology file, *.top, *.dat *.tsi *.bts
     std::string     m_IndexFileName;            // Name of the index file for group specification

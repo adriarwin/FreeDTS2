@@ -108,46 +108,23 @@ for (int step = m_Initial_Step; step < m_Final_Step; step++){
         //m_pState->GetMesh()->CenterMesh();
 
         m_pState->GetCurvatureCalculator()->Initialize();
-        double totalE = m_pState->GetEnergyCalculator()->CalculateAllLocalEnergy();
-        m_pState->GetEnergyCalculator()->UpdateTotalEnergy(totalE);
-        m_pState->GetFluctationSpectrum()->CalculateSpectrum();
-
-        /*Complex sum_p(0,0);
-
-        double n=1;
-        double m=1;
-
-        double qx=n*2*PI/(*(m_pState->GetMesh()->GetBox()))(0);
-        double qy=m*2*PI/(*(m_pState->GetMesh()->GetBox()))(1);
-
-        std::cout<<(*(m_pState->GetMesh()->GetBox()))(0)<<" "<<(*(m_pState->GetMesh()->GetBox()))(1)<<std::endl;
-
-        const std::vector<vertex *>& pAllVertices = m_pState->GetMesh()->GetActiveV();
         
-        for (std::vector<vertex *>::const_iterator it = pAllVertices.begin() ; it != pAllVertices.end(); ++it) {
-            sum_p=sum_p+Complex((*it)->GetVZPos(),0)*std::exp(Complex(0, qx*(*it)->GetVXPos()+qy*(*it)->GetVYPos()));
-        }
-
-        std::cout<<"Number one "<<(sum_p*std::conj(sum_p)).real()<<std::endl;
-
-        n=2;
-        m=2;
-
-        qx=n*2*PI/(*(m_pState->GetMesh()->GetBox()))(0);
-        qy=m*2*PI/(*(m_pState->GetMesh()->GetBox()))(1);
-
-        sum_p=Complex(0,0);
+        m_pState->GetAnalysisCalculations()->Calculate();
         
-        for (std::vector<vertex *>::const_iterator it = pAllVertices.begin() ; it != pAllVertices.end(); ++it) {
-            sum_p=sum_p+Complex((*it)->GetVZPos(),0)*std::exp(Complex(0, qx*(*it)->GetVXPos()+qy*(*it)->GetVYPos()));
-        }
+        if (m_pState->GetAnalysisVariables()->GetFluctuationSpectrumActive()==true){
+            m_pState->GetFluctationSpectrum()->CalculateSpectrum();
+            }
+        
+        m_pState->GetTimeSeriesDataOutput()->WriteTimeSeriesDataOutput(step);
 
-        std::cout<<"Number two "<<(sum_p*std::conj(sum_p)).real()<<std::endl;
-        */
         
 
 } //End of simulation loop 
 
+
+    if (m_pState->GetAnalysisVariables()->GetFluctuationSpectrumActive()==true){
+            m_pState->GetFluctationSpectrum()->CloseOutputStreams();
+        }
 // for(int step=GetInitialStep(); step<GetFinalStep(); step++)
     std::clock_t end = std::clock();
     double elapsed_secs = double(end - start) / CLOCKS_PER_SEC;

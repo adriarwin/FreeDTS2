@@ -50,42 +50,39 @@ Writes time series data to the output file.
 Note: The function returns true if the data is successfully written,
 and false if the periodic condition is not met or if there is an error writing to the file.
 */
-    if( m_Periodic == 0 || step%m_Periodic!=0)
-        return false;
+
     
     m_TimeSeriesFile<<std::fixed;
     m_TimeSeriesFile<<std::setprecision(Precision);
     
-//--> write step and energy
-    m_TimeSeriesFile<<step<<"   "<<m_pState->GetEnergyCalculator()->GetEnergy()<<"   ";
+//--> write step
+    m_TimeSeriesFile<<step<<"   ";
 
     
 //    m_TimeSeriesFile<<step<<"   "<<m_pState->GetEnergyCalculator()->GetEnergy()<<"   ";
 
 //--->write box side length
-    if(m_pState->GetDynamicBox()->GetDerivedDefaultReadName()!= NoBoxChange::GetDefaultReadName() ){
-        m_TimeSeriesFile<<(*(m_pState->GetMesh()->GetBox()))(0)<<"  ";
-        m_TimeSeriesFile<<(*(m_pState->GetMesh()->GetBox()))(1)<<"  ";
-        m_TimeSeriesFile<<(*(m_pState->GetMesh()->GetBox()))(2)<<"  ";
-    }
-    if (m_pState->GetVAHGlobalMeshProperties()->VolumeIsActive()) {
-        m_TimeSeriesFile << m_pState->GetVAHGlobalMeshProperties()->GetTotalVolume()<<"  ";
-    }
-    if (m_pState->GetVAHGlobalMeshProperties()->AreaIsActive()) {
-        m_TimeSeriesFile << m_pState->GetVAHGlobalMeshProperties()->GetTotalArea()<<"  ";
-    }
-    if (m_pState->GetVAHGlobalMeshProperties()->GlobalCurvatureIsActive()) {
-        m_TimeSeriesFile << m_pState->GetVAHGlobalMeshProperties()->GetTotalMeanCurvature() <<"  ";
-    }
-    if (m_pState->GetApplyConstraintBetweenGroups()->GetDerivedDefaultReadName() != "No") {
-        m_TimeSeriesFile << m_pState->GetApplyConstraintBetweenGroups()->GetEnergy()<<"  ";
-    }
-    if (m_pState->GetOpenEdgeEvolution()->GetDerivedDefaultReadName() != "No") {
-        m_TimeSeriesFile <<m_pState->GetOpenEdgeEvolution()->GetEdgeSize() <<" ";
-    }
-    if (m_pState->GetDynamicTopology()->GetDerivedDefaultReadName() != "No") {
-        m_TimeSeriesFile <<m_pState->GetDynamicTopology()->GetSurfaceGenus()<<"  ";
-    }
+    if (m_pState->GetAnalysisVariables()->GetEnergyCalculationActive()) {
+            m_TimeSeriesFile<<m_pState->GetAnalysisCalculations()->GetEnergy()<<"   ";
+        }
+        if (m_pState->GetAnalysisVariables()->GetAreaCalculationActive()) {
+            m_TimeSeriesFile << m_pState->GetAnalysisCalculations()->GetArea()<<"   ";
+        }
+        if (m_pState->GetAnalysisVariables()->GetProjectedAreaCalculationActive()) {
+            m_TimeSeriesFile <<  m_pState->GetAnalysisCalculations()->GetProjectedArea()<< "   ";
+
+        }
+        if (m_pState->GetAnalysisVariables()->GetMeanCurvatureCalculationActive()) {
+            m_TimeSeriesFile << m_pState->GetAnalysisCalculations()->GetMeanCurvature() <<"   ";
+
+        }
+        if (m_pState->GetAnalysisVariables()->GetGaussianCurvatureCalculationActive()) {
+             m_TimeSeriesFile << m_pState->GetAnalysisCalculations()->GetGaussianCurvature() <<"   ";
+        }
+
+        if (m_pState->GetAnalysisVariables()->GetThicknessCalculationActive()) {
+            m_TimeSeriesFile <<  m_pState->GetAnalysisCalculations()->GetThickness()<< "   " ;
+        }
     m_TimeSeriesFile<<std::endl;
     
     return true;
@@ -101,7 +98,8 @@ bool TimeSeriesDataOutput::OpenFile(bool clearfile) {
       simulation. If the file cannot be opened or there is an error, appropriate error messages
       are printed to stderr.
      */
-    std::string filename = m_customFileName.empty() ? (m_pState->GetRunTag() + TimeSeriDataExt) : m_customFileName;
+
+    std::string filename=m_pState->GetAnalysisVariables()->GetFolderName() + '/' + m_pState->GetAnalysisVariables()->GetNameGeneralAnalysisFile();
 
     if (!clearfile) {
         // If it's a restart simulation, check if the energy file matches the restart
@@ -119,31 +117,30 @@ bool TimeSeriesDataOutput::OpenFile(bool clearfile) {
             return false;
         }
         // Write the header if it's not a restart
-        m_TimeSeriesFile << " ## mcstep  energy ";
-        if (m_pState->GetDynamicBox()->GetDerivedDefaultReadName() != NoBoxChange::GetDefaultReadName()) {
-            m_TimeSeriesFile << " Lx  Ly  Lz ";
+        m_TimeSeriesFile << " ## Frame ";
+        if (m_pState->GetAnalysisVariables()->GetEnergyCalculationActive()) {
+            m_TimeSeriesFile << " Energy ";
         }
-        if (m_pState->GetVAHGlobalMeshProperties()->VolumeIsActive()) {
-            m_TimeSeriesFile << " Volume  ";
+        if (m_pState->GetAnalysisVariables()->GetAreaCalculationActive()) {
+            m_TimeSeriesFile << " Area  ";
 
         }
-        if (m_pState->GetVAHGlobalMeshProperties()->AreaIsActive()) {
-            m_TimeSeriesFile << " Area ";
+        if (m_pState->GetAnalysisVariables()->GetProjectedAreaCalculationActive()) {
+            m_TimeSeriesFile << " Area_p";
 
         }
-        if (m_pState->GetVAHGlobalMeshProperties()->GlobalCurvatureIsActive()) {
-            m_TimeSeriesFile << " Global_Curvature ";
+        if (m_pState->GetAnalysisVariables()->GetMeanCurvatureCalculationActive()) {
+            m_TimeSeriesFile << " MeanCurvature ";
 
         }
-        if (m_pState->GetApplyConstraintBetweenGroups()->GetDerivedDefaultReadName() != "No") {
-            m_TimeSeriesFile << " Constraint_energy ";
+        if (m_pState->GetAnalysisVariables()->GetGaussianCurvatureCalculationActive()) {
+            m_TimeSeriesFile << " GaussianCurvature";
         }
-        if (m_pState->GetOpenEdgeEvolution()->GetDerivedDefaultReadName() != "No") {
-            m_TimeSeriesFile << " edge_size ";
+
+        if (m_pState->GetAnalysisVariables()->GetThicknessCalculationActive()) {
+            m_TimeSeriesFile << " Thickness";
         }
-        if (m_pState->GetDynamicTopology()->GetDerivedDefaultReadName() != "No") {
-            m_TimeSeriesFile << " surface_genus ";
-        }
+
 
         m_TimeSeriesFile << std::endl;
     }

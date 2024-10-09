@@ -28,6 +28,7 @@ State::State(std::vector<std::string> argument) :
       m_pNonbinaryTrajectory(new Traj_tsi(this)),  // Initialize Traj_tsi
       m_pVisualizationFile(new WritevtuFiles(this)),  // Initialize WritevtuFiles
       m_pBinaryTrajectory(new NoFile),  // Initialize BinaryTrajectory
+      
 
       //---- Initialize constraint components
       m_pVAHCalculator(new VAHGlobalMeshProperties),
@@ -59,11 +60,15 @@ State::State(std::vector<std::string> argument) :
       m_Argument(argument),  // Set Argument
       m_TopologyFile("topology.top"),  // Set TopologyFile
       m_InputFileName("Input.dts"),  // Set InputFileName
+      m_InputAnalysisFileName("Input.ana"),
       m_IndexFileName("Index.inx"),  // Set IndexFileName
       m_GeneralOutputFilename("dts"),  // Set GeneralOutputFilename
       m_Total_no_Threads(1),  // Set Total_no_Threads
       m_Targeted_State(true),  // Set Targeted_State
-      m_RestartFileName("")  // Set RestartFileName
+      m_RestartFileName(""),  // Set RestartFileName
+      
+      m_pAnalysisVariables(new AnalysisVariables),
+      m_pAnalysisCalculations(new AnalysisCalculations(this))
 { // start of the "class State" constructor
     
     
@@ -81,6 +86,9 @@ State::State(std::vector<std::string> argument) :
             exit(0);
      }
      if (!ReadInputFile(m_InputFileName)) {
+            exit(0);
+     }
+     if (!ReadAnalysisInputFile(m_InputAnalysisFileName)) {
             exit(0);
      }
      else{
@@ -161,6 +169,7 @@ bool State::ExploreArguments(std::vector<std::string> &argument){
     const std::string INDEX_FLAG       = "-ndx";
     const std::string DEFOUT_FLAG      = "-defout";
     const std::string THREAD_FLAG      = "-nt";
+    const std::string INPUTANA_FLAG       = "-ana";
 
     for (size_t i=1;i<argument.size();i=i+2)
     {
@@ -173,6 +182,10 @@ bool State::ExploreArguments(std::vector<std::string> &argument){
         else if(flag == INPUT_FLAG) {
             
             m_InputFileName = argument[i+1];
+        }
+        else if(flag == INPUTANA_FLAG) {
+            
+            m_InputAnalysisFileName = argument[i+1];
         }
         else if(flag == TOPOLOGY_FLAG) {
             
@@ -221,6 +234,104 @@ bool State::ExploreArguments(std::vector<std::string> &argument){
 
     return true;
 }
+
+bool State::ReadAnalysisInputFile(std::string file)
+{
+
+    
+
+    
+
+    std::string ext = file.substr(file.find_last_of(".") + 1);
+    std::string filename = (ext != AnaExt) ? file + "." + AnaExt : file;
+
+    if (!Nfunction::FileExist(filename)) {
+        std::cerr << "----> Error: the input file with the name " << filename << " does not exist" << std::endl;
+        return false;
+    }
+    std::ifstream input(filename);
+    if (!input) {
+        std::cerr << "----> Error: failed to open the input file " << filename << std::endl;
+        return false;
+    }
+
+    
+    std::string firstword, rest, str, type;
+    while (input >> firstword) {
+    
+        if (input.eof()) break;
+
+        if(firstword.size() !=0  && firstword[0] == ';'){
+            getline(input,rest);
+            continue;
+        }
+
+        if(firstword == AnalysisVariables::GetFluctuationSpectrumName()) { // "Integrator_Type"
+            int nx,ny;
+            input >> str >> type >> nx >> ny;
+            if(type =="on"){
+                m_pFluctuationSpectrum = new FluctuationSpectrum(this,nx,ny);    
+            }
+            m_pAnalysisVariables->SetFluctationSpectrumActive();
+            getline(input,rest);
+        }
+        else if(firstword == AnalysisVariables::GetInputFolderName()){
+            input>>str>>type;
+            m_pAnalysisVariables->SetFolderName(type);
+            getline(input,rest);
+        }
+
+        else if(firstword == AnalysisVariables::GetAreaName()){
+            input>>str>>type;
+            if(type =="on"){
+            m_pAnalysisVariables->SetAreaCalculationActive();}
+            getline(input,rest);
+        }
+
+        else if(firstword == AnalysisVariables::GetProjectedAreaName()){
+            input>>str>>type;
+            if(type =="on"){
+            m_pAnalysisVariables->SetProjectedAreaCalculationActive();}
+            getline(input,rest);
+        }
+
+        else if(firstword == AnalysisVariables::GetEnergyName()){
+            input>>str>>type;
+            if(type =="on"){
+            m_pAnalysisVariables->SetEnergyCalculationActive();}
+            getline(input,rest);
+        }
+
+        else if(firstword == AnalysisVariables::GetMeanCurvatureName()){
+            input>>str>>type;
+            if(type =="on"){
+            m_pAnalysisVariables->SetMeanCurvatureCalculationActive();}
+            getline(input,rest);
+        }
+
+        else if(firstword == AnalysisVariables::GetGaussianCurvatureName()){
+            input>>str>>type;
+            if(type =="on"){
+            m_pAnalysisVariables->SetGaussianCurvatureCalculationActive();}
+            getline(input,rest);
+        }
+
+        else if(firstword == AnalysisVariables::GetThicknessName()){
+            input>>str>>type;
+            if(type =="on"){
+            m_pAnalysisVariables->SetThicknessCalculationActive();}
+            getline(input,rest);
+        }
+
+    }
+    input.close();
+    
+
+
+    return true;
+}
+
+
 bool State::ReadInputFile(std::string file)
 {
     /*
@@ -974,18 +1085,35 @@ bool State::Initialize(){
 
 //----> ANA
 // We read the folder of TrajTSI files
-        m_pReadTrajTSI=new ReadTrajTSI(m_pNonbinaryTrajectory->GetFolderName(),m_GeneralOutputFilename);
-        m_pReadTrajTSI->ValidateFiles();
+        #ifndef MPI_DETECTED
+            m_pReadTrajTSI=new ReadTrajTSI(m_pNonbinaryTrajectory->GetFolderName(),m_GeneralOutputFilename);
+            m_pReadTrajTSI->ValidateFiles();
+            m_pAnalysisVariables->OpenFolder();
+        #endif
+
+        #ifdef MPI_DETECTED
+            int rank;
+            MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+            std::string foldernameTrajTSI=m_pNonbinaryTrajectory->GetFolderName() + '_' + Nfunction::Int_to_String(rank);
+            m_pReadTrajTSI=new ReadTrajTSI(foldernameTrajTSI,m_GeneralOutputFilename);
+            m_pReadTrajTSI->ValidateFiles();
+
+            std::string foldername=m_pAnalysisVariables->GetFolderName() + "_" + Nfunction::Int_to_String(rank);
+            m_pAnalysisVariables->SetFolderName(foldername);
+            m_pAnalysisVariables->OpenFolder();
+        #endif
 //Update initial step and final step
         //std::cout<<m_pReadTrajTSI->GetNumberOfFrames()<<std::endl;
         m_pSimulation->UpdateInitialStep(0);
         m_pSimulation->UpdateFinalStep(m_pReadTrajTSI->GetNumberOfFrames());
 
-        int nx=5;
-        int ny=5;
-        
-        m_pFluctuationSpectrum = new FluctuationSpectrum(this,nx,ny);
+        if (m_pAnalysisVariables ->GetFluctuationSpectrumActive()==true){
+                m_pFluctuationSpectrum->OpenOutputStreams();}
 
+        if(!m_pTimeSeriesDataOutput->OpenFile(true)){
+                    m_NumberOfErrors++;
+                }
+        
         //std::vector<std::string> FilePaths=m_pReadTrajTSI->getFilePaths();
         //std::vector<int> FrameList=m_pReadTrajTSI->getFrameList();
 
@@ -1108,7 +1236,7 @@ bool State::Initialize(){
             mesh_blueprint = Create_BluePrint.MashBluePrintFromInput_Top(m_InputFileName, m_TopologyFile);
             
             //----- open time series files
-            if(!m_pTimeSeriesLogInformation->OpenFile(true)){
+            /*if(!m_pTimeSeriesLogInformation->OpenFile(true)){
                 m_NumberOfErrors++;
             }
             if(!m_pTimeSeriesDataOutput->OpenFile(true)){
@@ -1127,7 +1255,7 @@ bool State::Initialize(){
                 if(!m_pVisualizationFile->OpenFolder()){
                     m_NumberOfErrors++;
                 }
-            }
+            }*/
 
         }
         m_RandomNumberGenerator->Initialize();
@@ -1172,7 +1300,7 @@ bool State::Initialize(){
     m_pSimulation->Initialize();
 
 //--- now that the system is ready for simulation, we first write the State into the log file and make one vis 
-    #ifndef MPI_DETECTED
+    /*#ifndef MPI_DETECTED
     m_pTimeSeriesLogInformation->WriteStartingState();
     m_pVisualizationFile->WriteAFrame(-m_pVisualizationFile->GetPeriod());
     #endif
@@ -1183,7 +1311,7 @@ bool State::Initialize(){
         m_pTimeSeriesLogInformation->WriteStartingState();
         m_pVisualizationFile->WriteAFrame(-m_pVisualizationFile->GetPeriod());
     }
-    #endif
+    #endif*/
 //----> energy class
 //---> to get interaction energies
     m_pEnergyCalculator->Initialize(m_InputFileName);
