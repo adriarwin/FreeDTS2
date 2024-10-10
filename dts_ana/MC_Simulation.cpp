@@ -104,13 +104,13 @@ for (int step = m_Initial_Step; step < m_Final_Step; step++){
         mesh_blueprint = Create_BluePrint.MashBluePrintFromInput_Top(m_pState->GetInputFile(),filename);
         m_pState->GetMesh()->GenerateMesh(mesh_blueprint);
 
-        //I need one specially thought for semi-flat membranees!!!
-        //m_pState->GetMesh()->CenterMesh();
+        //I need one specially thought for semi-flat membranees!!! A conditional is needed here
+        m_pState->GetMesh()->CenterSemiFlatMesh();
 
         m_pState->GetCurvatureCalculator()->Initialize();
         
         m_pState->GetAnalysisCalculations()->Calculate();
-        
+
         if (m_pState->GetAnalysisVariables()->GetFluctuationSpectrumActive()==true){
             m_pState->GetFluctationSpectrum()->CalculateSpectrum();
             }

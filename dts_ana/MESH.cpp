@@ -71,6 +71,50 @@ void  MESH::CenterMesh(){
 }
 
 
+void  MESH::CenterSemiFlatMesh(){
+
+    double minHeight=(*m_pActiveV.begin())->GetVZPos();
+    double maxHeight=(*m_pActiveV.begin())->GetVZPos();;
+    double zpos;
+
+
+    for (std::vector<vertex *>::iterator it = m_pActiveV.begin() ; it != m_pActiveV.end(); ++it){
+
+        zpos = (*it)->GetVZPos(); // Get the Z-coordinate of the vertex
+            if (zpos < minHeight) {
+                minHeight = zpos; // Update min height
+            }
+            if (zpos > maxHeight) {
+                maxHeight = zpos; // Update max height
+            }
+    }
+
+    double thickness=maxHeight-minHeight;
+    double Lz=(*m_pBox)(2);
+
+    if (thickness<0.9*Lz){
+        return;
+    }
+
+    
+    for (std::vector<vertex *>::iterator it = m_pActiveV.begin() ; it != m_pActiveV.end(); ++it){
+
+        zpos = (*it)->GetVZPos();
+        
+        if (zpos>0.5*Lz){
+            (*it)->UpdateVZPos(zpos-0.5*Lz);
+        } 
+        else if (zpos<0.5*Lz){
+            (*it)->UpdateVZPos(zpos+0.5*Lz);
+        }
+
+    }
+    
+    return;
+}
+
+
+
 bool MESH::GenerateMesh(MeshBluePrint meshblueprint)
 {
     m_Vertex.clear();
