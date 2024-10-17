@@ -845,12 +845,12 @@ while (input >> firstword) {
         {
             // ParallelReplica = Parallel_Tempering Algorithm rate n_processors minbeta maxbeta
             std::string algorithm,type;
-            int period, n_processors;
+            int period, n_processors,initialsteps;
             double minbeta, maxbeta;
-            input>>str>>type>>algorithm>>period>>n_processors>>minbeta>>maxbeta;
+            input>>str>>type>>algorithm>>period>>initialsteps>>n_processors>>minbeta>>maxbeta;
             if(algorithm == ParallelTemperingMoveSimple::GetBaseDefaultReadName()){
                 #ifdef MPI_DETECTED
-                m_pParallelTemperingMove = new ParallelTemperingMoveSimple(this ,period, n_processors, minbeta, maxbeta);
+                m_pParallelTemperingMove = new ParallelTemperingMoveSimple(this ,period, n_processors, minbeta, maxbeta,initialsteps);
                 #endif
 
                 #ifndef MPI_DETECTED

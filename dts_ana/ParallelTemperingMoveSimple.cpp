@@ -23,12 +23,13 @@ This class changes the box in x and y direction to minimize the energy. It is ca
 The way it works is based on the changing the box in x and y direction by a small size of dr by calling "ChangeBoxSize" function.
 =================================================================================================================
 */
-ParallelTemperingMoveSimple::ParallelTemperingMoveSimple(State *pState,int period, int nprocessors, double minbeta, double maxbeta) :
+ParallelTemperingMoveSimple::ParallelTemperingMoveSimple(State *pState,int period, int nprocessors, double minbeta, double maxbeta,int initialsteps) :
         m_pState(pState),
         m_Period(period),
         m_Nprocessors (nprocessors),
         m_MinBeta (minbeta),
-        m_MaxBeta (maxbeta)
+        m_MaxBeta (maxbeta),
+        m_InitialSteps(initialsteps)
         {
         }
             //-- convert the type string into the direction vector
@@ -142,7 +143,7 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
      * @return true if the box size was changed, false otherwise.
      */
 //---> if does not match the preiod, return false
-    if(step%m_Period != 0)
+    if(step%m_Period != 0 || step<m_InitialSteps)
         return false;
 
     

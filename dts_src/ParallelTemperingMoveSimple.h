@@ -20,7 +20,7 @@ class State;
 class ParallelTemperingMoveSimple : public AbstractParallelTemperingMove {
 public:
     
-    ParallelTemperingMoveSimple(State *pState, int period, int nprocessors, double minbeta, double maxbeta);
+    ParallelTemperingMoveSimple(State *pState, int period, int nprocessors, double minbeta, double maxbeta,int initialsteps);
 	~ParallelTemperingMoveSimple();
 
     void Initialize();
@@ -39,6 +39,7 @@ private:
     
     
 private:
+    int m_InitialSteps;
     int m_Nprocessors;
     double m_MinBeta;
     double m_MaxBeta;
