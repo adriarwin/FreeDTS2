@@ -28,6 +28,8 @@ public:
 
     inline  std::string GetDerivedDefaultReadName()  {return "ParallelTemperingMoveSimple";}
     inline  static std::string GetBaseDefaultReadName()  {return "ParallelTemperingMoveSimple";}
+
+    std::vector<int> GetRankAtTempID() {return m_RankAtTempID;}
     
     std::string CurrentState();
     bool GetTargetState();
@@ -35,6 +37,9 @@ public:
 
 private:
     bool ChangeToNewTemperatureID(int NewTempID);
+    bool isInteger(const std::string& s);
+    std::vector<int> splitStringToIntVector(const std::string& line);
+    std::vector<int> ReadLastLineOutput(const std::string& output, int N);
 //Here I can insert things no one will ever know...
     
     

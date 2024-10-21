@@ -8,9 +8,8 @@
 #include "Voxelization.h"
 #ifdef MPI_DETECTED
 #include <mpi.h>
-
 #include <sstream>
-
+#include <iostream>
 
 
 /*
@@ -59,11 +58,24 @@ void ParallelTemperingMoveSimple::Initialize() {
     std::cout<<"---> the algorithm for Parallel Tempering involves applying this: "<< GetBaseDefaultReadName()<<" \n";}
     //m_RankWithUpTempID=rank;
     //m_RankWithDownTempID=rank;
+    if (m_Restart==false){
     for (int i=0;i<m_Size;i++)
         {
             m_RankAtTempID.push_back(i);
         }
-    
+    }
+    else{
+        m_RankAtTempID=ReadLastLineOutput(GetOutputFileName(),m_Size);
+        MPI_Barrier(MPI_COMM_WORLD);
+        for(int i=0; i<m_Size; i++){
+                if(m_RankAtTempID[i]==m_Rank){
+                    m_TempID=i;
+                    if (m_TempID==0){m_TargetState=true;}
+                    break;
+                }
+        }
+    }
+
     std::vector<double> localBetaVec;
     if (rank == 0) {
         localBetaVec = ReadTemperatures();
@@ -128,6 +140,7 @@ void ParallelTemperingMoveSimple::Initialize() {
 
     }
 
+
     #endif
 }
 
@@ -165,12 +178,11 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
     bool CountIsEven=(m_Counter%2==0);
 
     //TEST::
-    //CountIsEven=true;
+
 
 
     //RECEIVE BROADCAST FROM LAST EXCHANGE, SWAP RANKS, UPDATE RANKATTEMPID
     if (m_Counter>0){
-
         if (!CountIsEven){
 
             #if DEBUG_MODE_PT==Enabled
@@ -806,6 +818,70 @@ bool ParallelTemperingMoveSimple::GetTargetState(){
 void ParallelTemperingMoveSimple::SetRestart(){
     m_Restart=true;
 }
+
+// Function to check if a string is a valid integer
+bool ParallelTemperingMoveSimple::isInteger(const std::string& s) {
+    return !s.empty() && std::all_of(s.begin(), s.end(), ::isdigit);
+}
+
+// Function to split a string by spaces and convert to integers
+std::vector<int> ParallelTemperingMoveSimple::splitStringToIntVector(const std::string& line) {
+    std::vector<int> result;
+    std::stringstream ss(line);
+    std::string temp;
+
+    while (ss >> temp) {
+        if (isInteger(temp)) {
+            result.push_back(std::stoi(temp));
+        } else {
+            // If any part is not an integer, return an empty vector
+            return {};
+        }
+    }
+
+    return result;
+}
+
+// Function to read the last line of a file and parse it into a vector
+std::vector<int> ParallelTemperingMoveSimple::ReadLastLineOutput(const std::string& output, int N) {
+    std::ifstream file(output);
+    std::string lastLine;
+    std::string line;
+
+    if (!file.is_open()) {
+        std::cerr << "Error: Could not open file " << output << std::endl;
+        // Return a default vector if the file cannot be opened
+        std::vector<int> defaultVec;
+        for (int i = 0; i < N; ++i) {
+            defaultVec.push_back(i);
+        }
+        return defaultVec;
+    }
+    std::cout<<"Here"<<std::endl;
+    // Read the file to find the last non-empty line
+    while (std::getline(file, line)) {
+        if (!line.empty()) {
+            lastLine = line;
+        }
+    }
+    std::cout<<"Here 2"<<std::endl;
+
+    file.close();
+
+    // Try to convert the last line to a vector of integers
+    std::vector<int> result = splitStringToIntVector(lastLine);
+    if (!result.empty() && result.size() == N) {
+        return result;
+    }
+
+    // If the last line is not a valid integer vector, return a default vector
+    std::vector<int> defaultVec;
+    for (int i = 0; i < N; ++i) {
+        defaultVec.push_back(i);
+    }
+    return defaultVec;
+}
+
 
 std::string ParallelTemperingMoveSimple::CurrentState(){
     

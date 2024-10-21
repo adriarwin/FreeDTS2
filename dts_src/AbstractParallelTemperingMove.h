@@ -79,6 +79,8 @@ public:
      */
     virtual std::string GetDerivedDefaultReadName() = 0;
 
+    virtual std::vector<int> GetRankAtTempID() = 0;
+
     /*
      * @brief Gets the base class's default read name.
      *
@@ -122,6 +124,11 @@ public:
     void SetRestart(){
         return;
     }
+
+    std::vector<int> GetRankAtTempID(){
+        std::vector<int> A(0);
+        return A;}
+
 
 
     std::string CurrentState(){

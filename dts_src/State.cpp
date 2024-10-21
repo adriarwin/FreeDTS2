@@ -1016,7 +1016,11 @@ bool State::Initialize(){
             double r_vertex;
             double r_box;
             int rank;
+            int size;
+            int m_TempID;
+            std::vector<int> RankAtTempID=m_pParallelTemperingMove->GetRankAtTempID();
             MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+            MPI_Comm_size(MPI_COMM_WORLD, &size);
 
             std::string extension = ".res";  // Define the extension part
             std::string filename = m_RestartFileName;
@@ -1028,8 +1032,14 @@ bool State::Initialize(){
                 // Extract the "something" part by removing ".res"
                 std::string baseName = filename.substr(0, pos);
                 
+                for(int i=0; i<size; i++){
+                    if(RankAtTempID[i]==rank){
+                        m_TempID=i;
+                        break;
+                    }
+                }
                 // Append "_<rank>" to the "something" part
-                baseName = baseName + "_" + Nfunction::Int_to_String(rank);
+                baseName = baseName + "_" + Nfunction::Int_to_String(m_TempID);
                 
                 // Reconstruct the filename with the modified "something" part and ".res"
                 m_RestartFileName = baseName + extension;

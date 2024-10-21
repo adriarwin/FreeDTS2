@@ -49,7 +49,7 @@ Job::Job(const std::vector<std::string> &argument) {
         exit(0);
     }
 
-    std::cout << "Running simulation on single CPU" << std::endl;
+    std::cout << "MPI flag not detected. " << std::endl;
     State T_state(argument);
     T_state.Initialize();
     T_state.GetSimulation()->do_Simulation();
@@ -103,6 +103,7 @@ Job::Job(const std::vector<std::string> &argument) {
     }
 
     #elif defined(MPI_DETECTED)
+    std::cout << "MPI flag detected. " << std::endl;
     State T_state(argument);
     T_state.Initialize();
     T_state.GetSimulation()->do_Simulation();
