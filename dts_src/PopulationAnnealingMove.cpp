@@ -39,14 +39,13 @@ void PopulationAnnealingMove::Initialize() {
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     //std::cout<<"Rank: "<<rank<<std::endl;
-    m_Rank = rank;
+    m_pRank = rank;
     int size;
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     //std::cout<<"Size: "<<size<<std::endl;
     m_pSize = size;
-    m_pTempID = rank;
     m_pCounter = 0;
-    f(m_Rank==0){
+    if(m_pRank==0){
     std::cout<<"---> the algorithm for Populated Annealing involves applying this: "<< GetBaseDefaultReadName()<<" \n";}
     std::vector<double> localBetaVec;
     if (rank == 0) {
@@ -88,7 +87,7 @@ bool PopulationAnnealingMove::EvolveOneStep(int step) {
      * @return true if the box size was changed, false otherwise.
      */
     //---> if does not match the period, return false
-    if (step % m_Period != 0 || step < m_InitialSteps)
+    if (step % m_pPeriod != 0)
         return false;
 
     MPI_Barrier(MPI_COMM_WORLD);
@@ -164,13 +163,6 @@ bool PopulationAnnealingMove::is_line_empty(const std::string& line) {
     return line.empty() || std::all_of(line.begin(), line.end(), [](unsigned char c) { return std::isspace(c); });
 }
 
-bool PopulationAnnealingMove::GetTargetState() {
-    return m_TargetState;
-}
-
-void PopulationAnnealingMove::SetRestart() {
-    m_Restart = true;
-}
 
 // Function to check if a string is a valid integer
 bool PopulationAnnealingMove::isInteger(const std::string& s) {

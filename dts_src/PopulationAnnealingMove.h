@@ -20,7 +20,7 @@ class State;
 class PopulationAnnealingMove : public AbstractPopulationAnnealingMove {
 public:
     
-    PopulationAnnealingMove(State *pState, int period, int nprocessors, double minbeta, double maxbeta,int initialsteps);
+    PopulationAnnealingMove(State *pState, std::string period_file, std::string temperature_file, std::string input_files, int n_processors);
 	~PopulationAnnealingMove();
 
     void Initialize();
@@ -53,11 +53,8 @@ private:
     std::vector<int> m_pPeriodVector;
     std::vector<std::string> m_pInputFilesVector;
     int m_pRank; //What is the rank of current processor.
-
-    int m_Period;
-    int m_Rank;
-    int m_Size;
-    int m_Counter;
+    int m_pPeriod;
+    int m_pCounter;
 
     State *m_pState;
     
