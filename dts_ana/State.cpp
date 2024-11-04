@@ -1171,8 +1171,8 @@ bool State::Initialize(){
 
         #ifdef MPI_DETECTED
         if (!m_RestartFileName.empty()) {
-            m_pParallelTemperingMove->SetRestart();
-            m_pParallelTemperingMove->Initialize();
+            //m_pParallelTemperingMove->SetRestart();
+            //m_pParallelTemperingMove->Initialize();
             int step;
             double r_vertex;
             double r_box;
@@ -1232,7 +1232,7 @@ bool State::Initialize(){
 
 
         if(!restartReadSuccess){ // this for also a situation where m_RestartFileName is empty
-            m_pParallelTemperingMove->Initialize();
+            //m_pParallelTemperingMove->Initialize();
             mesh_blueprint = Create_BluePrint.MashBluePrintFromInput_Top(m_InputFileName, m_TopologyFile);
             
             //----- open time series files

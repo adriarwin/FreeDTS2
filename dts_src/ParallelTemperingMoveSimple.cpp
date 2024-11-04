@@ -1,5 +1,3 @@
-
-
 #include <stdio.h>
 #include "ParallelTemperingMoveSimple.h"
 #include "Nfunction.h"

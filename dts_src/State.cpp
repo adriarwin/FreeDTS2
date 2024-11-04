@@ -44,6 +44,7 @@ State::State(std::vector<std::string> argument) :
       m_pOpenEdgeEvolution(new NoEvolution),  // Initialize OpenEdgeEvolution
       m_pInclusionConversion(new NoInclusionConversion),  // Initialize InclusionConversion
       m_pParallelTemperingMove(new NoParallelTemperingMove),  // Initialize ParallelTemperingMove
+      m_pPopulationAnnealingMove(new NoPopulationAnnealingMove),
 
       //--- Initialize accessory objects
       m_pCurvatureCalculations(new CurvatureByShapeOperatorType1(this)),  // Initialize CurvatureCalculations
@@ -871,6 +872,29 @@ while (input >> firstword) {
             getline(input,rest);
 
         }
+
+        else if(firstword == "PopulationAnnealing")
+        {
+            // ParallelReplica = Parallel_Tempering Algorithm rate n_processors minbeta maxbeta
+            std::string type,periodfile,temperaturefile,inputfiles;
+            int numberofprocessors;
+            input>>str>>type>>periodfile>>temperaturefile>>inputfiles>>numberofprocessors;
+            if(type == PopulationAnnealingMove::GetBaseDefaultReadName()){
+                #ifdef MPI_DETECTED
+                m_pPopulationAnnealingMove = new PopulationAnnealingMove(this,periodfile,temperaturefile,inputfiles,numberofprocessors);
+                #endif
+
+                #ifndef MPI_DETECTED
+                std::cout<<"MPI is not detected for Population Annealing. Program will be run with a single CPU."<<std::endl;
+                #endif
+            }
+        
+            
+
+
+            getline(input,rest);
+
+        }
         else if(firstword == BTSFile::GetDefaultReadName() ){ // "OutPutTRJ_BTS"
             int periodic, precision;
             std::string filename;
@@ -1082,6 +1106,8 @@ bool State::Initialize(){
 
         if(!restartReadSuccess){ // this for also a situation where m_RestartFileName is empty
             m_pParallelTemperingMove->Initialize();
+            m_pPopulationAnnealingMove->Initialize();
+            
             mesh_blueprint = Create_BluePrint.MashBluePrintFromInput_Top(m_InputFileName, m_TopologyFile);
             
             //----- open time series files

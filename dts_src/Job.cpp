@@ -106,7 +106,7 @@ Job::Job(const std::vector<std::string> &argument) {
     std::cout << "MPI flag detected. " << std::endl;
     State T_state(argument);
     T_state.Initialize();
-    T_state.GetSimulation()->do_Simulation();
+    //T_state.GetSimulation()->do_Simulation();
     
 /*
     int world_rank;

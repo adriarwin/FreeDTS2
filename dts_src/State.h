@@ -128,6 +128,9 @@
 //--- parallel tempering
 #include "AbstractParallelTemperingMove.h"
 #include "ParallelTemperingMoveSimple.h"
+//---- population annealing
+#include "AbstractPopulationAnnealingMove.h"
+#include "PopulationAnnealingMove.h" 
 //--- interaction with Substrate
 #include "AbstractVertexAdhesionToSubstrate.h"
 #include "SphericalVertexSubstrate.h"
@@ -191,7 +194,7 @@ inline AbstractDynamicTopology          *GetDynamicTopology()                   
 inline AbstractOpenEdgeEvolution        *GetOpenEdgeEvolution()                         {return m_pOpenEdgeEvolution;}
 inline AbstractInclusionConversion      *GetInclusionConversion()                       {return m_pInclusionConversion;}
 inline AbstractParallelTemperingMove    *GetParallelTempering()                         {return m_pParallelTemperingMove;}
-
+inline AbstractPopulationAnnealingMove  *GetPopulationAnnealing()                         {return m_pPopulationAnnealingMove;}
 
 inline AbstractBoundary                 *GetBoundary()                                  {return m_pBoundary;}
 //---- System energy and voxels
@@ -242,6 +245,7 @@ private:
     AbstractDynamicTopology       *m_pDynamicTopology;
     AbstractOpenEdgeEvolution     *m_pOpenEdgeEvolution;
     AbstractParallelTemperingMove *m_pParallelTemperingMove;
+    AbstractPopulationAnnealingMove *m_pPopulationAnnealingMove;
     
     VAHGlobalMeshProperties       *m_pVAHCalculator;
     AbstractVolumeCoupling        *m_pVolumeCoupling;
