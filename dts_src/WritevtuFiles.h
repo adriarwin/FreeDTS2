@@ -23,6 +23,7 @@ public:
 
     bool WriteAFrame(int step);
     bool OpenFolder();
+    bool ChangeFolderName(const std::string& newfoldername);
     inline  std::string GetDerivedDefaultReadName()  {return "VTUFileFormat";}
      inline  static std::string GetDefaultReadName()   {return "VTUFileFormat";}
     std::string CurrentState();

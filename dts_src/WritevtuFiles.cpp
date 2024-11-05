@@ -26,6 +26,11 @@ bool WritevtuFiles::OpenFolder(){
   //  m_pBox = (pState->GetMesh())->GetBox();
     return Nfunction::OpenFolder(m_FolderName);
 }
+
+bool WritevtuFiles::ChangeFolderName(const std::string& foldername){
+    m_FolderName = m_FolderName+foldername;
+    return true;
+}
 void WritevtuFiles::WriteInclusion(std::string id, const std::vector<vertex *>  &all_ver, std::ofstream *Output)
 {
     double cc=0;

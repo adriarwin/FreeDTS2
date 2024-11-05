@@ -8,6 +8,7 @@
 #include <mpi.h>
 #include <sstream>
 #include <iostream>
+#include <filesystem>
 
 /*
 ===============================================================================================================
@@ -19,11 +20,11 @@ This class changes the box in x and y direction to minimize the energy. It is ca
 The way it works is based on the changing the box in x and y direction by a small size of dr by calling "ChangeBoxSize" function.
 =================================================================================================================
 */
-PopulationAnnealingMove::PopulationAnnealingMove(State *pState, std::string period_file, std::string temperature_file, std::string input_files, int n_processors) :
+PopulationAnnealingMove::PopulationAnnealingMove(State *pState, std::string period_file, std::string temperature_file, std::string topology_files, int n_processors) :
         m_pState(pState),
         m_pPeriodFile(period_file),
         m_pTemperatureFile(temperature_file),
-        m_pInputFiles(input_files),
+        m_pTopologyFile(topology_files),
         m_pInputSize(n_processors)
 {
 }
@@ -31,6 +32,10 @@ PopulationAnnealingMove::PopulationAnnealingMove(State *pState, std::string peri
 
 PopulationAnnealingMove::~PopulationAnnealingMove() {
 
+}
+
+bool PopulationAnnealingMove::PopulationAnnealingMoveOn(){
+    return true;
 }
 
 void PopulationAnnealingMove::Initialize() {
@@ -45,6 +50,7 @@ void PopulationAnnealingMove::Initialize() {
     //std::cout<<"Size: "<<size<<std::endl;
     m_pSize = size;
     m_pCounter = 0;
+
     if(m_pRank==0){
     std::cout<<"---> the algorithm for Populated Annealing involves applying this: "<< GetBaseDefaultReadName()<<" \n";}
     std::vector<double> localBetaVec;
@@ -69,7 +75,118 @@ void PopulationAnnealingMove::Initialize() {
     m_pBetaVector = globalBetaVec;
     if (rank==0){m_pBetaVector=localBetaVec;}
 
+    std::vector<int> localPeriodVec;
+    if (rank == 0) {
+        localPeriodVec = ReadPeriods();
+    }
     
+    // Broadcast the size of the vector to all ranks
+    int vecSizep = (rank == 0) ? localPeriodVec.size() : 0;
+    MPI_Bcast(&vecSizep, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+    // Resize the local vector based on the size received
+    std::vector<int> globalPeriodVec(vecSizep);
+    if (rank == 0) {
+        // Ensure localBetaVec.data() is the correct pointer for broadcasting
+        MPI_Bcast(localPeriodVec.data(), vecSize, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    } else {
+        MPI_Bcast(globalPeriodVec.data(), vecSize, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    }
+
+    // Now each rank has a copy of the vector
+    m_pPeriodVector = globalPeriodVec;
+    if (rank==0){m_pPeriodVector=localPeriodVec;}
+
+    //Checking that both vectors have the same size
+    if (m_pBetaVector.size() != m_pPeriodVector.size()) {
+        std::ostringstream errorMsg;
+        errorMsg << "Error on rank " << m_pRank << ": Vector sizes do not match. "
+                 << "m_pBetaVector size: " << m_pBetaVector.size() << ", "
+                 << "m_pPeriodVector size: " << m_pPeriodVector.size();
+        std::cerr << errorMsg.str() << std::endl;
+        MPI_Abort(MPI_COMM_WORLD, 1);  // Abort all MPI processes
+    }
+
+    // Read input files
+    if (rank == 0) {
+        std::ifstream file(m_pTopologyFile);
+        std::string line;
+        while (std::getline(file, line)) {
+            m_pTopologyFilesVector.push_back(line);
+        }
+
+        // Check if number of files matches number of processors
+        if (m_pTopologyFilesVector.size() != m_pSize) {
+            std::cerr << "Error: Number of input files (" << m_pTopologyFilesVector.size() 
+                      << ") does not match number of processors (" << size << ")" << std::endl;
+            MPI_Abort(MPI_COMM_WORLD, 1);
+        }
+
+        // Check if all files exist
+        for (const auto& file : m_pTopologyFilesVector) {
+            if (!std::filesystem::exists(file)) {
+                std::cerr << "Error: File " << file << " does not exist" << std::endl;
+                MPI_Abort(MPI_COMM_WORLD, 1);
+            }
+        }
+    }
+
+    // Broadcast the number of files
+    int numFiles = m_pTopologyFilesVector.size();
+    MPI_Bcast(&numFiles, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+    // Allocate space for each rank's file
+    std::string myFile;
+
+    if (rank == 0) {
+        // Send each filename to the corresponding rank
+        for (int i = 1; i < size; ++i) {
+            MPI_Send(m_pTopologyFilesVector[i].c_str(), m_pTopologyFilesVector[i].size() + 1, MPI_CHAR, i, 0, MPI_COMM_WORLD);
+        }
+        myFile = m_pTopologyFilesVector[0];
+    } else {
+        // Receive the filename
+        MPI_Status status;
+        MPI_Probe(0, 0, MPI_COMM_WORLD, &status);
+        int count;
+        MPI_Get_count(&status, MPI_CHAR, &count);
+        char* buffer = new char[count];
+        MPI_Recv(buffer, count, MPI_CHAR, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        myFile = std::string(buffer);
+        delete[] buffer;
+    }
+
+    std::cout << "Rank " << rank << " will use file: " << myFile << std::endl;
+
+    // Store the filename for later use
+    m_pTopologyFileString = myFile;
+
+    std::string newFolderName = "_" + Nfunction::Int_to_String(m_pRank);
+
+    m_pState->GetNonbinaryTrajectory()->SetFolderName(m_pState->GetNonbinaryTrajectory()->GetOriginalFolderName() +"_" + Nfunction::Int_to_String(m_pRank));
+    m_pState->GetTimeSeriesDataOutput()->SetCustomFileName(m_pState ->GetRunTag() + "_" +Nfunction::Int_to_String(m_pRank)+TimeSeriDataExt);
+    m_pState->GetRestart()->SetUniqueRestartFileName("_" + Nfunction::Int_to_String(m_pRank));
+    m_pState->GetVisualization()->ChangeFolderName(newFolderName);
+
+
+    int totalSteps = 0;
+    for (const auto& period : m_pPeriodVector) {
+        totalSteps += period;
+    }
+
+    // Set initial and final steps
+    int ini = 0;
+    int fi = totalSteps-1;
+    m_pPeriod=m_pPeriodVector[0];
+
+
+    m_pState->GetSimulation()->SetBeta(m_pBetaVector[m_pCounter], 0);
+    m_pState->GetSimulation()->UpdateInitialStep(ini);
+    m_pState->GetSimulation()->UpdateFinalStep(fi);
+
+    if (m_pRank==0){
+        m_pEnergyVector.resize(m_pSize);
+    }
 
 #endif
 }
@@ -87,12 +204,54 @@ bool PopulationAnnealingMove::EvolveOneStep(int step) {
      * @return true if the box size was changed, false otherwise.
      */
     //---> if does not match the period, return false
-    if (step % m_pPeriod != 0)
+    if (step <m_pPeriod)
         return false;
 
     MPI_Barrier(MPI_COMM_WORLD);
 
+    double local_energy=m_pState->GetEnergyCalculator()->GetEnergy();
+
+    MPI_Gather(&local_energy, 1, MPI_DOUBLE, 
+               m_pEnergyVector.data(), 1, MPI_DOUBLE, 
+               0, MPI_COMM_WORLD);
+
+    
+    if (m_pRank == 0) {
+        // Now energy_vector contains energies from all ranks
+        // You can process or print the energies here
+        std::cout << "Energies from all ranks:" << std::endl;
+        for (int i = 0; i < m_pSize; ++i) {
+            std::cout << "Rank " << i << ": " << m_pEnergyVector[i] << std::endl;
+        }
+    }
+
+    
+    //Update the counter
+    m_pCounter++;
+    m_pPeriod+=m_pPeriodVector[m_pCounter];
+
+    //Now it comes the exchange part.
+
+
+    m_pState->GetSimulation()->SetBeta(m_pBetaVector[m_pCounter], 0);
+
+    //std::cout << "Rank " << m_pRank << ": Counter updated to: " << m_pCounter << std::endl;
+    //std::cout << "Rank " << m_pRank << ": New period set to: " << m_pPeriod << std::endl;
+
+    
+
     return true;
+}
+
+
+std::vector<int> PopulationAnnealingMove::ReadPeriods() {
+    std::vector<int> periods;
+    std::ifstream file(m_pPeriodFile);
+    int period;
+    while (file >> period) {
+        periods.push_back(period);
+    }
+    return periods;
 }
 
 std::vector<double> PopulationAnnealingMove::ReadTemperatures() {
@@ -145,8 +304,8 @@ std::vector<double> PopulationAnnealingMove::ReadTemperatures() {
     TemperatureFile.close();
 
     for (size_t i = 1; i < betavec.size(); ++i) {
-        if (betavec[i] < betavec[i - 1]) {
-            std::cerr << "Error: Vector is not sorted in ascending order." << std::endl;
+        if (betavec[i] > betavec[i - 1]) {
+            std::cerr << "Error: Vector is not sorted in descending order." << std::endl;
             exit(0);  // Exit with error code
         }
     }

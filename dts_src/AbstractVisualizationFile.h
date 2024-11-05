@@ -19,6 +19,7 @@ public:
     }
     virtual bool WriteAFrame(int step) = 0;
     virtual bool OpenFolder() = 0;
+    virtual bool ChangeFolderName(const std::string& newfoldername) = 0;
     virtual inline  std::string GetDerivedDefaultReadName()  {return "";}
     virtual std::string CurrentState() = 0;
     inline int GetPeriod()  {return m_Period;}

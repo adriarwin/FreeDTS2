@@ -55,8 +55,9 @@ public:
      * @return true if the box size was changed, false otherwise.
      */
     virtual bool EvolveOneStep(int step) = 0;
+    virtual bool PopulationAnnealingMoveOn()=0;
 
-
+    virtual std::string GetTopologyFile()=0;
     /*
      * @brief Pure virtual function to initialize the box parameters.
      */
@@ -107,6 +108,13 @@ public:
     bool EvolveOneStep(int step){
         return false;
     }
+
+    bool PopulationAnnealingMoveOn(){
+        return false;}
+
+    std::string GetTopologyFile(){
+        std::string A;
+        return A;}
 
     std::vector<int> GetRankAtTempID(){
         std::vector<int> A(0);

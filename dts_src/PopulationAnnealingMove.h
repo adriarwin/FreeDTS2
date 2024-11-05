@@ -32,12 +32,15 @@ public:
     
     std::string CurrentState();
 
+    bool PopulationAnnealingMoveOn();
+
 
 private:
     bool ChangeToNewTemperatureID(int NewTempID);
     bool isInteger(const std::string& s);
     std::vector<int> splitStringToIntVector(const std::string& line);
     std::vector<int> ReadLastLineOutput(const std::string& output, int N);
+    std::string GetTopologyFile(){return m_pTopologyFileString;};
 //Here I can insert things no one will ever know...
     
     
@@ -45,13 +48,14 @@ private:
 
     std::string m_pPeriodFile; //File with all periods
     std::string m_pTemperatureFile; //File with all temperatures
-    std::string m_pInputFiles; //File with path to all input files
+    std::string m_pTopologyFile; //File with path to all input files
     int m_pInputSize; //Number of processors that you input
     int m_pSize; //Number of processors detected
 
     std::vector<double> m_pBetaVector;
     std::vector<int> m_pPeriodVector;
-    std::vector<std::string> m_pInputFilesVector;
+    std::vector<std::string> m_pTopologyFilesVector;
+    std::string m_pTopologyFileString;
     int m_pRank; //What is the rank of current processor.
     int m_pPeriod;
     int m_pCounter;
@@ -61,8 +65,11 @@ private:
     inline  std::string GetInitialTemperaturesFileName() {return "initial_temperatures.txt";}
     inline  std::string GetOutputFileName() {return "output_trajectories.txt";}
     std::vector<double> ReadTemperatures();
+    std::vector<int> ReadPeriods();
     bool is_line_empty(const std::string& line);
     void WriteRankAtTempIDToFile();
+
+    std::vector<double> m_pEnergyVector;
     
 
     

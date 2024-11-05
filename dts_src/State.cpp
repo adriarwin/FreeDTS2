@@ -1108,6 +1108,9 @@ bool State::Initialize(){
             m_pParallelTemperingMove->Initialize();
             m_pPopulationAnnealingMove->Initialize();
             
+            if (m_pPopulationAnnealingMove->PopulationAnnealingMoveOn()==true){
+                m_TopologyFile=m_pPopulationAnnealingMove->GetTopologyFile();
+            }
             mesh_blueprint = Create_BluePrint.MashBluePrintFromInput_Top(m_InputFileName, m_TopologyFile);
             
             //----- open time series files
@@ -1182,9 +1185,16 @@ bool State::Initialize(){
     #if MPI_DETECTED
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    if (m_pPopulationAnnealingMove->PopulationAnnealingMoveOn()==true){
+        m_pTimeSeriesLogInformation->WriteStartingState();
+        m_pVisualizationFile->WriteAFrame(-m_pVisualizationFile->GetPeriod());
+    }
+    else{
+    
     if (rank == 0) {
         m_pTimeSeriesLogInformation->WriteStartingState();
         m_pVisualizationFile->WriteAFrame(-m_pVisualizationFile->GetPeriod());
+    }
     }
     #endif
 //----> energy class

@@ -110,8 +110,13 @@ for (int step = m_Initial_Step; step <= m_Final_Step; step++){
 #endif
 
 #ifdef MPI_DETECTED
+        if (m_pState->GetPopulationAnnealing()->PopulationAnnealingMoveOn()==true){
+            m_pState->GetVisualization()->WriteAFrame(step);
+        }
+        else{
         if(m_pState->GetParallelTempering()->GetTargetState() == true){ 
             m_pState->GetVisualization()->WriteAFrame(step);
+        }
         }
 #endif
         //--- write non-binary trejectory e.g., tsi, tsg
@@ -151,6 +156,8 @@ for (int step = m_Initial_Step; step <= m_Final_Step; step++){
         m_pState->GetInclusionConversion()->Exchange(step);
         //---- attempt parallel tempering move
         m_pState->GetParallelTempering()->EvolveOneStep(step);
+        //---- update the population annealing
+        m_pState->GetPopulationAnnealing()->EvolveOneStep(step);
     
 
 //----> print info about the simulation, e.g., rate,
