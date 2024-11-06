@@ -49,6 +49,14 @@ bool Restart::UpdateRestartState(int step,  double r_vertex, double r_box){
     }
     return true;
 }
+
+bool Restart::UpdateRestartStateNoCondition(int step,  double r_vertex, double r_box){
+        
+    
+    WriteRestart(m_RestartFileName, step, m_pState->GetMesh(),r_vertex, r_box);
+    
+    return true;
+}
 //=== Writing a restart file: this file is just the active [State] Object with an updated initial step
 void Restart::WriteRestart(std::string &filename, int step, MESH * pmesh, double r, double rb){
     

@@ -62,6 +62,7 @@ public:
      * @brief Pure virtual function to initialize the box parameters.
      */
     virtual void Initialize() = 0;
+    virtual void SetRestart() = 0;
 
     /*
      * @brief Pure virtual function to get the current state of the box.
@@ -107,6 +108,10 @@ public:
     }
     bool EvolveOneStep(int step){
         return false;
+    }
+
+    void SetRestart(){
+        return;
     }
 
     bool PopulationAnnealingMoveOn(){

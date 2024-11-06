@@ -33,9 +33,11 @@ public:
     std::string CurrentState();
 
     bool PopulationAnnealingMoveOn();
+    void SetRestart();
 
 
 private:
+    std::vector<int> ReorderNewRanks(std::vector<int> new_ranks);   
     bool ChangeToNewTemperatureID(int NewTempID);
     bool isInteger(const std::string& s);
     std::vector<int> splitStringToIntVector(const std::string& line);
@@ -46,11 +48,14 @@ private:
     
 private:
 
+    std::vector<std::string> m_pRestartFilesVector;
     std::string m_pPeriodFile; //File with all periods
     std::string m_pTemperatureFile; //File with all temperatures
     std::string m_pTopologyFile; //File with path to all input files
     int m_pInputSize; //Number of processors that you input
     int m_pSize; //Number of processors detected
+
+    std::vector<int> m_pNewRank;
 
     std::vector<double> m_pBetaVector;
     std::vector<int> m_pPeriodVector;
@@ -59,18 +64,20 @@ private:
     int m_pRank; //What is the rank of current processor.
     int m_pPeriod;
     int m_pCounter;
-
+    int m_pNextConfiguration;
     State *m_pState;
     
     inline  std::string GetInitialTemperaturesFileName() {return "initial_temperatures.txt";}
-    inline  std::string GetOutputFileName() {return "output_trajectories.txt";}
+    inline  std::string GetOutputFileName() {return "output_descending_mapping.txt";}
     std::vector<double> ReadTemperatures();
     std::vector<int> ReadPeriods();
     bool is_line_empty(const std::string& line);
     void WriteRankAtTempIDToFile();
 
     std::vector<double> m_pEnergyVector;
-    
+    std::ofstream m_TimeSeriesFile;
+    void WriteParentalDescendingMappingToFile();
+    bool m_pRestart=false;    
 
     
 

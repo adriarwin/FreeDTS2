@@ -9,7 +9,9 @@
 #include <sstream>
 #include <iostream>
 #include <filesystem>
-
+#include <iostream>
+#include <iomanip>
+#include <unordered_set>
 /*
 ===============================================================================================================
  Last update Aug 2023 by Weria
@@ -54,12 +56,12 @@ void PopulationAnnealingMove::Initialize() {
     if(m_pRank==0){
     std::cout<<"---> the algorithm for Populated Annealing involves applying this: "<< GetBaseDefaultReadName()<<" \n";}
     std::vector<double> localBetaVec;
-    if (rank == 0) {
-        localBetaVec = ReadTemperatures();
-    }
+    localBetaVec = ReadTemperatures();
+    m_pBetaVector=localBetaVec;
+    
 
     // Broadcast the size of the vector to all ranks
-    int vecSize = (rank == 0) ? localBetaVec.size() : 0;
+    /*int vecSize = (rank == 0) ? localBetaVec.size() : 0;
     MPI_Bcast(&vecSize, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
     // Resize the local vector based on the size received
@@ -72,8 +74,10 @@ void PopulationAnnealingMove::Initialize() {
     }
 
     // Now each rank has a copy of the vector
-    m_pBetaVector = globalBetaVec;
+    
     if (rank==0){m_pBetaVector=localBetaVec;}
+    else{m_pBetaVector=globalBetaVec;}*/
+
 
     std::vector<int> localPeriodVec;
     if (rank == 0) {
@@ -88,9 +92,9 @@ void PopulationAnnealingMove::Initialize() {
     std::vector<int> globalPeriodVec(vecSizep);
     if (rank == 0) {
         // Ensure localBetaVec.data() is the correct pointer for broadcasting
-        MPI_Bcast(localPeriodVec.data(), vecSize, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+        MPI_Bcast(localPeriodVec.data(), vecSizep, MPI_INT, 0, MPI_COMM_WORLD);
     } else {
-        MPI_Bcast(globalPeriodVec.data(), vecSize, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+        MPI_Bcast(globalPeriodVec.data(), vecSizep, MPI_INT, 0, MPI_COMM_WORLD);
     }
 
     // Now each rank has a copy of the vector
@@ -106,6 +110,7 @@ void PopulationAnnealingMove::Initialize() {
         std::cerr << errorMsg.str() << std::endl;
         MPI_Abort(MPI_COMM_WORLD, 1);  // Abort all MPI processes
     }
+
 
     // Read input files
     if (rank == 0) {
@@ -158,6 +163,19 @@ void PopulationAnnealingMove::Initialize() {
 
     std::cout << "Rank " << rank << " will use file: " << myFile << std::endl;
 
+   m_pRestartFilesVector.resize(m_pSize);
+
+// Loop over m_pSize
+    for (int i = 0; i < m_pSize; ++i) {
+    // Generate RestartFileName for each rank
+    std::string restartFileName =m_pState->GetRunTag() + "_" + Nfunction::Int_to_String(i)+"."+ RestartExt;
+    
+    // Fill it in m_pRestartFilesVector
+    m_pRestartFilesVector[i] = restartFileName;
+    }
+
+    // Print m_pRestartFilesVector for the current rank
+
     // Store the filename for later use
     m_pTopologyFileString = myFile;
 
@@ -168,6 +186,11 @@ void PopulationAnnealingMove::Initialize() {
     m_pState->GetRestart()->SetUniqueRestartFileName("_" + Nfunction::Int_to_String(m_pRank));
     m_pState->GetVisualization()->ChangeFolderName(newFolderName);
 
+    
+
+
+    int ini,fi;
+
 
     int totalSteps = 0;
     for (const auto& period : m_pPeriodVector) {
@@ -175,21 +198,69 @@ void PopulationAnnealingMove::Initialize() {
     }
 
     // Set initial and final steps
-    int ini = 0;
-    int fi = totalSteps-1;
-    m_pPeriod=m_pPeriodVector[0];
+    if (m_pRestart==false){
+        ini = 0;
+        fi = totalSteps-1;
+        m_pPeriod=m_pPeriodVector[0];
+    }
+    else{
+        ini = m_pState->GetSimulation()->GetInitialStep();
+        fi = totalSteps-1;
+        m_pPeriod = m_pPeriodVector[0];
+        m_pCounter = 0;
+        int i = 0;
+        while (ini > m_pPeriod) {
+            i++;
+            m_pPeriod += m_pPeriodVector[i];
+        }
+
+        m_pCounter=i;
+    }
 
 
-    m_pState->GetSimulation()->SetBeta(m_pBetaVector[m_pCounter], 0);
+
+
+    double beta=m_pBetaVector[0];
+
+    m_pState->GetSimulation()->SetBeta(beta, 0);
     m_pState->GetSimulation()->UpdateInitialStep(ini);
     m_pState->GetSimulation()->UpdateFinalStep(fi);
+
 
     if (m_pRank==0){
         m_pEnergyVector.resize(m_pSize);
     }
 
+    if (m_pRestart==false){
+        if (m_pRank == 0) {
+            m_TimeSeriesFile.open(GetOutputFileName(), std::ios_base::out);
+            m_TimeSeriesFile << "Parental-descending-mapping: "<<std::endl;
+            // Call the new function to write m_RankAtTempID to m_TimeSeriesFile
+        }
+    }
+    else{
+        if (m_pRank == 0) {
+            m_TimeSeriesFile.open(GetOutputFileName(), std::ios_base::app);
+            // Call the new function to write m_RankAtTempID to m_TimeSeriesFile
+        }
+
+    }
+
 #endif
 }
+
+void PopulationAnnealingMove::WriteParentalDescendingMappingToFile() {
+    if (!m_TimeSeriesFile.is_open()) {
+        std::cerr << "Error: Time series file is not open!" << std::endl;
+        return;
+    }
+
+    for (const auto& rankID : m_pNewRank) {
+        m_TimeSeriesFile << rankID << " ";
+    }
+    m_TimeSeriesFile << std::endl;
+}
+
 
 bool PopulationAnnealingMove::EvolveOneStep(int step) {
     /**
@@ -207,7 +278,12 @@ bool PopulationAnnealingMove::EvolveOneStep(int step) {
     if (step <m_pPeriod)
         return false;
 
+
+    m_pState->GetRestart()->UpdateRestartStateNoCondition(step, m_pState->GetVertexPositionUpdate()->GetDR(), m_pState->GetDynamicBox()->GetDR());
     MPI_Barrier(MPI_COMM_WORLD);
+
+    m_pCounter++;
+    m_pPeriod+=m_pPeriodVector[m_pCounter];
 
     double local_energy=m_pState->GetEnergyCalculator()->GetEnergy();
 
@@ -215,42 +291,155 @@ bool PopulationAnnealingMove::EvolveOneStep(int step) {
                m_pEnergyVector.data(), 1, MPI_DOUBLE, 
                0, MPI_COMM_WORLD);
 
+    if (m_pRank==0){
+
     
-    if (m_pRank == 0) {
-        // Now energy_vector contains energies from all ranks
-        // You can process or print the energies here
-        std::cout << "Energies from all ranks:" << std::endl;
-        for (int i = 0; i < m_pSize; ++i) {
-            std::cout << "Rank " << i << ": " << m_pEnergyVector[i] << std::endl;
-        }
+
+    std::vector<double> weights(m_pSize);
+    for (int j = 0; j < m_pSize; ++j) {
+        double energy = m_pEnergyVector[j];
+        double beta_diff = m_pBetaVector[m_pCounter] - m_pBetaVector[m_pCounter - 1];
+        weights[j] = exp(-energy * beta_diff);
+    }
+    
+    // Normalize weights
+    double sum_weights = 0.0;
+    for (double weight : weights) {
+        sum_weights += weight;
+    }
+    for (double& weight : weights) {
+        weight /= sum_weights;
     }
 
     
-    //Update the counter
-    m_pCounter++;
-    m_pPeriod+=m_pPeriodVector[m_pCounter];
+    
+    std::vector<int> new_ranks(m_pSize);
+    for (int j = 0; j < m_pSize; ++j) {
+        double rand_num = m_pState->GetRandomNumberGenerator()->UniformRNG(1.0);;
+        double cum_prob = 0.0;
+        for (int k = 0; k < m_pSize; ++k) {
+            cum_prob += weights[k];
+            if (rand_num < cum_prob) {
+                new_ranks[j] = k;
+                break;
+            }
+        }
+    }
 
-    //Now it comes the exchange part.
+    new_ranks = ReorderNewRanks(new_ranks);
 
+    m_pNewRank=new_ranks;
+    WriteParentalDescendingMappingToFile();
+    int local_next_config = 0;
 
-    m_pState->GetSimulation()->SetBeta(m_pBetaVector[m_pCounter], 0);
-
-    //std::cout << "Rank " << m_pRank << ": Counter updated to: " << m_pCounter << std::endl;
-    //std::cout << "Rank " << m_pRank << ": New period set to: " << m_pPeriod << std::endl;
+    for (int i = 0; i < m_pSize; ++i) {
+            int dest_rank = i;
+            int value_to_send = new_ranks[i];
+            if (dest_rank == 0) {
+                local_next_config = value_to_send;
+            } else {
+                MPI_Send(&value_to_send, 1, MPI_INT, dest_rank, 0, MPI_COMM_WORLD);
+            }
+    }
+    m_pNextConfiguration = local_next_config;
 
     
 
-    return true;
+    }
+    
+    
+    if (m_pRank != 0) {
+        int local_next_config = 0;
+        MPI_Recv(&local_next_config, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        m_pNextConfiguration = local_next_config;
+    }
+
+    
+
+    // Synchronize all processes
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    //1. Broadcast new ranks to each rank (each rank will know what its next configuration will be)
+    //2. Use restart?
+    m_pState->GetSimulation()->SetBeta(m_pBetaVector[m_pCounter], 0);
+
+
+    if (m_pNextConfiguration == m_pRank){
+        return true;}
+    else{
+        MeshBluePrint mesh_blueprint;
+        bool restartReadSuccess = true;
+        double r_vertex, r_box;
+        std::string RestartFileName=m_pRestartFilesVector[m_pNextConfiguration];
+        mesh_blueprint = m_pState->GetRestart()->ReadFromRestart(RestartFileName, step, restartReadSuccess, r_vertex, r_box);        
+        m_pState->GetMesh()->GenerateMesh(mesh_blueprint);
+        m_pState->GetVertexPositionUpdate()->UpdateDR(r_vertex);
+        m_pState->GetDynamicBox()->UpdateDR(r_box);
+        m_pState->GetVoxelization()->Voxelize(m_pState->GetMesh()->GetActiveV());
+        m_pState->GetCurvatureCalculator()->Initialize();
+        m_pState->GetEnergyCalculator()->UpdateTotalEnergy(m_pState->GetEnergyCalculator()->CalculateAllLocalEnergy());
+        
+        return true;
+    }
+    
+
+    
 }
 
+void PopulationAnnealingMove::SetRestart() {
+    m_pRestart=true;
+}
+
+
+std::vector<int> PopulationAnnealingMove::ReorderNewRanks(std::vector<int> new_ranks) {
+    int n = new_ranks.size();
+    std::vector<bool> placed(n, false);
+    std::vector<int> result = new_ranks;
+    std::unordered_set<int> unique_values(new_ranks.begin(), new_ranks.end());
+
+    // First pass: place values where they match their index
+    for (int i = 0; i < n; ++i) {
+        if (unique_values.count(i) && result[i] == i) {
+            placed[i] = true;
+            unique_values.erase(i);
+        }
+    }
+
+    // Second pass: ensure each unique value is at its index
+    for (int value : unique_values) {
+        if (!placed[value]) {
+            auto it = std::find(result.begin(), result.end(), value);
+            if (it != result.end()) {
+                std::swap(result[value], *it);
+                placed[value] = true;
+            }
+        }
+    }
+
+    return result;
+}
 
 std::vector<int> PopulationAnnealingMove::ReadPeriods() {
     std::vector<int> periods;
     std::ifstream file(m_pPeriodFile);
+    
+    if (!file.is_open()) {
+        throw std::runtime_error("Unable to open period file: " + m_pPeriodFile);
+    }
+
     int period;
     while (file >> period) {
         periods.push_back(period);
     }
+
+    if (file.fail() && !file.eof()) {
+        throw std::runtime_error("Non-integer value found in period file");
+    }
+
+    if (periods.empty()) {
+        throw std::runtime_error("No valid periods found in file");
+    }
+
     return periods;
 }
 

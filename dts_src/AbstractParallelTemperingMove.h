@@ -65,6 +65,8 @@ public:
      */
     virtual void Initialize() = 0;
 
+    virtual bool ParallelTemperingMoveOn()=0;
+
     /*
      * @brief Pure virtual function to get the current state of the box.
      *
@@ -118,6 +120,10 @@ public:
         return false;
     }
     bool GetTargetState(){
+        return false;
+    }
+
+    bool ParallelTemperingMoveOn(){
         return false;
     }
 

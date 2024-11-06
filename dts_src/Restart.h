@@ -43,7 +43,8 @@ public:
     ~Restart();
     
     
-    bool UpdateRestartState(int step, double r_vertex, double r_box);  // Writing the restart file
+    bool UpdateRestartState(int step, double r_vertex, double r_box);
+    bool UpdateRestartStateNoCondition(int step, double r_vertex, double r_box);  // Writing the restart file
     /*
      * @brief Updates the restart state by writing the current simulation step and parameters to a file.
      *
@@ -52,6 +53,7 @@ public:
      * @param r_box A double value representing a parameter related to the simulation box.
      * @return True if the update is successful, false otherwise.
      */
+    std::string GetRestartFileName(){return m_RestartFileName;};
     MeshBluePrint ReadFromRestart(const std::string& filename, int& step, bool& readok, double& r_vertex, double& r_box); // Reading a restart file
     void SetRestartFileName();
     void SetUniqueRestartFileName(std::string extra);

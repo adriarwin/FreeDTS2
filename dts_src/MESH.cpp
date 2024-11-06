@@ -1,8 +1,5 @@
 #include <fstream>
 #include "MESH.h"
-#ifdef MPI_DETECTED
-#include <mpi.h>
-#endif
 /*
  Weria Pezeshkian (weria.pezeshkian@gmail.com)
  Copyright (c) Weria Pezeshkian
@@ -72,8 +69,70 @@ void  MESH::CenterMesh(){
     
     return;
 }
+
+
+void  MESH::CenterSemiFlatMesh(){
+
+    double minHeight=(*m_pActiveV.begin())->GetVZPos();
+    double maxHeight=(*m_pActiveV.begin())->GetVZPos();;
+    double zpos;
+
+
+    for (std::vector<vertex *>::iterator it = m_pActiveV.begin() ; it != m_pActiveV.end(); ++it){
+
+        zpos = (*it)->GetVZPos(); // Get the Z-coordinate of the vertex
+            if (zpos < minHeight) {
+                minHeight = zpos; // Update min height
+            }
+            if (zpos > maxHeight) {
+                maxHeight = zpos; // Update max height
+            }
+    }
+
+    double thickness=maxHeight-minHeight;
+    double Lz=(*m_pBox)(2);
+
+    if (thickness<0.9*Lz){
+        return;
+    }
+
+    
+    for (std::vector<vertex *>::iterator it = m_pActiveV.begin() ; it != m_pActiveV.end(); ++it){
+
+        zpos = (*it)->GetVZPos();
+        
+        if (zpos>0.5*Lz){
+            (*it)->UpdateVZPos(zpos-0.5*Lz);
+        } 
+        else if (zpos<0.5*Lz){
+            (*it)->UpdateVZPos(zpos+0.5*Lz);
+        }
+
+    }
+    
+    return;
+}
+
+
+
 bool MESH::GenerateMesh(MeshBluePrint meshblueprint)
 {
+    m_Vertex.clear();
+    m_Triangle.clear();
+    m_Links.clear();
+    m_Inclusion.clear();
+    m_pActiveV.clear();
+    m_pSurfV.clear();
+    m_pEdgeV.clear();
+    m_pActiveL.clear();
+    m_pHL.clear();
+    m_pMHL.clear();
+    m_pEdgeL.clear();
+    m_pActiveT.clear();
+    m_pInclusion.clear();
+    m_pGhostT.clear();
+    m_pGhostL.clear();
+    m_pGhostV.clear();
     m_Box = meshblueprint.simbox;
     if(m_Box.isbad()){
         std::cout<<"---> box from blueprint is bad \n";
@@ -299,16 +358,9 @@ bool MESH::GenerateMesh(MeshBluePrint meshblueprint)
     }
     // =======
     // ==== info of the mesh
-    #ifndef MPI_DETECTED
+    
     std::cout<<"---> active vertex "<<m_pActiveV.size()<<" surf vertex "<<m_pSurfV.size()<<"  edge vertex "<<m_pEdgeV.size()<<" -- \n";
-    #endif
-    #ifdef MPI_DETECTED
-    int rank;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    if(rank==0){
-        std::cout<<"---> active vertex "<<m_pActiveV.size()<<" surf vertex "<<m_pSurfV.size()<<"  edge vertex "<<m_pEdgeV.size()<<" -- \n";
-    }
-    #endif
+
     //====== create ghost
     int lid = 2*(m_pMHL.size())+m_pEdgeL.size();
     int tid = m_pActiveT.size() ;
@@ -346,13 +398,7 @@ bool MESH::GenerateMesh(MeshBluePrint meshblueprint)
 
     if(m_No_VectorFields_Per_V != 0 ) {
         // Get an iterator to the beginning of meshblueprint.bvectorfields
-        #ifdef MPI_DETECTED
-        if(rank==0){
-        std::cout<<"---> Note, each vertex has "<< m_No_VectorFields_Per_V <<" vector fields \n";}
-        #endif
-        #ifndef MPI_DETECTED
         std::cout<<"---> Note, each vertex has "<< m_No_VectorFields_Per_V <<" vector fields \n";
-        #endif
         std::vector<VectorField_Map>::iterator data_it = meshblueprint.bvectorfields.begin();
         // Iterate over active vertices and initialize them with corresponding vector field data
         for (std::vector<vertex*>::iterator it = m_pActiveV.begin(); it != m_pActiveV.end(); ++it, ++data_it) {
@@ -361,13 +407,7 @@ bool MESH::GenerateMesh(MeshBluePrint meshblueprint)
         }
     }//     if(m_No_VectorFields_Per_V !=0) {
     else{
-        #ifdef MPI_DETECTED
-        if(rank==0){
-        std::cout<<"---> Note, the vertices do not have any vector fields. \n";}
-        #endif
-        #ifndef MPI_DETECTED
         std::cout<<"---> Note, the vertices do not have any vector fields. \n";
-        #endif
     }
     
     if(m_No_VectorFields_Per_V != 0 )
@@ -463,15 +503,7 @@ bool MESH::UpdateGroupFromIndexFile(std::string &filename){
     
     std::ifstream indexfile(filename);
     if (!indexfile) {
-        #ifdef MPI_DETECTED
-        int rank;
-        MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-        if(rank==0){
-        std::cerr << "---> note: no index file has been provided "  << std::endl;}
-        #endif
-        #ifndef MPI_DETECTED
         std::cerr << "---> note: no index file has been provided "  << std::endl;
-        #endif
         return false;
     }
 

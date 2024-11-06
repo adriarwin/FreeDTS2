@@ -30,6 +30,8 @@ public:
     inline  static std::string GetBaseDefaultReadName()  {return "ParallelTemperingMoveSimple";}
 
     std::vector<int> GetRankAtTempID() {return m_RankAtTempID;}
+
+    bool ParallelTemperingMoveOn() {return true;}
     
     std::string CurrentState();
     bool GetTargetState();
