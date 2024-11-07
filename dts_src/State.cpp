@@ -995,6 +995,7 @@ bool State::Initialize(){
 
         #ifndef MPI_DETECTED
         m_pParallelTemperingMove->Initialize();
+        m_pPopulationAnnealingMove->Initialize();
         if (!m_RestartFileName.empty()) {
             int step;
             double r_vertex;
@@ -1033,6 +1034,8 @@ bool State::Initialize(){
         #endif
 
         #ifdef MPI_DETECTED
+
+        if (m_pParallelTemperingMove->ParallelTemperingMoveOn()==true || m_pPopulationAnnealingMove->PopulationAnnealingMoveOn()==true ){
         if (!m_RestartFileName.empty()) {
             m_pParallelTemperingMove->SetRestart();
             m_pParallelTemperingMove->Initialize();
@@ -1131,7 +1134,50 @@ bool State::Initialize(){
                 m_NumberOfWarnings++;
             }
         }
+        }
+        else{
+            m_pParallelTemperingMove->Initialize();
+        m_pPopulationAnnealingMove->Initialize();
+        if (!m_RestartFileName.empty()) {
+            int step;
+            double r_vertex;
+            double r_box;
+
+            // Attempt to open the restart file
+            std::cout << "---> Note: attempting to open the restart file: " << m_RestartFileName << std::endl;
+
+            // Read the restart file and update the State object to that state
+            mesh_blueprint = m_pRestart->ReadFromRestart(m_RestartFileName, step, restartReadSuccess, r_vertex, r_box);
+
+            // Check if the restart file was successfully read
+            if (restartReadSuccess) {
+                std::cout << "---> Note: Restart file was successfully read" << std::endl;
+                m_pVertexPositionIntegrator->UpdateDR(r_vertex);
+                m_pDynamicBox->UpdateDR(r_box);
+                m_pSimulation->UpdateInitialStep(step+1);
+                //----- open log file
+                if(!m_pTimeSeriesLogInformation->OpenFile(false)){
+                    m_NumberOfErrors++;
+                }
+                if(!m_pTimeSeriesDataOutput->OpenFile(false)){
+                    m_NumberOfErrors++;
+                }
+                //---- open the binary trajectory
+                if(!m_pBinaryTrajectory->OpenFile(false, 'w')){
+                    m_NumberOfErrors++;
+                }
+            }
+            else{
+                // If failed to read restart file, generate MeshBluePrint from input topology file
+                std::cout << "---> Warning: Failed to read restart file, will use topology file" << std::endl;
+                m_NumberOfWarnings++;
+            }
+        }
+
+        }
         #endif
+
+
 
 
         if(!restartReadSuccess){ // this for also a situation where m_RestartFileName is empty
@@ -1179,6 +1225,11 @@ bool State::Initialize(){
         #ifndef MPI_DETECTED
         m_pRestart->SetRestartFileName();
         #endif
+        #ifdef MPI_DETECTED
+        if (m_pPopulationAnnealingMove->PopulationAnnealingMoveOn()==false && m_pParallelTemperingMove->ParallelTemperingMoveOn()==false){
+            m_pRestart->SetRestartFileName();
+        }
+        #endif
 //----> calaculate curvature for all vertices
         m_pCurvatureCalculations->Initialize();
 //----> set some easy access for integrators
@@ -1219,12 +1270,16 @@ bool State::Initialize(){
         m_pTimeSeriesLogInformation->WriteStartingState();
         m_pVisualizationFile->WriteAFrame(-m_pVisualizationFile->GetPeriod());
     }
-    else{
+    else if (m_pParallelTemperingMove->ParallelTemperingMoveOn()==true){
     
-    if (rank == 0) {
+    if (m_pParallelTemperingMove->GetTargetState()== true) {
         m_pTimeSeriesLogInformation->WriteStartingState();
         m_pVisualizationFile->WriteAFrame(-m_pVisualizationFile->GetPeriod());
     }
+    }
+    else{
+        m_pTimeSeriesLogInformation->WriteStartingState();
+        m_pVisualizationFile->WriteAFrame(-m_pVisualizationFile->GetPeriod());
     }
     #endif
 //----> energy class

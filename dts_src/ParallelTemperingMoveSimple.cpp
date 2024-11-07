@@ -60,6 +60,10 @@ void ParallelTemperingMoveSimple::Initialize() {
     for (int i=0;i<m_Size;i++)
         {
             m_RankAtTempID.push_back(i);
+            if (i==m_Rank){
+                if (i==0){m_TargetState=true;}
+                else{m_TargetState=false;}
+            }
         }
     }
     else{
@@ -69,6 +73,7 @@ void ParallelTemperingMoveSimple::Initialize() {
                 if(m_RankAtTempID[i]==m_Rank){
                     m_TempID=i;
                     if (m_TempID==0){m_TargetState=true;}
+                    else{m_TargetState=false;}
                     break;
                 }
         }
@@ -208,7 +213,6 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
             for(int i=0; i<m_Size; i++){
                 if(m_RankAtTempID[i]==m_Rank){
                     m_TempID=i;
-                    if (m_TempID==0){m_TargetState=true;}
                     break;
                 }
             }
@@ -270,7 +274,6 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
             for(int i=0; i<m_Size; i++){
                 if(m_RankAtTempID[i]==m_Rank){
                     m_TempID=i;
-                    if (m_TempID==0){m_TargetState=true;}
                     break;
                 }
             }
@@ -346,6 +349,8 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
         //IF ACCEPTED, EFFECTIVELY SWAP RANKS
         if (ReceiveExchangeAccepted){
             int NewTempID=DestTempID;
+            if (NewTempID==0){m_TargetState=true;}
+            else{m_TargetState=false;}
             m_pState->GetSimulation()->SetBeta(m_BetaVec[NewTempID], 0);
             m_pState->GetNonbinaryTrajectory()->SetFolderName(m_pState->GetNonbinaryTrajectory()->GetOriginalFolderName() +"_" + Nfunction::Int_to_String(NewTempID)); 
             m_pState->GetTimeSeriesDataOutput()->CloseFile();
@@ -451,6 +456,8 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
         //EFFECTIVE SWAP OF TEMPERATURES
         if (ExchangeAccepted){
             int NewTempID=SourceTempID;
+            if (NewTempID==0){m_TargetState=true;}
+            else{m_TargetState=false;}
             m_pState->GetSimulation()->SetBeta(m_BetaVec[NewTempID], 0);
             m_pState->GetNonbinaryTrajectory()->SetFolderName(m_pState->GetNonbinaryTrajectory()->GetOriginalFolderName() +"_" + Nfunction::Int_to_String(NewTempID));
             m_pState->GetTimeSeriesDataOutput()->CloseFile();
@@ -559,6 +566,8 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
         //EFFECTIVE SWAP OF TEMPERATURES
         if (ExchangeAccepted){
             int NewTempID=SourceTempID;
+            if (NewTempID==0){m_TargetState=true;}
+            else{m_TargetState=false;}
             m_pState->GetSimulation()->SetBeta(m_BetaVec[NewTempID], 0);
             m_pState->GetNonbinaryTrajectory()->SetFolderName(m_pState->GetNonbinaryTrajectory()->GetOriginalFolderName() +"_" + Nfunction::Int_to_String(NewTempID));
             m_pState->GetTimeSeriesDataOutput()->CloseFile();
@@ -662,6 +671,8 @@ bool ParallelTemperingMoveSimple::EvolveOneStep(int step){
         //IF ACCEPTED, EFFECTIVELY SWAP RANKS
         if (ReceiveExchangeAccepted){
             int NewTempID=DestTempID;
+            if (NewTempID==0){m_TargetState=true;}
+            else{m_TargetState=false;}
             m_pState->GetSimulation()->SetBeta(m_BetaVec[NewTempID], 0);
             m_pState->GetNonbinaryTrajectory()->SetFolderName(m_pState->GetNonbinaryTrajectory()->GetOriginalFolderName() +"_" + Nfunction::Int_to_String(NewTempID)); 
             m_pState->GetTimeSeriesDataOutput()->CloseFile();

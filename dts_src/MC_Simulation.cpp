@@ -75,7 +75,15 @@ bool MC_Simulation::do_Simulation(){
 #endif
 
 #ifdef MPI_DETECTED
+        if (m_pState->GetPopulationAnnealing()->PopulationAnnealingMoveOn()==true){
+            m_pState->GetVisualization()->WriteAFrame(0);
+        }
+        else if (m_pState->GetParallelTempering()->ParallelTemperingMoveOn()==true){
         if(m_pState->GetParallelTempering()->GetTargetState() == true){ 
+            m_pState->GetVisualization()->WriteAFrame(0);
+        }
+        }
+        else{
             m_pState->GetVisualization()->WriteAFrame(0);
         }
 #endif
@@ -113,10 +121,13 @@ for (int step = m_Initial_Step; step <= m_Final_Step; step++){
         if (m_pState->GetPopulationAnnealing()->PopulationAnnealingMoveOn()==true){
             m_pState->GetVisualization()->WriteAFrame(step);
         }
-        else{
+        else if (m_pState->GetParallelTempering()->ParallelTemperingMoveOn()==true){
         if(m_pState->GetParallelTempering()->GetTargetState() == true){ 
             m_pState->GetVisualization()->WriteAFrame(step);
         }
+        }
+        else{
+            m_pState->GetVisualization()->WriteAFrame(step);
         }
 #endif
         //--- write non-binary trejectory e.g., tsi, tsg
