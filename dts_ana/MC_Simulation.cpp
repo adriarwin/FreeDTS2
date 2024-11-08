@@ -105,7 +105,10 @@ for (int step = m_Initial_Step; step < m_Final_Step; step++){
         m_pState->GetMesh()->GenerateMesh(mesh_blueprint);
 
         //I need one specially thought for semi-flat membranees!!! A conditional is needed here
-        m_pState->GetMesh()->CenterSemiFlatMesh();
+        if (m_pState->GetAnalysisVariables()->GetTopology()=="flat"){
+            m_pState->GetMesh()->CenterSemiFlatMesh();}
+        else if (m_pState->GetAnalysisVariables()->GetTopology()=="spherical"){
+            m_pState->GetMesh()->CenterMesh();}
 
         m_pState->GetCurvatureCalculator()->Initialize();
         

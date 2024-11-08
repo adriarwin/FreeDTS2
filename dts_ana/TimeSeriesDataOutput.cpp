@@ -68,6 +68,9 @@ and false if the periodic condition is not met or if there is an error writing t
         if (m_pState->GetAnalysisVariables()->GetAreaCalculationActive()) {
             m_TimeSeriesFile << m_pState->GetAnalysisCalculations()->GetArea()<<"   ";
         }
+        if (m_pState->GetAnalysisVariables()->GetVolumeCalculationActive()) {
+            m_TimeSeriesFile << m_pState->GetAnalysisCalculations()->GetVolume()<<"   ";
+        }
         if (m_pState->GetAnalysisVariables()->GetProjectedAreaCalculationActive()) {
             m_TimeSeriesFile <<  m_pState->GetAnalysisCalculations()->GetProjectedArea()<< "   ";
 
@@ -123,6 +126,10 @@ bool TimeSeriesDataOutput::OpenFile(bool clearfile) {
         }
         if (m_pState->GetAnalysisVariables()->GetAreaCalculationActive()) {
             m_TimeSeriesFile << " Area  ";
+
+        }
+        if (m_pState->GetAnalysisVariables()->GetVolumeCalculationActive()) {
+            m_TimeSeriesFile << " Volume  ";
 
         }
         if (m_pState->GetAnalysisVariables()->GetProjectedAreaCalculationActive()) {

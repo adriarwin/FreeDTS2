@@ -3,6 +3,9 @@
 #include "Nfunction.h"
 #include "vertex.h"
 #include "State.h"
+#include "triangle.h"
+#include "links.h"
+
 
 
 AnalysisCalculations::AnalysisCalculations(State *pState){
@@ -28,12 +31,20 @@ void AnalysisCalculations::Calculate(){
     }
 
 
-    if (m_pState->GetAnalysisVariables()->GetAreaCalculationActive()) {
+    if (m_pState->GetAnalysisVariables()->GetAreaCalculationActive() || m_pState->GetAnalysisVariables()->GetVolumeCalculationActive()) {
         std::vector<triangle *>& all_tri = m_pState->GetMesh()->GetActiveT();
         for (std::vector<triangle *>::iterator it = all_tri.begin() ; it != all_tri.end(); ++it) {
-            m_pArea += (*it)->GetArea();
+             if (m_pState->GetAnalysisVariables()->GetAreaCalculationActive()){
+                m_pArea += (*it)->GetArea();
+             }
+             if (m_pState->GetAnalysisVariables()->GetVolumeCalculationActive()){
+                m_pVolume += CalculateSingleTriangleVolume((*it));}
             }
     }
+
+
+
+    
 
     std::vector<vertex *>& all_vertex = m_pState->GetMesh()->GetActiveV();
     double minHeight=(*all_vertex.begin())->GetVZPos();
@@ -85,6 +96,9 @@ void AnalysisCalculations::InitializeMemberVariables(){
         if (m_pState->GetAnalysisVariables()->GetAreaCalculationActive()) {
             m_pArea=0;
         }
+        if (m_pState->GetAnalysisVariables()->GetVolumeCalculationActive()) {
+            m_pVolume=0;
+        }
         if (m_pState->GetAnalysisVariables()->GetProjectedAreaCalculationActive()) {
             m_pProjectedArea=0;
 
@@ -103,4 +117,21 @@ void AnalysisCalculations::InitializeMemberVariables(){
 
 }
 
+
+double AnalysisCalculations::CalculateSingleTriangleVolume(triangle *pTriangle){
+
+    if(m_pState->GetMesh()->GetHasCrossedPBC()){
+        *(m_pState->GetTimeSeriesLog()) << "---> the system has crossed the PBC while volume is being calculated.";
+        *(m_pState->GetTimeSeriesLog()) << " SOLUTION: Restart the simulation and center the system. Also, activate the command for centering the box.";
+
+         exit(0);
+    }
+    
+    double T_area = pTriangle->GetArea();
+    Vec3D Normal_v = pTriangle->GetNormalVector();
+    Vec3D Pos = pTriangle->GetV1()->GetPos();
+
+    // Compute triangle volume
+    return T_area * (Vec3D::dot(Normal_v, Pos)) / 3.0;
+}
 

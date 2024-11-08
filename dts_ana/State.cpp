@@ -266,6 +266,7 @@ bool State::ReadAnalysisInputFile(std::string file)
             continue;
         }
 
+
         if(firstword == AnalysisVariables::GetFluctuationSpectrumName()) { // "Integrator_Type"
             int nx,ny;
             input >> str >> type >> nx >> ny;
@@ -275,6 +276,12 @@ bool State::ReadAnalysisInputFile(std::string file)
             m_pAnalysisVariables->SetFluctationSpectrumActive();
             getline(input,rest);
         }
+        else if(firstword == AnalysisVariables::GetInputTopologyName()){
+            input>>str>>type;
+            m_pAnalysisVariables->SetTopology(type);
+            getline(input,rest);
+        }
+
         else if(firstword == AnalysisVariables::GetInputFolderName()){
             input>>str>>type;
             m_pAnalysisVariables->SetFolderName(type);
@@ -285,6 +292,13 @@ bool State::ReadAnalysisInputFile(std::string file)
             input>>str>>type;
             if(type =="on"){
             m_pAnalysisVariables->SetAreaCalculationActive();}
+            getline(input,rest);
+        }
+
+        else if(firstword == AnalysisVariables::GetVolumeName()){
+            input>>str>>type;
+            if(type =="on"){
+            m_pAnalysisVariables->SetVolumeCalculationActive();}
             getline(input,rest);
         }
 
@@ -636,6 +650,11 @@ while (input >> firstword) {
             }
             getline(input,rest);
         }
+
+        else if(firstword=="PopulationAnnealing"){
+            input>>str>>type;
+            getline(input,rest);
+        }
 // dynamic box
         else if(firstword == AbstractDynamicBox::GetBaseDefaultReadName()){
             int period = 0;
@@ -963,18 +982,7 @@ while (input >> firstword) {
             int period, n_processors;
             double minbeta, maxbeta;
             input>>str>>type>>algorithm>>period>>n_processors>>minbeta>>maxbeta;
-            std::cout<<"Printing algorithm"<<algorithm<<std::endl;
-            std::cout<<"Printing type"<<type<<std::endl;
-            if(algorithm == ParallelTemperingMoveSimple::GetBaseDefaultReadName()){
-                std::cout<<"Initializing this!"<<algorithm<<std::endl;
-                #ifdef MPI_DETECTED
-                m_pParallelTemperingMove = new ParallelTemperingMoveSimple(this ,period, n_processors, minbeta, maxbeta);
-                #endif
-
-                #ifndef MPI_DETECTED
-                std::cout<<"MPI is not detected. Program will be run with a single CPU."<<std::endl;
-                #endif
-            }
+            
         
             
 
@@ -1079,8 +1087,6 @@ bool State::Initialize(){
      */
 //-----> Get the mesh
         // Create a MeshBluePrint object
-        CreateMashBluePrint Create_BluePrint;
-        MeshBluePrint mesh_blueprint;
 //---->  Check if the restart file name is provided
 
 //----> ANA
@@ -1114,6 +1120,9 @@ bool State::Initialize(){
                     m_NumberOfErrors++;
                 }
         
+        CreateMashBluePrint Create_BluePrint;
+        MeshBluePrint mesh_blueprint;
+        
         //std::vector<std::string> FilePaths=m_pReadTrajTSI->getFilePaths();
         //std::vector<int> FrameList=m_pReadTrajTSI->getFrameList();
 
@@ -1128,136 +1137,10 @@ bool State::Initialize(){
         //std::cout << std::endl;
 
 
-        bool restartReadSuccess = false;
+        std::vector<std::string> FramePath=m_pReadTrajTSI->GetFilePaths();
+        std::string filename=FramePath[0];
 
-        #ifndef MPI_DETECTED
-        m_pParallelTemperingMove->Initialize();
-        if (!m_RestartFileName.empty()) {
-            int step;
-            double r_vertex;
-            double r_box;
-
-            // Attempt to open the restart file
-            std::cout << "---> Note: attempting to open the restart file: " << m_RestartFileName << std::endl;
-
-            // Read the restart file and update the State object to that state
-            mesh_blueprint = m_pRestart->ReadFromRestart(m_RestartFileName, step, restartReadSuccess, r_vertex, r_box);
-
-            // Check if the restart file was successfully read
-            if (restartReadSuccess) {
-                std::cout << "---> Note: Restart file was successfully read" << std::endl;
-                m_pVertexPositionIntegrator->UpdateDR(r_vertex);
-                m_pDynamicBox->UpdateDR(r_box);
-                m_pSimulation->UpdateInitialStep(step+1);
-                //----- open log file
-                if(!m_pTimeSeriesLogInformation->OpenFile(false)){
-                    m_NumberOfErrors++;
-                }
-                if(!m_pTimeSeriesDataOutput->OpenFile(false)){
-                    m_NumberOfErrors++;
-                }
-                //---- open the binary trajectory
-                if(!m_pBinaryTrajectory->OpenFile(false, 'w')){
-                    m_NumberOfErrors++;
-                }
-            }
-            else{
-                // If failed to read restart file, generate MeshBluePrint from input topology file
-                std::cout << "---> Warning: Failed to read restart file, will use topology file" << std::endl;
-                m_NumberOfWarnings++;
-            }
-        }
-        #endif
-
-        #ifdef MPI_DETECTED
-        if (!m_RestartFileName.empty()) {
-            //m_pParallelTemperingMove->SetRestart();
-            //m_pParallelTemperingMove->Initialize();
-            int step;
-            double r_vertex;
-            double r_box;
-            int rank;
-            MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
-            std::string extension = ".res";  // Define the extension part
-            std::string filename = m_RestartFileName;
-
-            // Find the position of ".res" in the filename
-            size_t pos = filename.rfind(extension);
-
-            if (pos != std::string::npos) {  // If ".res" is found in the string
-                // Extract the "something" part by removing ".res"
-                std::string baseName = filename.substr(0, pos);
-                
-                // Append "_<rank>" to the "something" part
-                baseName = baseName + "_" + Nfunction::Int_to_String(rank);
-                
-                // Reconstruct the filename with the modified "something" part and ".res"
-                m_RestartFileName = baseName + extension;
-            } else {
-                // Handle the case if ".res" is not found; use original filename as fallback
-                std::cerr << "Error: The file extension '.res' was not found in " << m_RestartFileName << std::endl;
-            }
-            // Attempt to open the restart file
-            std::cout << "---> Note: attempting to open the restart file: " << m_RestartFileName << std::endl;
-
-            // Read the restart file and update the State object to that state
-            mesh_blueprint = m_pRestart->ReadFromRestart(m_RestartFileName, step, restartReadSuccess, r_vertex, r_box);
-
-            // Check if the restart file was successfully read
-            if (restartReadSuccess) {
-                std::cout << "---> Note: Restart file was successfully read" << std::endl;
-                m_pVertexPositionIntegrator->UpdateDR(r_vertex);
-                m_pDynamicBox->UpdateDR(r_box);
-                m_pSimulation->UpdateInitialStep(step+1);
-                //----- open log file
-                if(!m_pTimeSeriesLogInformation->OpenFile(false)){
-                    m_NumberOfErrors++;
-                }
-                if(!m_pTimeSeriesDataOutput->OpenFile(false)){
-                    m_NumberOfErrors++;
-                }
-                //---- open the binary trajectory
-                if(!m_pBinaryTrajectory->OpenFile(false, 'w')){
-                    m_NumberOfErrors++;
-                }
-            }
-            else{
-                // If failed to read restart file, generate MeshBluePrint from input topology file
-                std::cout << "---> Warning: Failed to read restart file, will use topology file" << std::endl;
-                m_NumberOfWarnings++;
-            }
-        }
-        #endif
-
-
-        if(!restartReadSuccess){ // this for also a situation where m_RestartFileName is empty
-            //m_pParallelTemperingMove->Initialize();
-            mesh_blueprint = Create_BluePrint.MashBluePrintFromInput_Top(m_InputFileName, m_TopologyFile);
-            
-            //----- open time series files
-            /*if(!m_pTimeSeriesLogInformation->OpenFile(true)){
-                m_NumberOfErrors++;
-            }
-            if(!m_pTimeSeriesDataOutput->OpenFile(true)){
-                m_NumberOfErrors++;
-            }
-            //---- open the binar trajectory
-            if(!m_pBinaryTrajectory->OpenFile(true, 'w')){
-                m_NumberOfErrors++;
-            }
-            // tolder for non-binary trajectory
-            if(! m_pNonbinaryTrajectory->OpenFolder()){
-                m_NumberOfErrors++;
-            }
-            // open folder for Visualization
-            if(m_pVisualizationFile->GetDerivedDefaultReadName()== "VTUFileFormat"){
-                if(!m_pVisualizationFile->OpenFolder()){
-                    m_NumberOfErrors++;
-                }
-            }*/
-
-        }
+        mesh_blueprint = Create_BluePrint.MashBluePrintFromInput_Top(m_InputFileName, filename);
         m_RandomNumberGenerator->Initialize();
         // Generate mesh from the mesh blueprint
         m_Mesh.GenerateMesh(mesh_blueprint);
@@ -1269,9 +1152,6 @@ bool State::Initialize(){
 
 //============ activate of all inputs and data structures
         //In here, this should depend on the used rank
-        #ifndef MPI_DETECTED
-        m_pRestart->SetRestartFileName();
-        #endif
 //----> calaculate curvature for all vertices
         m_pCurvatureCalculations->Initialize();
 //----> set some easy access for integrators

@@ -5,6 +5,10 @@
 #include <string>
 #include "SimDef.h"
 #include "Nfunction.h"
+#include "vertex.h"
+#include "triangle.h"
+#include "links.h"
+
 class State;
 class AnalysisCalculations {
 public:
@@ -13,6 +17,8 @@ public:
 
     
     double GetArea() {return m_pArea;}
+
+    double GetVolume() {return m_pVolume;}
 
     
     double GetEnergy() {return m_pEnergy;}
@@ -40,6 +46,7 @@ private:
     void CalculateThickness();
     void CalculateGaussianCurvature();*/
     void InitializeMemberVariables();
+    double CalculateSingleTriangleVolume(triangle *pTriangle);
 
 
 private:
@@ -50,6 +57,7 @@ private:
     double m_pArea;
     double m_pThickness;
     double m_pMeanCurvature;
+    double m_pVolume;
     State *m_pState;
     
 };

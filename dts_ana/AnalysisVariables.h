@@ -15,6 +15,10 @@ public:
     bool OpenFolder() {return  Nfunction::OpenFolder(m_pFolderName);}
     std::string GetFolderName() {return m_pFolderName;}
 
+    inline static std::string GetInputTopologyName() {return "Topology";}
+    void SetTopology(std::string topology){m_pTopology=topology;}
+    std::string GetTopology(){return m_pTopology;}
+
 
     inline static std::string GetFluctuationSpectrumName() {return "FluctuationSpectrum";}
     void SetFluctationSpectrumActive() {m_pFluctuationSpectrumActive=true;}
@@ -26,6 +30,10 @@ public:
     inline static std::string GetAreaName() {return "Area";}
     void SetAreaCalculationActive() {m_pAreaCalculationActive=true;}
     bool GetAreaCalculationActive() {return m_pAreaCalculationActive;}
+
+    inline static std::string GetVolumeName() {return "Volume";}
+    void SetVolumeCalculationActive() {m_pVolumeCalculationActive=true;}
+    bool GetVolumeCalculationActive() {return m_pVolumeCalculationActive;}
 
     inline static std::string GetEnergyName() {return "Energy";}
     void SetEnergyCalculationActive() {m_pEnergyCalculationActive=true;}
@@ -55,16 +63,19 @@ private:
 
     bool m_pFluctuationSpectrumActive=false;
     bool m_pAreaCalculationActive=false;
+    bool m_pVolumeCalculationActive=false;
     bool m_pEnergyCalculationActive=false;
     bool m_pMeanCurvatureCalculationActive=false;
     bool m_pProjectedAreaCalculationActive=false;
     bool m_pGaussianCurvatureCalculationActive=false;
     bool m_pThicknessCalculationActive=false;
+    std::string m_pTopology;
 
     std::string m_pFolderName;
     std::string m_NameQVectorFile="qvector.ana";
     std::string m_NameHQVectorFile="hqvector.ana";
     std::string m_NameGeneralAnalysisFile="dts.ana";
+    
     
 };
 
