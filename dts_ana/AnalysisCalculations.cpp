@@ -120,12 +120,12 @@ void AnalysisCalculations::InitializeMemberVariables(){
 
 double AnalysisCalculations::CalculateSingleTriangleVolume(triangle *pTriangle){
 
-    if(m_pState->GetMesh()->GetHasCrossedPBC()){
+    /*if(m_pState->GetMesh()->GetHasCrossedPBC()){
         *(m_pState->GetTimeSeriesLog()) << "---> the system has crossed the PBC while volume is being calculated.";
         *(m_pState->GetTimeSeriesLog()) << " SOLUTION: Restart the simulation and center the system. Also, activate the command for centering the box.";
 
          exit(0);
-    }
+    }*/
     
     double T_area = pTriangle->GetArea();
     Vec3D Normal_v = pTriangle->GetNormalVector();

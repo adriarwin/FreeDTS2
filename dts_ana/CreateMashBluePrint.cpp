@@ -13,6 +13,7 @@ CreateMashBluePrint::CreateMashBluePrint() {
 }
 MeshBluePrint CreateMashBluePrint::MashBluePrintFromInput_Top(const std::string& inputfilename, const std::string& topfilename)
 {
+
 // initializing the box size
     m_Box(0) = 1;
     m_Box(1) = 1;
@@ -20,7 +21,13 @@ MeshBluePrint CreateMashBluePrint::MashBluePrintFromInput_Top(const std::string&
     m_Number_of_VectorFields = 0;
     m_InputFileName = inputfilename;
     m_TopologyFileName = topfilename;
-    
+
+    m_VertexMap.clear();
+    m_TriangleMap.clear();
+    m_InclusionMap.clear();
+    m_VectorFieldsMap.clear();
+    m_ExcludedID.clear();
+
     ReadTopology(topfilename);
 
     m_MeshBluePrint.bvertex = m_VertexMap;

@@ -85,15 +85,24 @@ bool MC_Simulation::do_Simulation(){
     std::vector<std::string> FramePath=m_pState->GetReadTrajTSI()->GetFilePaths();
     std::vector<int> FrameList=m_pState->GetReadTrajTSI()->GetFrameList();
 
-//Only one rank prints this output
+    #ifdef MPI_DETECTED
     std::clock_t start = std::clock();
-    std::cout<<"------>   Analysis will be performed for frames "<<m_Initial_Step<<" to "<<m_Final_Step<<" steps\n";
-//Start of the analysis loop
+    if (rank==0){
+    
+    std::cout<<"------>   Simulation will be performed from "<<m_Initial_Step<<" to "<<m_Final_Step<<" steps\n";}
+    #endif
+
+    #ifndef MPI_DETECTED
+    std::clock_t start = std::clock();
+    std::cout<<"------>   Simulation will be performed from "<<m_Initial_Step<<" to "<<m_Final_Step<<" steps\n";
+    #endif
+
+    CreateMashBluePrint Create_BluePrint;
+    MeshBluePrint mesh_blueprint;
 
 for (int step = m_Initial_Step; step < m_Final_Step; step++){
 
-        CreateMashBluePrint Create_BluePrint;
-        MeshBluePrint mesh_blueprint;
+        
 
         std::string filename=FramePath[step];
         std::cout<<filename<<std::endl;
@@ -129,10 +138,21 @@ for (int step = m_Initial_Step; step < m_Final_Step; step++){
             m_pState->GetFluctationSpectrum()->CloseOutputStreams();
         }
 // for(int step=GetInitialStep(); step<GetFinalStep(); step++)
+     #ifdef MPI_DETECTED
+    MPI_Barrier(MPI_COMM_WORLD);
+    if (rank==0){
     std::clock_t end = std::clock();
     double elapsed_secs = double(end - start) / CLOCKS_PER_SEC;
-    std::cout<<"---- Analysis has ended ----\n";
-    std::cout<<" The analysis took: "<<Nfunction::ConvertSecond2Time(elapsed_secs)<<"\n";
+    std::cout<<"---- Simulation has ended ----\n";
+    std::cout<<" The run took: "<<Nfunction::ConvertSecond2Time(elapsed_secs)<<"\n";}
+    #endif
+
+    #ifndef MPI_DETECTED
+    std::clock_t end = std::clock();
+    double elapsed_secs = double(end - start) / CLOCKS_PER_SEC;
+    std::cout<<"---- Simulation has ended ----\n";
+    std::cout<<" The run took: "<<Nfunction::ConvertSecond2Time(elapsed_secs)<<"\n";
+    #endif 
 
     
     return true;
