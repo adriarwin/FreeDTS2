@@ -169,6 +169,8 @@ for (int step = m_Initial_Step; step <= m_Final_Step; step++){
         m_pState->GetParallelTempering()->EvolveOneStep(step);
         //---- update the population annealing
         m_pState->GetPopulationAnnealing()->EvolveOneStep(step);
+
+        m_pState->GetAnnealedImportanceSampling()->EvolveOneStep(step);
     
 
 //----> print info about the simulation, e.g., rate,

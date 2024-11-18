@@ -45,6 +45,7 @@ State::State(std::vector<std::string> argument) :
       m_pInclusionConversion(new NoInclusionConversion),  // Initialize InclusionConversion
       m_pParallelTemperingMove(new NoParallelTemperingMove),  // Initialize ParallelTemperingMove
       m_pPopulationAnnealingMove(new NoPopulationAnnealingMove),
+      m_pAnnealedImportanceSamplingMove(new NoAnnealedImportanceSamplingMove),
 
       //--- Initialize accessory objects
       m_pCurvatureCalculations(new CurvatureByShapeOperatorType1(this)),  // Initialize CurvatureCalculations
@@ -895,6 +896,22 @@ while (input >> firstword) {
             getline(input,rest);
 
         }
+        else if(firstword == "AnnealedImportanceSampling")
+        {
+            // ParallelReplica = Parallel_Tempering Algorithm rate n_processors minbeta maxbeta
+            std::string type,periodfile,temperaturefile;
+            input>>str>>type>>periodfile>>temperaturefile;
+            if(type == "on"){
+                m_pAnnealedImportanceSamplingMove = new AnnealedImportanceSamplingMove(this,periodfile,temperaturefile);
+
+            }
+        
+            
+
+
+            getline(input,rest);
+
+        }
         else if(firstword == BTSFile::GetDefaultReadName() ){ // "OutPutTRJ_BTS"
             int periodic, precision;
             std::string filename;
@@ -992,11 +1009,14 @@ bool State::Initialize(){
         
 
         bool restartReadSuccess = false;
+        
 
         #ifndef MPI_DETECTED
         m_pParallelTemperingMove->Initialize();
         m_pPopulationAnnealingMove->Initialize();
+        
         if (!m_RestartFileName.empty()) {
+            m_pAnnealedImportanceSamplingMove->SetRestart();
             int step;
             double r_vertex;
             double r_box;
@@ -1037,6 +1057,7 @@ bool State::Initialize(){
 
         if (m_pParallelTemperingMove->ParallelTemperingMoveOn()==true || m_pPopulationAnnealingMove->PopulationAnnealingMoveOn()==true ){
         if (!m_RestartFileName.empty()) {
+            m_pAnnealedImportanceSamplingMove->SetRestart();
             m_pParallelTemperingMove->SetRestart();
             m_pParallelTemperingMove->Initialize();
 
@@ -1136,18 +1157,24 @@ bool State::Initialize(){
         }
         }
         else{
-            m_pParallelTemperingMove->Initialize();
+        
+        m_pParallelTemperingMove->Initialize();
         m_pPopulationAnnealingMove->Initialize();
+        
+        
         if (!m_RestartFileName.empty()) {
             int step;
             double r_vertex;
             double r_box;
+            m_pAnnealedImportanceSamplingMove->SetRestart();
+            
 
             // Attempt to open the restart file
             std::cout << "---> Note: attempting to open the restart file: " << m_RestartFileName << std::endl;
 
             // Read the restart file and update the State object to that state
             mesh_blueprint = m_pRestart->ReadFromRestart(m_RestartFileName, step, restartReadSuccess, r_vertex, r_box);
+
 
             // Check if the restart file was successfully read
             if (restartReadSuccess) {
@@ -1287,6 +1314,8 @@ bool State::Initialize(){
     m_pEnergyCalculator->Initialize(m_InputFileName);
 //---> to update each vertex and edge energy. Up to now May 2024, edge energy is not zero when both vertices has inclusions
     m_pEnergyCalculator->UpdateTotalEnergy(m_pEnergyCalculator->CalculateAllLocalEnergy());
+    
+    m_pAnnealedImportanceSamplingMove->Initialize();
 
     if(m_NumberOfErrors!=0){
         std::cout<<" There were "<<m_NumberOfErrors<<" errors in the input files "<<std::endl;

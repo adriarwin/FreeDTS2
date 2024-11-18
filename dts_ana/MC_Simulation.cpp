@@ -119,6 +119,7 @@ for (int step = m_Initial_Step; step < m_Final_Step; step++){
         else if (m_pState->GetAnalysisVariables()->GetTopology()=="spherical"){
             m_pState->GetMesh()->CenterMesh();}
 
+        
         m_pState->GetCurvatureCalculator()->Initialize();
         
         m_pState->GetAnalysisCalculations()->Calculate();

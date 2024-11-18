@@ -131,6 +131,9 @@
 //---- population annealing
 #include "AbstractPopulationAnnealingMove.h"
 #include "PopulationAnnealingMove.h" 
+//---- importance sampling
+#include "AbstractAnnealedImportanceSamplingMove.h"
+#include "AnnealedImportanceSamplingMove.h"
 //--- interaction with Substrate
 #include "AbstractVertexAdhesionToSubstrate.h"
 #include "SphericalVertexSubstrate.h"
@@ -195,6 +198,7 @@ inline AbstractOpenEdgeEvolution        *GetOpenEdgeEvolution()                 
 inline AbstractInclusionConversion      *GetInclusionConversion()                       {return m_pInclusionConversion;}
 inline AbstractParallelTemperingMove    *GetParallelTempering()                         {return m_pParallelTemperingMove;}
 inline AbstractPopulationAnnealingMove  *GetPopulationAnnealing()                         {return m_pPopulationAnnealingMove;}
+inline AbstractAnnealedImportanceSamplingMove  *GetAnnealedImportanceSampling()                         {return m_pAnnealedImportanceSamplingMove;}
 
 inline AbstractBoundary                 *GetBoundary()                                  {return m_pBoundary;}
 //---- System energy and voxels
@@ -246,6 +250,7 @@ private:
     AbstractOpenEdgeEvolution     *m_pOpenEdgeEvolution;
     AbstractParallelTemperingMove *m_pParallelTemperingMove;
     AbstractPopulationAnnealingMove *m_pPopulationAnnealingMove;
+    AbstractAnnealedImportanceSamplingMove *m_pAnnealedImportanceSamplingMove;
     
     VAHGlobalMeshProperties       *m_pVAHCalculator;
     AbstractVolumeCoupling        *m_pVolumeCoupling;
