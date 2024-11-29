@@ -45,7 +45,7 @@ public:
     inline const bool               GetHasCrossedPBC()  const       {return m_MeshCrossedPBC;}
     std::vector <InclusionType*>    GetInclusionType()     const    {return m_pInclusionType;}
     inline  int&                    GetNoVFPerVertex()         {return m_No_VectorFields_Per_V;} // returning the number of vector field per vertex
-
+    
     
     
     
@@ -61,6 +61,7 @@ public:
 
 
 public:
+
     void RemoveFromLinkList(links* z, std::vector<links*> &vect);
     void RemoveFromTriangleList(triangle* z, std::vector<triangle*> &vect);
     void RemoveFromVertexList(vertex* z, std::vector<vertex*> &vect);
@@ -76,6 +77,8 @@ public:
     bool UpdateGroupFromIndexFile(std::string &indexfilename);
     void UpdateNoVFPerVertex(int number);
     void CenterSemiFlatMesh();
+    void RemovePBC();
+    void CenterNOPBC();
     void CenterMesh();    // this function centers the mesh inside the box. For broken systems it may not work nicely
     bool GenerateMesh(MeshBluePrint meshblueprint);
     MeshBluePrint Convert_Mesh_2_BluePrint(MESH *mesh);
@@ -101,6 +104,7 @@ protected:
 
     
 private:
+    void Translate(std::vector<vertex*> v, Vec3D L);
     int m_No_VectorFields_Per_V;
     bool m_MeshCrossedPBC;
 //========== this variables should be fully hidden from anything =======================

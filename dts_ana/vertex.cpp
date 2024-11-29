@@ -28,6 +28,13 @@ vertex::vertex(MESH* pMesh, int id, double x, double y, double z) : m_pMesh(pMes
     m_PrincipalCurvature_2 = 0;
     
 }
+
+void vertex::NOPBCUpdatePos(Vec3D X)
+{
+    m_X= X(0);
+    m_Y= X(1);
+    m_Z= X(2);
+}
 vertex::vertex(MESH* pMesh, int id) : m_pMesh(pMesh) {
 
     m_ID=id;

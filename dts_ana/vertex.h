@@ -77,6 +77,7 @@ public:
     void ReverseEnergyCopy();
     
   // A set of functions to update vertex variables
+  void NOPBCUpdatePos(Vec3D x);
   void UpdateVXPos(double x);    // a function for update the x position of a vertex
   void ScalePos(double lx, double ly, double lz);    // a function for update the x position of a vertex
   void UpdateVYPos(double y);   // a function for update the y position of a vertex

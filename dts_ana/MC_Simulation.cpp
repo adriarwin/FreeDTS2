@@ -100,6 +100,10 @@ bool MC_Simulation::do_Simulation(){
     CreateMashBluePrint Create_BluePrint;
     MeshBluePrint mesh_blueprint;
 
+
+    if (m_pState->GetAnalysisVariables()->GetVisualizationActive()){
+        m_pState->GetVisualization()->WriteAFrame(0);}
+
 for (int step = m_Initial_Step; step < m_Final_Step; step++){
 
         
@@ -115,7 +119,10 @@ for (int step = m_Initial_Step; step < m_Final_Step; step++){
 
         //I need one specially thought for semi-flat membranees!!! A conditional is needed here
         if (m_pState->GetAnalysisVariables()->GetTopology()=="flat"){
-            m_pState->GetMesh()->CenterSemiFlatMesh();}
+            //m_pState->GetMesh()->CenterSemiFlatMesh();
+            m_pState->GetMesh()->RemovePBC();
+            m_pState->GetMesh()->CenterNOPBC();}
+            //m_pState->GetMesh()->CenterMesh();}
         else if (m_pState->GetAnalysisVariables()->GetTopology()=="spherical"){
             m_pState->GetMesh()->CenterMesh();}
 
@@ -130,6 +137,8 @@ for (int step = m_Initial_Step; step < m_Final_Step; step++){
         
         m_pState->GetTimeSeriesDataOutput()->WriteTimeSeriesDataOutput(step);
 
+        if (m_pState->GetAnalysisVariables()->GetVisualizationActive()){
+            m_pState->GetVisualization()->WriteAFrame(step);}
         
 
 } //End of simulation loop 

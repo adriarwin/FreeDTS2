@@ -1,5 +1,6 @@
 #include <fstream>
 #include "MESH.h"
+#include "LMatrix.h"
 /*
  Weria Pezeshkian (weria.pezeshkian@gmail.com)
  Copyright (c) Weria Pezeshkian
@@ -70,6 +71,46 @@ void  MESH::CenterMesh(){
     return;
 }
 
+void MESH::CenterNOPBC()
+{
+    Vec3D Box = *(m_pBox);
+    
+
+    double minZ=(*m_pActiveV.begin())->GetVZPos();
+    double minX=(*m_pActiveV.begin())->GetVXPos();
+    double minY=(*m_pActiveV.begin())->GetVYPos();
+
+    double zpos,ypos,xpos;
+
+
+    for (std::vector<vertex *>::iterator it = m_pActiveV.begin() ; it != m_pActiveV.end(); ++it){
+
+        zpos = (*it)->GetVZPos(); // Get the Z-coordinate of the vertex
+            if (zpos < minZ) {
+                minZ = zpos; // Update min height
+            }
+        xpos = (*it)->GetVXPos(); // Get the Z-coordinate of the vertex
+            if (xpos < minX) {
+                minX = xpos; // Update min height
+            }
+        ypos = (*it)->GetVYPos(); // Get the Z-coordinate of the vertex
+            if (ypos < minY) {
+                minY = ypos; // Update min height
+            }
+    }
+
+    Vec3D CM=(xpos,ypos,zpos);
+
+    Translate(m_pActiveV,CM);
+    /*for (std::vector<vertex *>::iterator it = m_pActiveV.begin() ; it != m_pActiveV.end(); ++it)
+    {
+        Vec3D Pos((*it)->GetVXPos(),(*it)->GetVYPos(),(*it)->GetVZPos());
+        (*it)->NOPBCUpdatePos(Pos-CM+Box*0.5);
+    }*/
+    
+    
+}
+
 
 void  MESH::CenterSemiFlatMesh(){
 
@@ -111,6 +152,303 @@ void  MESH::CenterSemiFlatMesh(){
     }
     
     return;
+}
+
+struct L_CLUSTER {
+    
+    std::vector<vertex *> Vertex;
+    std::vector<int> NCluster;
+    std::vector<vertex *> ItsV;
+    std::vector<vertex *> NV;
+    int checked;
+    Vec3D LX;
+} ;
+
+void MESH::RemovePBC()
+{
+
+
+
+
+    std::vector< L_CLUSTER > AllCluster;
+
+    LMatrix VerMat(m_pActiveV.size(),m_pActiveV.size(),'I');
+    for (int n=0;n<m_pActiveV.size();n++)
+    {VerMat(n,n) = 1;}
+    
+    
+
+    
+    for (std::vector<vertex *>::iterator it1 = m_pActiveV.begin() ; it1 != m_pActiveV.end(); ++it1)
+    {
+            int id1=(*it1)->GetVID();
+            std::vector <vertex *> NV = (*it1)->GetVNeighbourVertex();
+            int connect = 0;
+
+            for (std::vector<vertex *>::iterator it3 = NV.begin() ; it3 != NV.end(); ++it3)
+            {
+                 connect = 0;
+                int id2 = (*it3)->GetVID();
+
+                    double dx =(*it1)->GetVXPos()-(*it3)->GetVXPos();
+                    double dy =(*it1)->GetVYPos()-(*it3)->GetVYPos();
+                    double dz =(*it1)->GetVZPos()-(*it3)->GetVZPos();
+                    
+                    
+                    double dist=dx*dx+dy*dy+dz*dz;
+                    //// check the distance
+                    
+                    if(dist<3.001)
+                        connect = 1;
+                if(connect == 1)
+                    VerMat(id1,id2) = connect;
+                }
+
+        }
+
+
+for (int n=0;n<m_pActiveV.size();n++)
+{
+    for (int m=n+1;m<m_pActiveV.size();m++)
+    {
+        if(VerMat(n,m)!=0)
+        {
+            for (int i=0;i<m_pActiveV.size();i++)
+            {
+                if(VerMat(m,i)==0)
+                    VerMat(m,i)=VerMat(n,i);
+                    VerMat(n,i)=0;
+                    
+                    }
+            break;
+        }
+    }
+}
+    
+    int clid = 0 ;
+    int Vsize = m_pActiveV.size();
+    for (int n=0;n<Vsize;n++)
+    {
+        int cluster = 0;
+        //  std::cout<<clid<<"  "<<n<<" here 1 wrif[vm, \n";
+        
+        for (int m=0;m<m_pActiveV.size();m++)
+        {
+            if(VerMat(n,m)!=0)
+            {
+                cluster++;
+                break;
+            }
+        }
+        
+        std::vector<vertex *> TV;
+        if(cluster!=0)
+        {
+            
+            // TV.push_back(m_pAllV.at(n));
+            for (int m=0;m<m_pActiveV.size();m++)
+            {
+                if(VerMat(n,m)!=0)
+                {
+                    (m_pActiveV.at(m))->UpdateGroup(clid);
+                    //  (m_pAllV.at(m)->GetInclusion())->UpdateType("P"+f.Int_to_String(clid),clid);
+                    TV.push_back(m_pActiveV.at(m));
+                    
+                }
+            }
+            
+            L_CLUSTER CL;
+            CL.Vertex =TV;
+            CL.checked = 0;
+            Vec3D LX;
+            CL.LX=LX;
+            AllCluster.push_back(CL);
+            
+            clid++;
+        }
+    }
+    std::cout<<"System contains "<<AllCluster.size()<<"  CLusters \n";
+    for (std::vector<L_CLUSTER>::iterator it = AllCluster.begin() ; it != AllCluster.end(); ++it)
+    {
+        //  (*it).checked = 1;
+        std::vector <vertex *> CV = (*it).Vertex;
+        for (std::vector<vertex*>::iterator it1 = CV.begin() ; it1 != CV.end(); ++it1)
+        {
+            std::vector <vertex *> NV = (*it1)->GetVNeighbourVertex();
+            for (std::vector<vertex*>::iterator it2 = NV.begin() ; it2 != NV.end(); ++it2)
+            {
+                if((*it1)->GetGroup() == (*it2)->GetGroup())
+                {
+                    
+                }
+                else
+                {
+                    ////====
+                    int clusterid1 = (*it1)->GetGroup();
+                    int clusterid2 = (*it2)->GetGroup();
+                    L_CLUSTER CL2 = AllCluster.at(clusterid2);
+                    bool isalready = false;
+                    std::vector<int> NCluster1 = (*it).NCluster;
+                    std::vector<int> NCluster2 = CL2.NCluster;
+                    std::vector<vertex *> ItsV1 = (*it).ItsV;
+                    std::vector<vertex *> NV1 = (*it).NV;
+                    std::vector<vertex *> ItsV2 = CL2.ItsV;
+                    std::vector<vertex *> NV2 = CL2.NV;
+                    for (std::vector<int>::iterator itint = NCluster1.begin() ; itint != NCluster1.end(); ++itint)
+                    {
+                        if(clusterid2==(*itint))
+                        {
+                            isalready =true;
+                            break;
+                        }
+                    }
+                    if(isalready==false)
+                    {
+                        ItsV1.push_back(*it1);
+                        NV1.push_back(*it2);
+                        ItsV2.push_back(*it2);
+                        NV2.push_back(*it1);
+                        (*it).NV=NV1;
+                        (*it).ItsV=ItsV1;
+                        CL2.NV=NV2;
+                        CL2.ItsV=ItsV2;
+                        NCluster1.push_back(clusterid2);
+                        NCluster2.push_back(clusterid1);
+                        CL2.NCluster=NCluster2;
+                        (*it).NCluster=NCluster1;
+                    }
+                }
+            }
+        }
+    }
+    
+    //==
+    std::vector<vertex> m_OLDV;
+    
+    for (std::vector<vertex*>::iterator it = m_pActiveV.begin() ; it != m_pActiveV.end(); ++it)
+    {
+        m_OLDV.push_back(*(*it));
+    }
+    Vec3D m_OLDBox = *(m_pBox);
+    //  m_Box = m_Box*10;;
+    (AllCluster.at(0)).checked=1;
+    
+    //  Translate(m_pAllV, (m_OLDBox*5));
+    
+    srand(88888);
+    int i=0;
+    
+    while (true)
+    {
+        int breaking = true;
+        for (std::vector<L_CLUSTER>::iterator it = AllCluster.begin() ; it != AllCluster.end(); ++it)
+        {
+            
+            //  std::cout<<i++<<"  "<<(*it).checked<<"\n";
+            
+            if((*it).checked==0)
+            {
+                breaking = false;
+                break;
+            }
+        }
+        
+        if(breaking==true)
+            break;
+        
+        
+        int rng= rand() % (AllCluster.size());
+        L_CLUSTER CL = AllCluster.at(rng);
+        std::vector<vertex *> Vertex = CL.Vertex;
+        std::vector<int> NCluster = CL.NCluster;
+        std::vector<vertex *> ItsV = CL.ItsV;
+        std::vector<vertex *> NV = CL.NV;
+        
+        bool move = false;
+        int nid=0;
+        int id=0;
+        
+        
+        
+        for (std::vector<int>::iterator it = NCluster.begin() ; it != NCluster.end(); ++it)
+        {
+            if(AllCluster.at((*it)).checked==1)
+            {
+                nid=(*it);
+                move = true;
+                break;
+            }
+            id++;
+        }
+        if(move==true && AllCluster.at(rng).checked==0)
+        {
+            i++;
+            
+            AllCluster.at(rng).checked=1;
+            if(NCluster.at(id)!=nid)
+                std::cout<<"error \n";
+            
+            int vid1=(ItsV.at(id))->GetVID();
+            int vid2=(NV.at(id))->GetVID();
+            Vec3D TX;
+            
+            
+            double dx = (m_OLDV.at(vid1)).GetVXPos()-(m_OLDV.at(vid2)).GetVXPos();
+            double dy = (m_OLDV.at(vid1)).GetVYPos()-(m_OLDV.at(vid2)).GetVYPos();
+            double dz = (m_OLDV.at(vid1)).GetVZPos()-(m_OLDV.at(vid2)).GetVZPos();
+            Vec3D DX(dx,dy,dz);
+            
+            
+            for (int s=0;s<3;s++)
+            {
+                if(fabs(DX(s))<m_OLDBox(s)/2.0)
+                {
+                    TX(s)=0;
+                }
+                else
+                {
+                    if((DX(s))<0)
+                    {
+                        TX(s)=m_OLDBox(s);
+                    }
+                    else
+                    {
+                        TX(s)=-m_OLDBox(s);
+                        
+                    }
+                }
+            }
+            
+            
+            
+            Vec3D LX = (AllCluster.at((NV.at(id))->GetGroup())).LX;
+            
+            Vec3D LX2 = LX+TX;
+            (AllCluster.at(rng)).LX=LX2;
+            Translate(Vertex, LX2);
+            
+            
+        }
+        
+        
+    }
+ 
+    
+    
+
+
+}
+
+void MESH::Translate(std::vector<vertex*> v, Vec3D L)
+{
+    for (std::vector<vertex*>::iterator it = v.begin() ; it != v.end(); ++it)
+    {
+        Vec3D X((*it)->GetVXPos(),(*it)->GetVYPos(),(*it)->GetVZPos());
+        
+        Vec3D X2=X+L;
+        (*it)->NOPBCUpdatePos(X2);
+
+    }
 }
 
 
@@ -558,3 +896,5 @@ double MESH::SquareDistanceBetweenTwoVertices(vertex *p_v1, vertex* p_v2, Vec3D 
     return dx * dx + dy * dy + dz * dz;
     
 }
+
+

@@ -56,6 +56,11 @@ public:
     void SetThicknessCalculationActive() {m_pThicknessCalculationActive=true;}
     bool GetThicknessCalculationActive() {return m_pThicknessCalculationActive;}
 
+
+    inline static std::string GetVisualizationName() {return "Visualization";}
+    void SetVisualizationActive() {m_pVisualizationActive=true;}
+    bool GetVisualizationActive() {return m_pVisualizationActive;}
+
     std::string GetNameGeneralAnalysisFile() {return m_NameGeneralAnalysisFile;}
     
 
@@ -69,6 +74,8 @@ private:
     bool m_pProjectedAreaCalculationActive=false;
     bool m_pGaussianCurvatureCalculationActive=false;
     bool m_pThicknessCalculationActive=false;
+    bool m_pVisualizationActive=false;
+
     std::string m_pTopology;
 
     std::string m_pFolderName;

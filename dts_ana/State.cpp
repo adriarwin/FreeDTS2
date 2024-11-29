@@ -276,6 +276,19 @@ bool State::ReadAnalysisInputFile(std::string file)
             m_pAnalysisVariables->SetFluctationSpectrumActive();
             getline(input,rest);
         }
+        else if(firstword == AnalysisVariables::GetVisualizationName()) { // "Integrator_Type"
+            int period;
+            std::string foldername;
+            input >> str >> type >> period>>foldername;
+            if(type =="on"){
+                m_pVisualizationFile = new WritevtuFiles(this, period, foldername);  
+
+            }
+
+            m_pAnalysisVariables->SetVisualizationActive();
+            getline(input,rest);
+        }
+        
         else if(firstword == AnalysisVariables::GetInputTopologyName()){
             input>>str>>type;
             m_pAnalysisVariables->SetTopology(type);
@@ -477,7 +490,7 @@ while (input >> firstword) {
                 double period;
                 std::string foldername;
                 input >> foldername>> period;
-                m_pVisualizationFile = new WritevtuFiles(this, period, foldername);
+
             }
             getline(input,rest);
         }
@@ -1108,6 +1121,8 @@ bool State::Initialize(){
             m_pAnalysisVariables->SetFolderName(foldername);
             m_pAnalysisVariables->OpenFolder();
         #endif
+
+        m_pVisualizationFile->OpenFolder();
 //Update initial step and final step
         //std::cout<<m_pReadTrajTSI->GetNumberOfFrames()<<std::endl;
         m_pSimulation->UpdateInitialStep(0);
@@ -1179,9 +1194,12 @@ bool State::Initialize(){
     m_pApplyConstraintBetweenGroups->Initialize();
     m_pSimulation->Initialize();
 
+    m_pVisualizationFile->WriteAFrame(-m_pVisualizationFile->GetPeriod());
+    
 //--- now that the system is ready for simulation, we first write the State into the log file and make one vis 
     /*#ifndef MPI_DETECTED
     m_pTimeSeriesLogInformation->WriteStartingState();
+
     m_pVisualizationFile->WriteAFrame(-m_pVisualizationFile->GetPeriod());
     #endif
     #if MPI_DETECTED
