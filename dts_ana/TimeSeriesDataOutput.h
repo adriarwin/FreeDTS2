@@ -37,8 +37,10 @@ public:
     void SetCustomFileName(const std::string &filename);
     void CloseFile();
     void OpenFileWithoutHeader(std::string filename);
+    int GetInitialStepRestart(){ return m_pInitialStepRestart; }
 
 private:
+    int m_pInitialStepRestart;
     State *m_pState;
     int m_Periodic;
     std::ofstream m_TimeSeriesFile;  // Member variable to hold the file stream

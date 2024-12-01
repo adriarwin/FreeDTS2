@@ -306,6 +306,7 @@ private:
     int m_Total_no_Threads;       // Total no of Threads
     int m_NumberOfErrors;
     int m_NumberOfWarnings;
+    bool m_RestartAnalysis=false;
 
     
     //--- system variables

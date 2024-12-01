@@ -78,8 +78,9 @@ public:
     void UpdateNoVFPerVertex(int number);
     void CenterSemiFlatMesh();
     void RemovePBC();
-    void CenterNOPBC();
-    void CenterMesh();    // this function centers the mesh inside the box. For broken systems it may not work nicely
+    void CenterSemiFlatNOPBC();
+    void CenterMesh(); 
+    void CenterMeshSphericalNOPBC();    // this function centers the mesh inside the box. For broken systems it may not work nicely
     bool GenerateMesh(MeshBluePrint meshblueprint);
     MeshBluePrint Convert_Mesh_2_BluePrint(MESH *mesh);
     std::vector <InclusionType*> m_pInclusionType;

@@ -71,42 +71,93 @@ void  MESH::CenterMesh(){
     return;
 }
 
-void MESH::CenterNOPBC()
+void  MESH::CenterMeshSphericalNOPBC(){
+    double xcm=0;
+    double ycm=0;
+    double zcm=0;
+    for (std::vector<vertex *>::iterator it = m_pActiveV.begin() ; it != m_pActiveV.end(); ++it){
+        xcm+=(*it)->GetVXPos();
+        ycm+=(*it)->GetVYPos();
+        zcm+=(*it)->GetVZPos();
+    }
+    xcm=xcm/double(m_pActiveV.size());
+    ycm=ycm/double(m_pActiveV.size());
+    zcm=zcm/double(m_pActiveV.size());
+    
+    for (std::vector<vertex *>::iterator it = m_pActiveV.begin() ; it != m_pActiveV.end(); ++it){
+        Vec3D Pos((*it)->GetVXPos()-xcm+(*m_pBox)(0)/2.0,(*it)->GetVYPos()-ycm+(*m_pBox)(1)/2.0,(*it)->GetVZPos()-zcm+(*m_pBox)(2)/2.0);
+        (*it)->NOPBCUpdatePos(Pos);
+    }
+    
+    return;
+}
+
+void MESH::CenterSemiFlatNOPBC()
 {
     Vec3D Box = *(m_pBox);
     
 
     double minZ=(*m_pActiveV.begin())->GetVZPos();
-    double minX=(*m_pActiveV.begin())->GetVXPos();
-    double minY=(*m_pActiveV.begin())->GetVYPos();
+    double maxZ=(*m_pActiveV.begin())->GetVZPos();
 
-    double zpos,ypos,xpos;
+
+    double zpos,ypos,xpos,xavg,yavg,minX,minY;
 
 
     for (std::vector<vertex *>::iterator it = m_pActiveV.begin() ; it != m_pActiveV.end(); ++it){
-
         zpos = (*it)->GetVZPos(); // Get the Z-coordinate of the vertex
             if (zpos < minZ) {
                 minZ = zpos; // Update min height
             }
-        xpos = (*it)->GetVXPos(); // Get the Z-coordinate of the vertex
-            if (xpos < minX) {
-                minX = xpos; // Update min height
+            if (zpos > maxZ) {
+                maxZ = zpos; // Update max height
             }
-        ypos = (*it)->GetVYPos(); // Get the Z-coordinate of the vertex
-            if (ypos < minY) {
-                minY = ypos; // Update min height
-            }
+
+        xpos=(*it)->GetVXPos(); // Get the Z-coordinate of the vertex
+        ypos=(*it)->GetVYPos(); // Get the Z-coordinate of the vertex
+        xavg+=xpos;
+        yavg+=ypos;
     }
 
-    Vec3D CM=(xpos,ypos,zpos);
+    xavg=xavg/double(m_pActiveV.size());
+    yavg=yavg/double(m_pActiveV.size());
+    
 
-    Translate(m_pActiveV,CM);
-    /*for (std::vector<vertex *>::iterator it = m_pActiveV.begin() ; it != m_pActiveV.end(); ++it)
+    
+
+
+    double height=(maxZ-minZ);
+    double limit=minZ+height*0.125;
+
+    minX=xavg;
+    minY=yavg;
+
+    for (std::vector<vertex *>::iterator it = m_pActiveV.begin() ; it != m_pActiveV.end(); ++it){
+
+        zpos = (*it)->GetVZPos(); // Get the Z-coordinate of the vertex
+            if (zpos < limit) { 
+                xpos = (*it)->GetVXPos(); // Get the Z-coordinate of the vertex
+                if (xpos < minX) {
+                    minX = xpos; // Update min height
+                }
+                ypos = (*it)->GetVYPos(); // Get the Z-coordinate of the vertex
+                if (ypos < minY) {
+                    minY = ypos; // Update min height
+                }
+    }
+    }
+
+    Vec3D CM=(minX,minY,minZ);
+    std::vector<vertex *> Vertex =m_pActiveV;
+    //Translate(m_pActiveV,CM);
+    
+    for (std::vector<vertex *>::iterator it = m_pActiveV.begin() ; it != m_pActiveV.end(); ++it)
     {
-        Vec3D Pos((*it)->GetVXPos(),(*it)->GetVYPos(),(*it)->GetVZPos());
-        (*it)->NOPBCUpdatePos(Pos-CM+Box*0.5);
-    }*/
+        //std::cout<<"1:"<<(*it)->GetVXPos()<<"  "<<(*it)->GetVYPos()<<"  "<<(*it)->GetVZPos()<<"\n";
+        Vec3D Pos((*it)->GetVXPos()-minX,(*it)->GetVYPos()-minY,(*it)->GetVZPos()-minZ);
+        (*it)->NOPBCUpdatePos(Pos);
+        //std::cout<<"2:"<<(*it)->GetVXPos()<<"  "<<(*it)->GetVYPos()<<"  "<<(*it)->GetVZPos()<<"\n";
+    }
     
     
 }

@@ -216,6 +216,7 @@ bool State::ExploreArguments(std::vector<std::string> &argument){
         else if(flag == RESTART_FLAG){
             
             m_RestartFileName = argument[i+1];
+            m_RestartAnalysis=true;
         }
         else if(flag == THREAD_FLAG){
             
@@ -1108,12 +1109,17 @@ bool State::Initialize(){
             m_pReadTrajTSI=new ReadTrajTSI(m_pNonbinaryTrajectory->GetFolderName(),m_GeneralOutputFilename);
             m_pReadTrajTSI->ValidateFiles();
             m_pAnalysisVariables->OpenFolder();
+            m_pVisualizationFile->OpenFolder();
         #endif
 
         #ifdef MPI_DETECTED
             int rank;
             MPI_Comm_rank(MPI_COMM_WORLD, &rank);
             std::string foldernameTrajTSI=m_pNonbinaryTrajectory->GetFolderName() + '_' + Nfunction::Int_to_String(rank);
+            std::string foldernameVTU=m_pVisualizationFile->GetFolderName() + '_' + Nfunction::Int_to_String(rank);
+            m_pVisualizationFile->SetFolderName(foldernameVTU);
+            m_pVisualizationFile->OpenFolder();
+
             m_pReadTrajTSI=new ReadTrajTSI(foldernameTrajTSI,m_GeneralOutputFilename);
             m_pReadTrajTSI->ValidateFiles();
 
@@ -1122,18 +1128,34 @@ bool State::Initialize(){
             m_pAnalysisVariables->OpenFolder();
         #endif
 
-        m_pVisualizationFile->OpenFolder();
+        
 //Update initial step and final step
         //std::cout<<m_pReadTrajTSI->GetNumberOfFrames()<<std::endl;
-        m_pSimulation->UpdateInitialStep(0);
-        m_pSimulation->UpdateFinalStep(m_pReadTrajTSI->GetNumberOfFrames());
 
-        if (m_pAnalysisVariables ->GetFluctuationSpectrumActive()==true){
-                m_pFluctuationSpectrum->OpenOutputStreams();}
+        if (m_RestartAnalysis==false){
+            m_pSimulation->UpdateInitialStep(0);
+            m_pSimulation->UpdateFinalStep(m_pReadTrajTSI->GetNumberOfFrames());
 
-        if(!m_pTimeSeriesDataOutput->OpenFile(true)){
-                    m_NumberOfErrors++;
-                }
+            if (m_pAnalysisVariables ->GetFluctuationSpectrumActive()==true){
+                    m_pFluctuationSpectrum->OpenOutputStreams(true);}
+
+            if(!m_pTimeSeriesDataOutput->OpenFile(true)){
+                        m_NumberOfErrors++;}
+        }
+        else if (m_RestartAnalysis==true){
+
+            if(!m_pTimeSeriesDataOutput->OpenFile(false)){
+                        m_NumberOfErrors++;}
+            m_pSimulation->UpdateInitialStep(m_pTimeSeriesDataOutput->GetInitialStepRestart());
+            m_pSimulation->UpdateFinalStep(m_pReadTrajTSI->GetNumberOfFrames());
+
+            if (m_pAnalysisVariables ->GetFluctuationSpectrumActive()==true){
+                    m_pFluctuationSpectrum->OpenOutputStreams(false);}
+
+
+            
+        }
+
         
         CreateMashBluePrint Create_BluePrint;
         MeshBluePrint mesh_blueprint;

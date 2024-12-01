@@ -9,6 +9,10 @@
 #include "State.h"
 #include "Nfunction.h"
 #include "SimDef.h"
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <sstream>
 #ifdef MPI_DETECTED
 #include <mpi.h>
 #endif
@@ -106,12 +110,52 @@ bool TimeSeriesDataOutput::OpenFile(bool clearfile) {
 
     if (!clearfile) {
         // If it's a restart simulation, check if the energy file matches the restart
-        if (!CheckTimeSeriesFile(m_pState->GetSimulation()->GetInitialStep(), filename)) {
-            std::cerr << "---> error: energy file does not match with the restart: " << filename << std::endl;
+        m_TimeSeriesFile.open(filename, std::ios_base::app);
+        if (!m_TimeSeriesFile.is_open()) {
+            std::cerr << "---> error: Unable to open file in append mode: " << filename << std::endl;
             return false;
         }
-        // Append to the file without clearing it
-        m_TimeSeriesFile.open(filename, std::ios_base::app);
+
+        // Read the last line of the file
+        std::ifstream inputFile(filename);
+        if (inputFile.is_open()) {
+            std::string lastLine;
+            char ch;
+
+            // Move to the end of the file
+            inputFile.seekg(0, std::ios_base::end);
+            if (inputFile.tellg() == 0) { // Check if the file is empty
+                std::cerr << "---> warning: File is empty. No last line to read." << std::endl;
+            } else {
+                // Backtrack to find the last line
+                std::streamoff fileEnd = static_cast<std::streamoff>(inputFile.tellg());
+                for (std::streamoff pos = fileEnd - 1; pos >= 0; --pos) {
+                    inputFile.seekg(pos, std::ios_base::beg);
+                    inputFile.get(ch);
+                    if (ch == '\n' && pos != fileEnd - 1) {
+                        break; // Stop if a newline is found, and it's not the end
+                    }
+                    lastLine.insert(lastLine.begin(), ch);
+                }
+
+                // Parse the first column of the last line
+                std::istringstream lineStream(lastLine);
+                int firstColumnValue;
+                lineStream >> firstColumnValue;
+
+                if (lineStream.fail()) {
+                    std::cerr << "---> warning: Failed to parse the first column from the last line." << std::endl;
+                } else {
+                    m_pInitialStepRestart=firstColumnValue;
+                    // Use firstColumnValue if needed (e.g., for validation)
+                }
+            }
+            inputFile.close();
+        } else {
+            std::cerr << "---> error: Unable to open file for reading: " << filename << std::endl;
+            return false;
+        }
+
     } else {
         // Open the file, clearing it if necessary
         m_TimeSeriesFile.open(filename);

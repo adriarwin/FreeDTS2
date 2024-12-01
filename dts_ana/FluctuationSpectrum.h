@@ -30,7 +30,7 @@ public:
 
 public:
     void CalculateSpectrum();
-    void OpenOutputStreams();
+    void OpenOutputStreams(bool clearfile);
     void CloseOutputStreams();
 private:
     void GenerateVectorOrder();

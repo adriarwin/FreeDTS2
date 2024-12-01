@@ -32,12 +32,20 @@ FluctuationSpectrum::~FluctuationSpectrum() {
     
 }
 
-void FluctuationSpectrum::OpenOutputStreams() {
+void FluctuationSpectrum::OpenOutputStreams(bool clearfile) {
 
     std::string hqfilename=m_pState->GetAnalysisVariables()->GetFolderName() + '/' + m_pState->GetAnalysisVariables()->GetNameHQVectorFile();
     std::string qfilename=m_pState->GetAnalysisVariables()->GetFolderName() + '/' + m_pState->GetAnalysisVariables()->GetNameQVectorFile();
-    m_QVector.open(qfilename);
-    m_HQVector.open(hqfilename);
+
+    if (!clearfile) {
+        m_QVector.open(qfilename,std::ios_base::app);
+        m_HQVector.open(hqfilename,std::ios_base::app);
+        
+    }
+    else{
+        m_QVector.open(qfilename);
+        m_HQVector.open(hqfilename);
+    }
 }
 
 void FluctuationSpectrum::CloseOutputStreams() {
