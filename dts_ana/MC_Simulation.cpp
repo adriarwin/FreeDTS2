@@ -98,7 +98,7 @@ bool MC_Simulation::do_Simulation(){
     #endif
 
     CreateMashBluePrint Create_BluePrint;
-    MeshBluePrint mesh_blueprint;
+    //MeshBluePrint mesh_blueprint;
 
 
     if (m_pState->GetAnalysisVariables()->GetVisualizationActive()){
@@ -113,8 +113,8 @@ for (int step = m_Initial_Step; step < m_Final_Step; step++){
 
         /*std::ifstream input(m_pState->GetInputFile());
         ReadInclusionType(input,mesh);*/
-        
-        mesh_blueprint = Create_BluePrint.MashBluePrintFromInput_Top(m_pState->GetInputFile(),filename);
+        CreateMashBluePrint Create_BluePrint;
+        MeshBluePrint mesh_blueprint = Create_BluePrint.MashBluePrintFromInput_Top(m_pState->GetInputFile(),filename);
         m_pState->GetMesh()->GenerateMesh(mesh_blueprint);
 
         //I need one specially thought for semi-flat membranees!!! A conditional is needed here

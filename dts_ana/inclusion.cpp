@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include "inclusion.h"
 #include "vertex.h"

@@ -90,6 +90,13 @@ and false if the periodic condition is not met or if there is an error writing t
         if (m_pState->GetAnalysisVariables()->GetThicknessCalculationActive()) {
             m_TimeSeriesFile <<  m_pState->GetAnalysisCalculations()->GetThickness()<< "   " ;
         }
+
+        if (m_pState->GetAnalysisVariables()->GetInclusionCalculationActive()) {
+            m_TimeSeriesFile << m_pState->GetAnalysisCalculations()->GetInclusionNeighbour() << "   ";
+            m_TimeSeriesFile << m_pState->GetAnalysisCalculations()->GetInclusionEnergy() << "   ";
+            m_TimeSeriesFile << m_pState->GetAnalysisCalculations()->GetInclusionMeanCurvature() << "   ";
+            m_TimeSeriesFile << m_pState->GetAnalysisCalculations()->GetInclusionGaussianCurvature() << "   ";
+        }
     m_TimeSeriesFile<<std::endl;
     
     return true;
@@ -190,6 +197,10 @@ bool TimeSeriesDataOutput::OpenFile(bool clearfile) {
 
         if (m_pState->GetAnalysisVariables()->GetThicknessCalculationActive()) {
             m_TimeSeriesFile << " Thickness";
+        }
+
+        if (m_pState->GetAnalysisVariables()->GetInclusionCalculationActive()) {
+            m_TimeSeriesFile << " InclusionNeighbour InclusionEnergy InclusionMeanCurvature InclusionGaussianCurvature";
         }
 
 

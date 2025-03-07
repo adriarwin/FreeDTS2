@@ -35,6 +35,11 @@ public:
     
     double GetGaussianCurvature() {return m_pGaussianCurvature;}
 
+    double GetInclusionNeighbour() {return m_pInclusionNeighbour;}
+    double GetInclusionEnergy() {return m_pInclusionEnergy;}
+    double GetInclusionMeanCurvature() {return m_pInclusionMeanCurvature;}
+    double GetInclusionGaussianCurvature() {return m_pInclusionGaussianCurvature;}
+
     void Calculate();
 
 private:
@@ -47,6 +52,7 @@ private:
     void CalculateGaussianCurvature();*/
     void InitializeMemberVariables();
     double CalculateSingleTriangleVolume(triangle *pTriangle);
+    void CalculateInclusion();
 
 
 private:
@@ -58,6 +64,10 @@ private:
     double m_pThickness;
     double m_pMeanCurvature;
     double m_pVolume;
+    double m_pInclusionNeighbour;
+    double m_pInclusionEnergy;
+    double m_pInclusionMeanCurvature;
+    double m_pInclusionGaussianCurvature;
     State *m_pState;
     
 };

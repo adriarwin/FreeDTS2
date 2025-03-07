@@ -301,6 +301,12 @@ bool State::ReadAnalysisInputFile(std::string file)
             m_pAnalysisVariables->SetFolderName(type);
             getline(input,rest);
         }
+        else if(firstword == AnalysisVariables::GetInclusionName()){
+            input>>str>>type;
+            if(type =="on"){
+                m_pAnalysisVariables->SetInclusionCalculationActive();}
+            getline(input,rest);
+        }
 
         else if(firstword == AnalysisVariables::GetAreaName()){
             input>>str>>type;
@@ -1110,6 +1116,20 @@ bool State::Initialize(){
             m_pReadTrajTSI->ValidateFiles();
             m_pAnalysisVariables->OpenFolder();
             m_pVisualizationFile->OpenFolder();
+            CreateMashBluePrint Create_BluePrint;
+            MeshBluePrint mesh_blueprint;
+            std::vector<std::string> FramePath=m_pReadTrajTSI->GetFilePaths();
+            std::string filename=FramePath[0];
+            mesh_blueprint = Create_BluePrint.MashBluePrintFromInput_Top(m_InputFileName, filename);
+            m_RandomNumberGenerator->Initialize();
+            // Generate mesh from the mesh blueprint
+            m_Mesh.GenerateMesh(mesh_blueprint);
+            int no_incs=mesh_blueprint.binclusion.size();
+            std::cout<<"Inclusion number: "<< no_incs<<std::endl;
+            if (no_incs==0){
+                m_pAnalysisVariables->SetInclusionCalculationOff();
+            }
+
         #endif
 
         #ifdef MPI_DETECTED
@@ -1157,30 +1177,8 @@ bool State::Initialize(){
         }
 
         
-        CreateMashBluePrint Create_BluePrint;
-        MeshBluePrint mesh_blueprint;
+
         
-        //std::vector<std::string> FilePaths=m_pReadTrajTSI->getFilePaths();
-        //std::vector<int> FrameList=m_pReadTrajTSI->getFrameList();
-
-        //for (const auto& elem : FrameList) {
-        //    std::cout << elem << std::endl;
-        //}
-        //std::cout << std::endl;
-
-        //for (const auto& elem : FilePaths) {
-        //    std::cout << elem << std::endl;
-        //}
-        //std::cout << std::endl;
-
-
-        std::vector<std::string> FramePath=m_pReadTrajTSI->GetFilePaths();
-        std::string filename=FramePath[0];
-
-        mesh_blueprint = Create_BluePrint.MashBluePrintFromInput_Top(m_InputFileName, filename);
-        m_RandomNumberGenerator->Initialize();
-        // Generate mesh from the mesh blueprint
-        m_Mesh.GenerateMesh(mesh_blueprint);
         m_pVoxelization->SetBox(m_pMesh->GetBox());
 
         // Update group from index file
@@ -1218,22 +1216,7 @@ bool State::Initialize(){
 
     m_pVisualizationFile->WriteAFrame(-m_pVisualizationFile->GetPeriod());
     
-//--- now that the system is ready for simulation, we first write the State into the log file and make one vis 
-    /*#ifndef MPI_DETECTED
-    m_pTimeSeriesLogInformation->WriteStartingState();
 
-    m_pVisualizationFile->WriteAFrame(-m_pVisualizationFile->GetPeriod());
-    #endif
-    #if MPI_DETECTED
-    int rank;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    if (rank == 0) {
-        m_pTimeSeriesLogInformation->WriteStartingState();
-        m_pVisualizationFile->WriteAFrame(-m_pVisualizationFile->GetPeriod());
-    }
-    #endif*/
-//----> energy class
-//---> to get interaction energies
     m_pEnergyCalculator->Initialize(m_InputFileName);
 //---> to update each vertex and edge energy. Up to now May 2024, edge energy is not zero when both vertices has inclusions
     m_pEnergyCalculator->UpdateTotalEnergy(m_pEnergyCalculator->CalculateAllLocalEnergy());

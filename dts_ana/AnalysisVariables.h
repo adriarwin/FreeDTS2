@@ -25,6 +25,8 @@ public:
     bool GetFluctuationSpectrumActive() {return m_pFluctuationSpectrumActive;}
     std::string GetNameQVectorFile()    {return m_NameQVectorFile;}
     std::string GetNameHQVectorFile()    {return m_NameHQVectorFile;}
+    std::string GetNameHPQVectorFile()    {return m_NameHPQVectorFile;}
+    std::string GetNamePQVectorFile()    {return m_NamePQVectorFile;}
 
 
     inline static std::string GetAreaName() {return "Area";}
@@ -56,6 +58,11 @@ public:
     void SetThicknessCalculationActive() {m_pThicknessCalculationActive=true;}
     bool GetThicknessCalculationActive() {return m_pThicknessCalculationActive;}
 
+    inline static std::string GetInclusionName() {return "Inclusion";}
+    void SetInclusionCalculationActive() {m_pInclusionCalculationActive=true;}
+    void SetInclusionCalculationOff() {m_pInclusionCalculationActive=false;}
+    bool GetInclusionCalculationActive() {return m_pInclusionCalculationActive;}
+
 
     inline static std::string GetVisualizationName() {return "Visualization";}
     void SetVisualizationActive() {m_pVisualizationActive=true;}
@@ -75,15 +82,16 @@ private:
     bool m_pGaussianCurvatureCalculationActive=false;
     bool m_pThicknessCalculationActive=false;
     bool m_pVisualizationActive=false;
+    bool m_pInclusionCalculationActive=false;
 
     std::string m_pTopology;
 
     std::string m_pFolderName;
     std::string m_NameQVectorFile="qvector.ana";
     std::string m_NameHQVectorFile="hqvector.ana";
+    std::string m_NameHPQVectorFile="hpqvector.ana";
+    std::string m_NamePQVectorFile="pqvector.ana";
     std::string m_NameGeneralAnalysisFile="dts.ana";
-    
-    
 };
 
 #endif // READTRAJTSIFILES_H

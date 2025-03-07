@@ -35,7 +35,8 @@ public:
 private:
     void GenerateVectorOrder();
     void GenerateZeroAndNonZeroVectorOrder();
-    double FourierTransform(std::vector<std::vector<double>> qvector);
+    double FourierTransformNoInclusion(std::vector<std::vector<double>> qvector);
+    std::vector<double> FourierTransformInclusion(std::vector<std::vector<double>> qvector);
     void AverageHeight();
 
     
@@ -48,7 +49,9 @@ private:
     int m_SpectrumSize;
     std::vector<std::vector<std::vector<int>>> m_MatrixOrder;
     double m_AverageHeight;
-    std::ofstream m_QVector,m_HQVector;
+    double m_AverageInclusionDensity;
+    std::ofstream m_QVector,m_HQVector,m_HPQVector,m_PQVector;
+    
     
 
 
