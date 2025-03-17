@@ -138,6 +138,9 @@ for (int step = m_Initial_Step; step < m_Final_Step; step++){
         if (m_pState->GetAnalysisVariables()->GetFluctuationSpectrumActive()==true){
             m_pState->GetFluctationSpectrum()->CalculateSpectrum();
             }
+
+        if (m_pState->GetAnalysisVariables()->GetInclusionClusterCalculationActive()==true){    
+            m_pState->GetInclusionCluster()->CalculateClusterDistribution();}
         
         m_pState->GetTimeSeriesDataOutput()->WriteTimeSeriesDataOutput(step);
 

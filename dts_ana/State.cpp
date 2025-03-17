@@ -277,6 +277,15 @@ bool State::ReadAnalysisInputFile(std::string file)
             m_pAnalysisVariables->SetFluctationSpectrumActive();
             getline(input,rest);
         }
+        else if(firstword == AnalysisVariables::GetInclusionClusterName()) { // "Integrator_Type"
+            
+            input >> str >> type;
+            if(type =="on"){
+                m_pInclusionCluster = new InclusionCluster(this);    
+            }
+            m_pAnalysisVariables->SetInclusionClusterCalculationActive();
+            getline(input,rest);
+        }
         else if(firstword == AnalysisVariables::GetVisualizationName()) { // "Integrator_Type"
             int period;
             std::string foldername;
@@ -1115,7 +1124,10 @@ bool State::Initialize(){
             m_pReadTrajTSI=new ReadTrajTSI(m_pNonbinaryTrajectory->GetFolderName(),m_GeneralOutputFilename);
             m_pReadTrajTSI->ValidateFiles();
             m_pAnalysisVariables->OpenFolder();
-            m_pVisualizationFile->OpenFolder();
+            if (m_pAnalysisVariables ->GetVisualizationActive()==true){
+                m_pVisualizationFile->OpenFolder();
+            }
+
             CreateMashBluePrint Create_BluePrint;
             MeshBluePrint mesh_blueprint;
             std::vector<std::string> FramePath=m_pReadTrajTSI->GetFilePaths();
@@ -1159,6 +1171,9 @@ bool State::Initialize(){
             if (m_pAnalysisVariables ->GetFluctuationSpectrumActive()==true){
                     m_pFluctuationSpectrum->OpenOutputStreams(true);}
 
+            if (m_pAnalysisVariables ->GetInclusionClusterCalculationActive()==true){
+                        m_pInclusionCluster->OpenOutputStreams(true);}
+
             if(!m_pTimeSeriesDataOutput->OpenFile(true)){
                         m_NumberOfErrors++;}
         }
@@ -1171,6 +1186,9 @@ bool State::Initialize(){
 
             if (m_pAnalysisVariables ->GetFluctuationSpectrumActive()==true){
                     m_pFluctuationSpectrum->OpenOutputStreams(false);}
+            
+            if (m_pAnalysisVariables ->GetInclusionClusterCalculationActive()==true){
+                        m_pInclusionCluster->OpenOutputStreams(false);}
 
 
             
@@ -1214,7 +1232,9 @@ bool State::Initialize(){
     m_pApplyConstraintBetweenGroups->Initialize();
     m_pSimulation->Initialize();
 
-    m_pVisualizationFile->WriteAFrame(-m_pVisualizationFile->GetPeriod());
+    if (m_pAnalysisVariables ->GetVisualizationActive()==true){
+        m_pVisualizationFile->WriteAFrame(-m_pVisualizationFile->GetPeriod());
+    }
     
 
     m_pEnergyCalculator->Initialize(m_InputFileName);

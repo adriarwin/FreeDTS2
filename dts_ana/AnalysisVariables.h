@@ -63,6 +63,11 @@ public:
     void SetInclusionCalculationOff() {m_pInclusionCalculationActive=false;}
     bool GetInclusionCalculationActive() {return m_pInclusionCalculationActive;}
 
+    inline static std::string GetInclusionClusterName() {return "InclusionCluster";}
+    void SetInclusionClusterCalculationActive() {m_pInclusionClusterCalculationActive=true;}
+    bool GetInclusionClusterCalculationActive() {return m_pInclusionClusterCalculationActive;}
+    std::string GetNameInclusionClusterFile() {return m_NameInclusionClusterFile;}
+
 
     inline static std::string GetVisualizationName() {return "Visualization";}
     void SetVisualizationActive() {m_pVisualizationActive=true;}
@@ -83,6 +88,7 @@ private:
     bool m_pThicknessCalculationActive=false;
     bool m_pVisualizationActive=false;
     bool m_pInclusionCalculationActive=false;
+    bool m_pInclusionClusterCalculationActive=false;
 
     std::string m_pTopology;
 
@@ -92,6 +98,7 @@ private:
     std::string m_NameHPQVectorFile="hpqvector.ana";
     std::string m_NamePQVectorFile="pqvector.ana";
     std::string m_NameGeneralAnalysisFile="dts.ana";
+    std::string m_NameInclusionClusterFile="inclusioncluster.ana";
 };
 
 #endif // READTRAJTSIFILES_H

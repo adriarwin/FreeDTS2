@@ -137,6 +137,8 @@
 #include "ReadTrajTSI.h"
 //--- Fluctuation spectrum
 #include "FluctuationSpectrum.h"
+#include "InclusionCluster.h"
+//--- Cluster Analysis
 #include "AnalysisVariables.h"
 #include "AnalysisCalculations.h"
 
@@ -208,6 +210,7 @@ inline AbstractBoundary                 *GetBoundary()                          
 //---- System energy and voxels
 inline MESH                     *GetMesh()                                      {return m_pMesh;}  //
 inline FluctuationSpectrum      *GetFluctationSpectrum()                        {return m_pFluctuationSpectrum;}
+inline InclusionCluster      *GetInclusionCluster()                        {return m_pInclusionCluster;}
 inline void                     SetMesh(MESH newMesh)                          { (*m_pMesh) = (newMesh); }
 inline Voxelization<vertex>     *GetVoxelization()                              {return m_pVoxelization;}
 inline AbstractSimulation           *GetSimulation()                                {return m_pSimulation;};
@@ -239,6 +242,7 @@ private:
     AnalysisVariables *m_pAnalysisVariables;
     ReadTrajTSI *m_pReadTrajTSI;
     FluctuationSpectrum *m_pFluctuationSpectrum;
+    InclusionCluster *m_pInclusionCluster;
     AnalysisCalculations *m_pAnalysisCalculations;
 
     AbstractApplyConstraintBetweenGroups *m_pApplyConstraintBetweenGroups;
